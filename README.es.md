@@ -16,6 +16,26 @@ red, ni archivar tal cual quedó el día que se decidió algo.
 
 `docuweb` es un fichero. Se edita como una wiki y se archiva como un PDF.
 
+## Lo que ganas
+
+| En vez de | Con docuweb |
+|---|---|
+| Un `.docx` con capturas pegadas del diagrama | El diagrama son datos: mueves una caja y la flecha se recoloca sola |
+| Abrir Word, Writer o Docs, con su licencia o su cuenta | Doble clic en un fichero de 150 KB, en cualquier navegador, sin instalar ni registrarte |
+| Quedarte sin documento en cuanto no hay red: Docs, Confluence, la wiki | Vive en tu disco. Se abre en un avión, en una sala sin wifi o con la VPN caída |
+| Una página de wiki que no se puede mandar | Se manda por correo y llega entero: nada de enlaces rotos ni de «pide acceso» |
+| Exportar el diagrama a PNG cada vez que cambia | No hay exportación: el dibujo vive dentro del documento y sale a SVG cuando lo necesitas |
+| Un PDF de archivo, que ya no se toca | Se archiva igual, pero cada versión lleva dentro número, fecha, autor y nota de cambio |
+| «¿Quién tiene la última versión?» | El propio fichero: `-v7` en el nombre y el historial completo dentro |
+| Redactarlo entero a mano | Le pasas el repositorio a un asistente con AGENTS.md y te lo rellena |
+
+Sin servidor, sin base de datos, sin cuenta y sin proveedor al que pagar. No manda nada a
+ningún sitio: la única petición que sale es la tipografía de Google, y sin conexión usa la
+del sistema. Licencia MIT: te lo llevas y lo cambias.
+
+**Si te ahorra una tarde de pelear con un documento, dale una estrella al repositorio.** Es
+lo que hace que lo encuentre la siguiente persona con el mismo problema.
+
 ## Qué hace
 
 - **Diagramas editables.** Las cajas y las flechas son datos, no una imagen. Se arrastran,
@@ -158,3 +178,7 @@ El motor no tiene todavía cadenas en inglés; traducirlo es tocar los literales
 
 Puedes usarlo, modificarlo y distribuirlo, también en proyectos comerciales. Solo se pide
 conservar el aviso de copyright y la licencia.
+
+---
+
+⭐ Si te ha servido, una estrella ayuda a que llegue a quien le haga falta.

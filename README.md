@@ -16,6 +16,26 @@ archive exactly as they stood the day something was decided.
 
 `docuweb` is a file. You edit it like a wiki and archive it like a PDF.
 
+## What you get
+
+| Instead of | With docuweb |
+|---|---|
+| A `.docx` with screenshots of the diagram pasted in | The diagram is data: move a box and the arrow re-routes itself |
+| Opening Word, Writer or Docs, with its licence or account | Double-click a 150 KB file, in any browser, with nothing to install and no sign-up |
+| Losing the document the moment there is no network: Docs, Confluence, the wiki | It lives on your disk. It opens on a plane, in a room with no wifi, or with the VPN down |
+| A wiki page you cannot send | Email it and it arrives whole: no broken links, no "request access" |
+| Exporting the diagram to PNG every time it changes | No export step: the drawing lives inside the document, and goes out as SVG when you need it |
+| An archived PDF nobody touches again | Archive it the same way, except every version carries its number, date, author and change note inside |
+| "Who has the latest version?" | The file itself: `-v7` in the name and the full history inside |
+| Writing the whole thing by hand | Hand the repository to an assistant with AGENTS.md and it fills it in |
+
+No server, no database, no account, no vendor to pay. It sends nothing anywhere: the only
+request that leaves is the Google font, and without a connection it uses the system one.
+MIT licensed: take it and change it.
+
+**If it saves you an afternoon of fighting a document, star the repository.** That is what
+makes the next person with the same problem find it.
+
 ## What it does
 
 - **Editable diagrams.** Boxes and arrows are data, not an image. Drag, resize, connect and
@@ -157,3 +177,7 @@ user-facing English strings yet; translating it means touching the literals in
 
 Use it, modify it and distribute it, commercial projects included. All that is asked is that
 you keep the copyright notice and the licence.
+
+---
+
+⭐ If it was useful, a star helps it reach whoever needs it.
