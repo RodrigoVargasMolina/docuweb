@@ -36,25 +36,54 @@ archive exactly as they stood the day something was decided.
 
 ## Getting started
 
-**As a person:** open [`index.html`](index.html), choose *Plantillas* and select a document type. Open the downloaded HTML and use *Editar texto* or *Editar diagramas*. You can also start from [`template.html`](template.html).
+The document **is** the `.html` file. What you download is what you edit, email and archive:
+it carries the engine, the content, the diagrams and the history inside it. Once it is on
+your disk it needs nothing from this repository.
+
+| File | What it is |
+|---|---|
+| [`index.html`](index.html) | A complete, clickable example document. Works as a starting point too. |
+| [`template.html`](template.html) | An empty document: the bare structure. |
+| [`templates/`](templates/) | Five documents already written, one per purpose. |
+| `src/`, `tests/`, `docs/` | Sources and checks. Not needed to use a document. |
+
+1. **Take one with you.** From GitHub, use *Download raw file*: a plain click shows the
+   source, not the document. Or open any docuweb document, press **Plantillas** and pick a
+   type: it downloads as `propuesta-tecnica.html`, separate and with an empty history. Every
+   document carries the catalogue, so any one of them yields the rest.
+2. **Open it by double-click.** No server, nothing to install. Chrome or Edge if you want
+   versions to land in the document's own folder instead of Downloads.
+3. **Fill it in** with *Editar texto* and *Editar diagramas*, or hand it to an assistant
+   together with [AGENTS.md](AGENTS.md).
+4. **Save a version.** Out comes `propuesta-tecnica-v2.html`, with the number, date, author
+   and change note written inside. **That new file is the one you pass on**; the previous one
+   stays untouched, which is what makes it archivable.
+
+Rename it to whatever it is about — `payments-migration.html` — and versions follow the new
+name. The number does not come from the name: it comes from inside the file.
 
 **As someone directing an assistant:** hand it the repository and this sentence:
 
 > Read AGENTS.md and fill in template.html with this project's content.
 
-**To see before deciding:** open [`index.html`](index.html), a complete, clickable example
-about moving writes out of a monolith.
+**To see before deciding:** open [`index.html`](index.html), a complete example about moving
+writes out of a monolith. It is a document like any other: you can edit it and save your own
+version.
 
 ## Templates and presentation
 
-Five standalone templates are included: [technical proposal](templates/propuesta-tecnica.html),
-[executive report](templates/informe-ejecutivo.html), [project plan](templates/plan-proyecto.html),
-[alternatives comparison](templates/comparacion-alternativas.html) and
-[decision record](templates/registro-decision.html). Their content and interface are in Spanish.
+Five ready-made documents are included. Their content and interface are in Spanish.
+
+| Template | What it is for |
+|---|---|
+| [Technical proposal](templates/propuesta-tecnica.html) | Problem, alternatives, architecture and validation |
+| [Executive report](templates/informe-ejecutivo.html) | Findings, indicators and next steps |
+| [Project plan](templates/plan-proyecto.html) | Scope, milestones, owners and risks |
+| [Alternatives comparison](templates/comparacion-alternativas.html) | Criteria and evidence for choosing |
+| [Decision record](templates/registro-decision.html) | Context, resolution and consequences |
 
 **Estilo** switches between Technical, Editorial and Executive presentation without changing
-the content. **Tema** selects light, dark or system appearance. **Plantillas** downloads a
-separate document with a fresh history.
+the content. **Tema** selects light, dark or system appearance.
 
 **Editar texto** edits headings, paragraphs, table cells and captions. Controls at the bottom
 add sections, callouts, tables, diagrams and decisions, with undo and redo. Text and appearance
@@ -106,19 +135,21 @@ language-neutral.
 
 ## Compatibility
 
-Targets recent Chrome, Edge, Firefox and Safari. Automated checks run in Chromium;
-Firefox and Safari still require manual verification. On Mac the multi-select modifier is Cmd, because Ctrl+click is the right-click; the
-document detects this on its own.
+Targets recent Chrome, Edge, Firefox and Safari. Automated checks run in Chromium; Firefox
+and Safari still require manual verification. On Mac the multi-select modifier is Cmd,
+because Ctrl+click is the right-click; the document detects this on its own.
 
 ## Interface language
 
 The document chrome — toolbar, dialogs, help — is in Spanish. The engine carries no
-user-facing English strings yet; translating it means touching the literals in `src/motor.html` and `src/studio.js`.
-See [TODO.md](TODO.md).
+user-facing English strings yet; translating it means touching the literals in
+`src/motor.html` and `src/studio.js`. See [TODO.md](TODO.md).
 
 ## Development
 
-Build with `python src/build.py`. See [source and test documentation](docs/development.md) (Spanish).
+`index.html`, `template.html` and `templates/*.html` are generated: build them with
+`python src/build.py` after changing anything in `src/`. See
+[source and test documentation](docs/development.md) (Spanish).
 
 ## License
 

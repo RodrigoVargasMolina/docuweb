@@ -12,12 +12,14 @@ opcionales. No hay nada roto ni a medias.
 
 Ficheros:
 
-- `index.html` y `template.html` son **generados**. No los edites a mano: se pierden en la
-  siguiente compilación.
+- `index.html`, `template.html` y `templates/*.html` son **generados**. No los edites a
+  mano: se pierden en la siguiente compilación.
 - Se generan con `python src/build.py`, ejecutado **desde la raíz del repositorio**.
-- Las fuentes son `src/motor.html` (motor base), `src/studio.js` y `src/studio.css` (edición y presentación), `src/templates.json` (catálogo), `src/demo-cuerpo.html` (el cuerpo de la
-  demo) y `src/demo-datos.json` (sus diagramas). El cuerpo y los datos de la plantilla vacía
-  están dentro de `src/build.py`.
+- Las fuentes son `src/motor.html` (motor base), `src/studio.js` y `src/studio.css`
+  (edición y presentación), `src/drawing.js` (apariencia de cajas y flechas),
+  `src/templates.json` (catálogo), `src/demo-cuerpo.html` (el cuerpo de la demo) y
+  `src/demo-datos.json` (sus diagramas). El cuerpo y los datos de la plantilla vacía están
+  dentro de `src/build.py`.
 - Todo cambio en el motor se hace en `src/motor.html` y se recompila.
 
 ## Verificación
@@ -44,14 +46,14 @@ Si algo falla, el motor es `src/motor.html`; recompilar con `python src/build.py
   El esquema del JSON y los nombres de campo ya son neutros; lo que hay que traducir es la
   prosa.
 - **Idioma del interfaz.** Barra de herramientas, diálogos y ayuda están en castellano,
-  como literales dentro de `src/motor.html` y `src/studio.js`. Internacionalizarlo bien significa extraer esos
-  literales a un objeto de cadenas y elegir idioma por `navigator.language` o por un atributo
-  del documento. Es un trabajo acotado pero real, y conviene decidir si merece la pena antes
-  de hacerlo.
-- **Deriva del motor.** Si alguien edita `index.html` a mano, el motor de esa copia deja de
-  coincidir con `src/motor.html` y la siguiente compilación lo pisa. Una comprobación en
-  integración continua que recompile y falle si hay diferencias lo evitaría. Hoy solo lo
-  protege la advertencia de este fichero.
+  como literales dentro de `src/motor.html` y `src/studio.js`. Internacionalizarlo bien
+  significa extraer esos literales a un objeto de cadenas y elegir idioma por
+  `navigator.language` o por un atributo del documento. Es un trabajo acotado pero real, y
+  conviene decidir si merece la pena antes de hacerlo.
+- **Deriva del motor.** Si alguien edita a mano una salida —`index.html`, `template.html` o
+  una de `templates/`—, su motor deja de coincidir con `src/motor.html` y la siguiente
+  compilación lo pisa. Una comprobación en integración continua que recompile y falle si hay
+  diferencias lo evitaría. Hoy solo lo protege la advertencia de este fichero.
 
 ## Mejoras que se plantearon y no se hicieron
 
@@ -80,7 +82,8 @@ cuerpo debe ser siempre el marcador neutro que lleva ahora.
 
 Antes de publicar, y antes de añadir cualquier documento de ejemplo nuevo, pasar una búsqueda
 sin distinguir mayúsculas por los nombres propios del origen —empresa, productos, sistemas,
-repositorios, clientes— sobre `index.html`, `template.html` y `src/`. No debe devolver nada.
+repositorios, clientes— sobre `index.html`, `template.html`, `templates/` y `src/`. No debe
+devolver nada.
 
 ## Mejoras implementadas
 

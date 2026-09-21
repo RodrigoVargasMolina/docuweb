@@ -36,16 +36,39 @@ red, ni archivar tal cual quedó el día que se decidió algo.
 
 ## Empezar
 
-**Como persona:** abre [`index.html`](index.html), pulsa *Plantillas* y elige el tipo de documento.
-Abre el HTML descargado y usa *Editar texto* o *Editar diagramas*. También puedes empezar
-con [`template.html`](template.html).
+El documento **es** el fichero `.html`. Lo que descargas es lo que se edita, se manda por
+correo y se archiva: lleva dentro el motor, el contenido, los diagramas y el historial. Una
+vez está en tu disco no necesita este repositorio para nada.
+
+| Fichero | Qué es |
+|---|---|
+| [`index.html`](index.html) | Documento de ejemplo, completo y tocable. Vale también como punto de partida. |
+| [`template.html`](template.html) | Documento vacío, solo la estructura mínima. |
+| [`templates/`](templates/) | Cinco documentos ya redactados por propósito. |
+| `src/`, `tests/`, `docs/` | Fuentes y comprobaciones. No hacen falta para usar un documento. |
+
+1. **Llévate uno.** Desde GitHub, *Download raw file*: el clic normal enseña el código, no el
+   documento. O abre cualquier documento docuweb, pulsa **Plantillas** y elige el tipo: se
+   descarga como `propuesta-tecnica.html`, aparte y con el historial en blanco. Todos llevan
+   el catálogo dentro, así que de uno cualquiera salen los demás.
+2. **Ábrelo con doble clic.** Sin servidor y sin instalar nada. Chrome o Edge si quieres que
+   las versiones caigan en la carpeta del documento en vez de en Descargas.
+3. **Rellénalo** con *Editar texto* y *Editar diagramas*, o dáselo a un asistente junto con
+   [AGENTS.md](AGENTS.md).
+4. **Graba una versión.** Sale `propuesta-tecnica-v2.html`, con el número, la fecha, el autor
+   y la nota de cambio escritos dentro. **Ese fichero nuevo es el que pasas**; el anterior
+   queda intacto, que es lo que lo hace archivable.
+
+Renómbralo a lo que trate —`migracion-pagos.html`— y las versiones siguen el nombre nuevo.
+El número no sale del nombre: sale de dentro del fichero.
 
 **Como quien dirige a un asistente:** dale el repositorio y esta frase:
 
 > Lee AGENTS.md y rellena template.html con el contenido de este proyecto.
 
 **Ver antes de decidir:** abre [`index.html`](index.html), un documento de ejemplo completo
-y tocable sobre sacar las escrituras de un monolito.
+sobre sacar las escrituras de un monolito. Es un documento como cualquier otro: puedes
+editarlo y grabar tu propia versión.
 
 ## Plantillas y presentación
 
@@ -58,8 +81,7 @@ y tocable sobre sacar las escrituras de un monolito.
 | [Registro de decisión](templates/registro-decision.html) | Contexto, resolución y consecuencias |
 
 El selector **Estilo** cambia entre Técnico, Editorial y Ejecutivo conservando el contenido.
-**Tema** permite elegir claro, oscuro o seguir el sistema. Cada plantilla se descarga como
-un documento independiente, con su propio historial.
+**Tema** permite elegir claro, oscuro o seguir el sistema.
 
 **Editar texto** permite escribir en títulos, párrafos, celdas y pies de figura. Al final
 del documento puedes añadir secciones, avisos, tablas, diagramas y decisiones, y deshacer
@@ -126,7 +148,9 @@ El motor no tiene todavía cadenas en inglés; traducirlo es tocar los literales
 
 ## Desarrollo
 
-Compila con `python src/build.py`. Consulta [las fuentes y las pruebas](docs/development.md).
+`index.html`, `template.html` y `templates/*.html` son generados: recompílalos con
+`python src/build.py` después de tocar cualquier cosa de `src/`. Consulta
+[las fuentes y las pruebas](docs/development.md).
 
 ## Licencia
 
