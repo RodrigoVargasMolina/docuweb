@@ -36,9 +36,12 @@ module.exports = async function({run,open,click,change,screenshot,cdp}) {
   const sitio=()=>run(`(function(){const r=document.getElementById('btn-chrome').getBoundingClientRect();return {arriba:Math.round(r.top),ancho:Math.round(r.width)}})()`);
   const conBarra=await sitio();
   const altoConBarra=await run(`Math.round(document.querySelector('.appbar').getBoundingClientRect().height)`);
+  // el pliegue dura 240ms y acaba apagando la barra con `visibility`, que
+  // `checkVisibility()` solo mira si se le pide
+  const plegada=()=>run(`new Promise(r=>setTimeout(()=>r(document.getElementById('btn-save').checkVisibility({visibilityProperty:true})),320))`);
   await click('btn-chrome');
   assert.equal(await run(`document.body.classList.contains('chrome-hidden')`),true);
-  assert.equal(await visible('btn-save'),false,'the toolbar is gone');
+  assert.equal(await plegada(),false,'the toolbar is gone');
   assert.equal(await visible('btn-chrome'),true,'but the way back is not');
   assert.ok(await run(`Math.round(document.querySelector('.appbar').getBoundingClientRect().height)`)<altoConBarra/2,
     'and the document gets the space back');
@@ -56,7 +59,7 @@ module.exports = async function({run,open,click,change,screenshot,cdp}) {
   assert.equal(await run(`document.getElementById('btn-chrome').getAttribute('aria-label')`),'Mostrar la barra');
   await screenshot('cabecera-oculta');
   await click('btn-chrome');
-  assert.equal(await visible('btn-save'),true,'and it comes back');
+  assert.equal(await plegada(),true,'and it comes back');
   assert.equal(await run(`document.getElementById('btn-chrome').getAttribute('aria-label')`),'Ocultar la barra');
   await change('theme-select','light');
   assert.equal(await run(`document.getElementById('status').textContent`),'Sin guardar');

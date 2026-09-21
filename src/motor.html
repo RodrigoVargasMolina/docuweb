@@ -362,8 +362,9 @@
 <body>
 
 <div class="appbar">
+  <button type="button" class="btn btn--sm" id="btn-chrome" aria-controls="appbar-stack" aria-expanded="true" aria-label="Ocultar la barra" title="Ocultar la barra">▴</button>
   <div class="appbar-inner" id="appbar-inner">
-    <button type="button" class="btn btn--sm" id="btn-chrome" aria-controls="appbar-inner" aria-expanded="true" aria-label="Ocultar la barra" title="Ocultar la barra">▴</button>
+    <div class="appbar-stack" id="appbar-stack">
     <div class="appbar-heading">
     <button type="button" class="btn mobile-control" id="btn-menu" data-panel="preferences" aria-controls="preferences" aria-expanded="false" data-i18n-aria-label="appbar.preferences" aria-label="Preferencias">☰</button>
     <div class="document-identity"><span class="product-name">docuweb · </span><span class="brandmark">docuweb</span></div>
@@ -387,6 +388,7 @@
     <div class="appbar-preferences" id="preferences">
     <div class="document-controls"><label><span data-i18n="appbar.style">Estilo</span> <select id="design-select"><option value="technical" data-i18n="style.technical">Técnico</option><option value="editorial" data-i18n="style.editorial">Editorial</option><option value="executive" data-i18n="style.executive">Ejecutivo</option></select></label><label><span data-i18n="appbar.theme">Tema</span> <select id="theme-select"><option value="auto" data-i18n="theme.auto">Sistema</option><option value="light" data-i18n="theme.light">Claro</option><option value="dark" data-i18n="theme.dark">Oscuro</option></select></label><label><span data-i18n="appbar.lang">Idioma</span> <select id="lang-select"><option value="es">Español</option><option value="en">English</option></select></label></div>
     <button type="button" class="btn btn--ghost btn--sm" id="btn-reset" data-i18n-title="appbar.reset.title" title="Vuelve al contenido y los ajustes guardados en este fichero" data-i18n="appbar.reset">Restablecer documento</button>
+    </div>
     </div>
   </div>
 </div>
