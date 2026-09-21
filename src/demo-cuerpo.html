@@ -1,0 +1,150 @@
+  <header>
+    <p class="kicker">Plataforma de datos · propuesta</p>
+    <h1>Sacar las escrituras del monolito</h1>
+    <p class="lede">
+      El monolito atiende peticiones de clientes, genera informes y ejecuta tareas nocturnas con
+      el mismo proceso y la misma base de datos. <strong>Un cierre de mes degrada las lecturas de
+      todo el mundo.</strong> Esta propuesta separa las escrituras tras una cola y deja el camino
+      de lectura libre.
+    </p>
+    <div class="meta">
+      <span class="pill is-draft">Borrador para validación</span>
+      <span class="pill">Documento de ejemplo</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>El problema de hoy</h2>
+    <p>
+      Todo comparte proceso: la API que responde a clientes, la generación de informes y las tareas
+      programadas. No se puede escalar una sin escalar las demás, y una tarea pesada compite por la
+      misma conexión a base de datos que una petición de usuario.
+    </p>
+    <figure data-fig="f1">
+      <div class="figtools" data-tools="f1"></div>
+      <div class="canvas canvas--mid"><svg data-svg="f1" role="img" aria-label="El monolito contiene la API pública, los informes y las tareas programadas, y los tres compiten por la misma base de datos."></svg></div>
+      <figcaption>
+        <b>Tres cargas, un solo proceso.</b> La tarea nocturna y la petición de un cliente compiten
+        por el mismo grupo de conexiones. Subir réplicas para absorber el cierre de mes multiplica
+        también los informes, que es lo que no hace falta.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Arquitectura propuesta</h2>
+    <p>
+      El servicio de entrada decide por operación: lo que escribe va a una cola y se aplica de forma
+      diferida; lo que solo lee pasa de largo hacia el servicio de datos. El planificador sale a su
+      propia pieza y deja de vivir dentro de lo que sirve peticiones.
+    </p>
+    <figure data-fig="f2">
+      <div class="figtools" data-tools="f2"></div>
+      <div class="canvas canvas--wide"><svg data-svg="f2" role="img" aria-label="Los clientes entran por una pasarela al servicio de entrada, que encola las escrituras y reenvía las lecturas al servicio de datos; el planificador entra por red interna."></svg></div>
+      <div class="legend">
+        <span><i class="swatch sw-new"></i>pieza o camino nuevo</span>
+        <span><i class="swatch sw-out"></i>fuera del ámbito</span>
+        <span><i class="swatch sw-dead"></i>se elimina</span>
+      </div>
+      <figcaption>
+        <b>La cola absorbe el pico, la lectura no se entera.</b> Una escritura devuelve un
+        identificador en cuanto entra en la cola; el consumidor la aplica a su ritmo. El camino de
+        lectura nunca espera detrás de una escritura pesada.
+      </figcaption>
+    </figure>
+
+    <div class="notes">
+      <div class="note">
+        <h3>Solo dos operaciones son asíncronas</h3>
+        <p>
+          Crear y actualizar pasan por la cola. Buscar, descargar y listar siguen siendo síncronas y
+          el servicio de entrada se limita a reenviarlas.
+        </p>
+        <p class="src">sustituye esto por lo que diga tu código</p>
+      </div>
+      <div class="note">
+        <h3>La caché es el trabajo caro</h3>
+        <p>
+          No está en el servicio de entrada sino en el de datos, que escribe y luego relee para
+          resolver referencias. Retirarla obliga a rehacer esa parte.
+        </p>
+        <p class="src">sustituye esto por lo que diga tu código</p>
+      </div>
+      <div class="note">
+        <h3>Separar primero, limpiar después</h3>
+        <p>
+          Una entrega mueve la pieza tal cual está y otra retira la caché. Juntarlas mezcla un
+          cambio verificable con el único que puede alterar resultados.
+        </p>
+        <p class="src">secuencia propuesta</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Qué se retira</h2>
+    <p>
+      Los clientes dejan de hablar con el monolito y pasan por la pasarela. Cuando el último consumidor
+      de informes migre, el monolito, su cron interno y el generador de informes dejan de tener razón
+      de ser: nadie los llama.
+    </p>
+    <figure data-fig="f3">
+      <div class="figtools" data-tools="f3"></div>
+      <div class="canvas canvas--mid"><svg data-svg="f3" role="img" aria-label="Los clientes pasan a llamar al servicio nuevo por la pasarela; el monolito, el cron interno y los informes se apagan."></svg></div>
+      <figcaption>
+        <b>Un cambio de destino, cero cambios funcionales.</b> El contrato que ven los clientes no
+        cambia; cambia a quién llaman. El monolito se apaga sin tocar ninguna aplicación cliente.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Quién entra y con qué credencial</h2>
+    <p>
+      Tres consumidores con tres modelos distintos. Conviene fijarlo antes de construir, porque la
+      pieza nueva nace con la capa de autorización dentro o no nace bien.
+    </p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th scope="col">Consumidor</th><th scope="col">Ámbito</th><th scope="col">Autenticación</th><th scope="col">Estado</th></tr></thead>
+        <tbody>
+          <tr><td><b>clientes</b></td><td>externo</td><td>pasarela · clave por cliente</td><td><span class="tag">en curso</span></td></tr>
+          <tr><td><b>planificador</b></td><td>interno</td><td>red interna</td><td><span class="tag">por definir</span></td></tr>
+          <tr><td><b>servicio de entrada</b></td><td>externo</td><td>pasarela · clave por cliente</td><td><span class="tag is-new">por construir</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Decisiones abiertas</h2>
+    <p class="deccount" id="dec-count"></p>
+    <ol class="decisions">
+      <li data-decision="1"><span class="num">01</span><div>
+        <p class="decision-q">¿La cola es necesaria o basta con un trabajo en segundo plano?</p>
+        <p class="decision-w">Es la decisión de mayor impacto: define si hay una pieza de infraestructura más que operar. Si el pico real cabe en un proceso en segundo plano, la cola sobra.</p>
+      </div>
+        <div class="answer"><span class="lbl">↳ Respuesta:</span><textarea data-answer="1" rows="1" placeholder="sin responder"></textarea></div>
+      </li>
+      <li data-decision="2"><span class="num">02</span><div>
+        <p class="decision-q">¿La escritura devuelve 200 o 202 con identificador consultable?</p>
+        <p class="decision-w">Si la operación pasa a ser diferida, devolver 200 miente sobre lo que ha ocurrido. Mientras no haya clientes, cambiarlo es gratis.</p>
+      </div>
+        <div class="answer"><span class="lbl">↳ Respuesta:</span><textarea data-answer="2" rows="1" placeholder="sin responder"></textarea></div>
+      </li>
+      <li data-decision="3"><span class="num">03</span><div>
+        <p class="decision-q">¿Quién se queda con el esquema de mensajes?</p>
+        <p class="decision-w">Productor y consumidor comparten un contrato. Duplicarlo en ambos repositorios garantiza que se desincronicen en el tercer cambio.</p>
+      </div>
+        <div class="answer"><span class="lbl">↳ Respuesta:</span><textarea data-answer="3" rows="1" placeholder="sin responder"></textarea></div>
+      </li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>
+      Documento de ejemplo de <b>docuweb</b>. El contenido es ficticio y está aquí para enseñar la
+      forma: sustitúyelo por el tuyo. Un documento real debería decir aquí de dónde salen sus
+      diagramas y a qué fecha.
+    </p>
+  </footer>
