@@ -189,11 +189,11 @@
   /* ---------- panel ---------- */
   .props{
     position:fixed;right:16px;bottom:16px;z-index:50;
-    width:300px;max-width:calc(100vw - 32px);
+    width:360px;max-width:calc(100vw - 32px);
     background:var(--surface);border:1px solid var(--border-strong);
     border-radius:var(--radius);box-shadow:0 4px 20px rgba(25,25,25,.2);
     padding:16px;display:none;flex-direction:column;gap:12px;
-    max-height:min(70vh,560px);overflow:auto;
+    max-height:min(80vh,760px);overflow:auto;
   }
   .props.open{display:flex}
   .props header{display:flex;align-items:center;gap:8px}
@@ -301,6 +301,7 @@
     ol.decisions li{grid-template-columns:24px 1fr;gap:10px;padding:14px}
     .props{left:16px;right:16px;bottom:8px;width:auto}
   }
+/* STUDIO_STYLES */
 </style>
 </head>
 <body>
@@ -310,10 +311,14 @@
     <span class="brandmark">docuweb</span>
     <button type="button" class="revbadge" id="btn-history" title="Ver el historial de versiones de este fichero">v1</button>
     <span id="status" class="saved">sin cambios</span>
-    <button type="button" class="btn btn--sm" id="btn-notes" aria-pressed="true" title="Muestra u oculta las notas de revisión en los tres diagramas">Notas</button>
+    <button type="button" class="btn btn--sm" id="btn-notes" aria-pressed="true" title="Muestra u oculta las notas de revisión">Notas</button>
     <button type="button" class="btn btn--sm btn--ghost" id="btn-help" title="Cómo se edita este documento">Ayuda</button>
+    <button type="button" class="btn btn--sm" id="btn-templates">Plantillas</button>
+    <button type="button" class="btn" id="btn-content" aria-pressed="false">Editar texto</button>
     <button type="button" class="btn" id="btn-edit" aria-pressed="false">Editar diagramas</button>
     <button type="button" class="btn btn--primary" id="btn-save">Grabar versión</button>
+    <button type="button" class="btn btn--sm" id="btn-print">Imprimir / PDF</button>
+    <div class="document-controls"><label>Estilo <select id="design-select"><option value="technical">Técnico</option><option value="editorial">Editorial</option><option value="executive">Ejecutivo</option></select></label><label>Tema <select id="theme-select"><option value="auto">Sistema</option><option value="light">Claro</option><option value="dark">Oscuro</option></select></label></div>
     <button type="button" class="btn btn--ghost btn--sm" id="btn-reset" title="Vuelve a los diagramas originales de este fichero">Restablecer</button>
   </div>
 </div>
@@ -325,6 +330,7 @@
     <button type="button" class="btn btn--sm" id="notice-dismiss">Entendido</button>
   </div>
 
+  <div id="document-content">
   <header>
     <p class="kicker">docuweb</p>
     <h1>Motor</h1>
@@ -347,6 +353,16 @@
   <footer>
     <p>Marcador del motor. No es un documento.</p>
   </footer>
+  </div>
+  <div class="content-tools" aria-label="Añadir contenido">
+    <button class="btn btn--sm" type="button" data-add-block="section">+ Sección</button>
+    <button class="btn btn--sm" type="button" data-add-block="callout">+ Aviso</button>
+    <button class="btn btn--sm" type="button" data-add-block="table">+ Tabla</button>
+    <button class="btn btn--sm" type="button" data-add-block="figure">+ Diagrama</button>
+    <button class="btn btn--sm" type="button" data-add-block="decision">+ Decisión</button>
+    <button class="btn btn--sm" type="button" id="btn-content-undo">Deshacer</button>
+    <button class="btn btn--sm" type="button" id="btn-content-redo">Rehacer</button>
+  </div>
 </div>
 
 <div class="overlay" id="overlay" hidden>
@@ -412,18 +428,20 @@
 }
 </script>
 
+<script id="template-data" type="application/json">[]</script>
 <script>
 (function () {
   "use strict";
 
   var SVGNS = "http://www.w3.org/2000/svg";
   var STORE_KEY = "docuweb:borrador:" + (location.pathname || "doc");
-  var FIGS = ["f1", "f2", "f3"];
+  var FIGS = [];
   var SNAP = 4;
 
   var dataEl = document.getElementById("diagram-data");
   var baseline = JSON.parse(dataEl.textContent);
   var model = clone(baseline);
+  FIGS = Object.keys(model.figures);
 
   var state = {
     editing: false,
@@ -484,6 +502,7 @@
   function selPrune() {
     var f = state.sel.fig;
     if (!f) return;
+    if (!model.figures[f]) { selClear(); return; }
     state.sel.items = state.sel.items.filter(function (i) {
       return i.type === "node" ? !!node(f, i.id) : !!edge(f, i.id);
     });
@@ -551,12 +570,12 @@
   var NOTE_PAD = 12, NOTE_LH = 17, NOTE_SIZE = 12.5;
 
   function noteLines(n) {
-    return wrapText(n.text, Math.max(n.w - NOTE_PAD * 2, 40), NOTE_SIZE);
+    return wrapText(n.text, Math.max(n.w - NOTE_PAD * 2, 40), drawingFontSize(n, NOTE_SIZE));
   }
   // la nota crece con su contenido: nunca recorta lo escrito
   function fitNoteHeight(n) {
     var lines = noteLines(n).length || 1;
-    n.h = NOTE_PAD * 2 + lines * NOTE_LH + (n.by ? 16 : 0);
+    n.h = NOTE_PAD * 2 + lines * noteLineHeight(n) + (n.by ? drawingFontSize(n, NOTE_SIZE) + 4 : 0);
     return n.h;
   }
 
@@ -619,8 +638,8 @@
     var dead = n.kind === "dead" || n.kind === "chipdead";
     var tCls = "t-title" + (small ? " sm" : "") + (dead ? " t-dead" : "");
     var sCls = "t-sub" + (small ? " sm" : "") + (dead ? " t-dead" : "");
-    var tBase = small ? 13.5 : 15;
-    var sBase = small ? 12 : 12.5;
+    var tBase = drawingFontSize(n, small ? 13.5 : 15);
+    var sBase = appearanceOf(n).fontSize == null ? (small ? 12 : 12.5) : Math.max(9, tBase - 2.5);
 
     if (n.kind === "divider") {
       var vertical = n.h > n.w;
@@ -635,7 +654,7 @@
       return;
     }
     if (n.kind === "label") {
-      var anchor = n.align || "middle";
+      var anchor = appearanceOf(n).align || n.align || "middle";
       var lx = anchor === "end" ? n.x + n.w : anchor === "start" ? n.x : n.x + n.w / 2;
       g.appendChild(textEl(lx, n.y + 16, n.title || "", "t-sub", anchor));
       return;
@@ -643,7 +662,7 @@
     if (n.kind === "note") {
       var nl = noteLines(n);
       nl.forEach(function (ln, i) {
-        g.appendChild(textEl(n.x + NOTE_PAD, n.y + NOTE_PAD + 13 + i * NOTE_LH, ln, "t-note", "start"));
+        g.appendChild(textEl(n.x + NOTE_PAD, n.y + NOTE_PAD + drawingFontSize(n, NOTE_SIZE) + i * noteLineHeight(n), ln, "t-note", "start"));
       });
       if (n.by) {
         g.appendChild(textEl(n.x + n.w - NOTE_PAD, n.y + n.h - NOTE_PAD + 2, n.by, "t-noteby", "end"));
@@ -657,17 +676,19 @@
     if (n.sub2) lines.push({ s: n.sub2, cls: sCls, size: fitSize(n.sub2, maxW, sBase) });
     if (!lines.length) return;
 
-    var gap = 18;
+    var gap = Math.max(18, tBase * 1.3);
     var startY;
     if (n.top) {
-      startY = n.y + 26;
+      startY = n.y + 11 + tBase;
     } else {
       var total = (lines.length - 1) * gap;
       startY = n.y + n.h / 2 - total / 2 + 5;
     }
     lines.forEach(function (ln, i) {
-      var t = textEl(n.x + n.w / 2, startY + i * gap, ln.s, ln.cls);
-      t.setAttribute("font-size", ln.size);
+      var align = appearanceOf(n).align || "middle";
+      var tx = align === "start" ? n.x + pad : align === "end" ? n.x + n.w - pad : n.x + n.w / 2;
+      var t = textEl(tx, startY + i * gap, ln.s, ln.cls, align);
+      t.style.fontSize = ln.size + "px";
       g.appendChild(t);
     });
   }
@@ -729,11 +750,12 @@
         g.appendChild(el("rect", { x: n.x, y: n.y, width: n.w, height: n.h, rx: 4 }, "n-" + n.kind));
       }
       renderNodeText(g, n);
+      decorateNode(g, n);
       gNodes.appendChild(g);
     });
 
     // aristas
-    d.edges.forEach(function (e) {
+    d.edges.forEach(function (e, index) {
       var p = edgePath(f, e);
       if (!p) return;
       var kind = e.kind || "line";
@@ -752,16 +774,18 @@
         // flecha cuando esta se mueve, y ademas se puede separar de ella
         if (e.lo) { lx += e.lo.dx; ly += e.lo.dy; }
         // zona de agarre propia: el texto no recibe el puntero
-        var lw = textWidth(e.label, 12) + 12;
+        var labelSize = drawingFontSize(e, 12);
+        var lw = textWidth(e.label, labelSize) + 12;
         g.appendChild(el("rect", {
           x: anchor === "middle" ? lx - lw / 2 : lx - 6,
-          y: ly - 13, width: lw, height: 18, rx: 2,
+          y: ly - labelSize - 1, width: lw, height: labelSize + 6, rx: 2,
           "data-elabel": e.id
         }, "hitlbl"));
         var lbl = textEl(lx, ly, e.label, "t-edge" + (kind === "new" ? " new" : kind === "dead" ? " dead" : ""), anchor);
-        lbl.setAttribute("font-size", 12);
+        lbl.style.fontSize = labelSize + "px";
         g.appendChild(lbl);
       }
+      decorateEdge(g, line, e, defs, f, index);
       gEdges.appendChild(g);
     });
 
@@ -777,6 +801,7 @@
       }
       g.appendChild(el("rect", { x: n.x, y: n.y, width: n.w, height: n.h, rx: 4 }, "n-note"));
       renderNodeText(g, n);
+      decorateNode(g, n);
       gNotes.appendChild(g);
     });
 
@@ -848,19 +873,24 @@
   function undo() {
     if (!state.undo.length) return;
     state.redo.push(JSON.stringify(model));
+    var savedMeta = clone(meta());
     model = JSON.parse(state.undo.pop());
+    model.meta = savedMeta;
     selPrune();
     afterChange();
   }
   function redo() {
     if (!state.redo.length) return;
     state.undo.push(JSON.stringify(model));
+    var savedMeta = clone(meta());
     model = JSON.parse(state.redo.pop());
+    model.meta = savedMeta;
     selPrune();
     afterChange();
   }
 
   function afterChange() {
+    restoreContent();
     markDirty();
     renderAll();
     renderProps();
@@ -951,13 +981,16 @@
   /* ---------------- modal ---------------- */
 
   var overlay = document.getElementById("overlay");
+  var modalReturnFocus = null;
 
   function closeModal() {
     overlay.hidden = true;
+    if (modalReturnFocus && modalReturnFocus.isConnected) modalReturnFocus.focus();
     document.getElementById("modal-body").innerHTML = "";
     document.getElementById("modal-actions").innerHTML = "";
   }
   function openModal(title, buildBody, buttons) {
+    modalReturnFocus = document.activeElement;
     document.getElementById("modal-title").textContent = title;
     var body = document.getElementById("modal-body");
     var acts = document.getElementById("modal-actions");
@@ -972,8 +1005,8 @@
       acts.appendChild(el2);
     });
     overlay.hidden = false;
-    var first = body.querySelector("input");
-    if (first) { first.focus(); first.select(); }
+    var first = overlay.querySelector("input,button,select,textarea");
+    if (first) { first.focus(); if (first.select) first.select(); }
   }
 
   overlay.addEventListener("pointerdown", function (evt) {
@@ -1118,6 +1151,10 @@
   }
 
   function doSave(who, note) {
+    if (state.saving) return;
+    syncContent();
+    var wasTextEditing = textEditing;
+    setTextEditing(false);
     var m = meta();
     var metaBefore = JSON.parse(JSON.stringify(m));
     m.rev = m.rev + 1;
@@ -1157,12 +1194,17 @@
     var html = "<!doctype html>\n" + document.documentElement.outerHTML;
 
     function restaurar() {
+      state.saving = false;
+      document.body.inert = false;
+      setTextEditing(wasTextEditing);
       if (wasEditing) setEditing(true);
       state.sel = sel;
       renderAll();
       renderProps();
     }
 
+    state.saving = true;
+    document.body.inert = true;
     writeToDisk(filename, html).then(function (res) {
       if (res === "cancel") {
         // no se grabo nada: la version no debe avanzar
@@ -1195,7 +1237,12 @@
   function openHelp() {
     openModal("Cómo se edita", function (body) {
       var bloques = [
-        ["Editar", "El botón Editar diagramas abre las barras de herramientas de las tres figuras. "
+        ["Texto y bloques", "Editar texto permite escribir en títulos, párrafos, tablas y pies de figura. Al final del documento puedes añadir secciones, tablas, avisos, diagramas y decisiones. Deshacer y Rehacer también recuperan el contenido."],
+        ["Plantillas y estilo", "Plantillas descarga un documento nuevo. Estilo cambia la apariencia del documento actual; Tema permite elegir claro, oscuro o seguir el sistema. Todo se conserva al grabar una versión."],
+        ["Apariencia", "Selecciona una caja o línea para cambiar colores, relleno, patrón, grosor, esquinas y texto. Las flechas admiten puntas en ambos extremos. Puedes aplicar cambios a una selección múltiple, copiar y pegar apariencia o volver a los valores del tipo."],
+        ["Diagramas", "Selecciona cajas para duplicarlas, alinearlas, distribuirlas o ajustarlas al texto. Diagramas añade un flujo, capas, un antes y después o una secuencia."],
+        ["Imprimir / PDF", "Abre la impresión del navegador y elige Guardar como PDF. Se ocultan los controles y se incluyen las respuestas completas."],
+        ["Editar", "El botón Editar diagramas abre las barras de herramientas de las figuras. "
           + "Fuera de ese modo el documento solo se lee."],
         ["Mover y cambiar", "Arrastra cajas, codos de flecha y etiquetas. Tira de la esquina para "
           + "redimensionar. Doble clic sobre una caja abre su panel. Supr borra lo elegido."],
@@ -1327,9 +1374,14 @@
   }
 
   function renderProps() {
+    renderTools();
     var panel = document.getElementById("props");
     var body = document.getElementById("props-body");
     var title = document.getElementById("props-title");
+    var panelKey = state.sel.fig + ":" + state.sel.items.map(function (it) { return it.type + ":" + it.id; }).join(",");
+    var panelScroll = panel._selectionKey === panelKey ? panel.scrollTop : 0;
+    panel._selectionKey = panelKey;
+    requestAnimationFrame(function () { if (panel._selectionKey === panelKey) panel.scrollTop = panelScroll; });
     body.innerHTML = "";
     if (!state.editing || !selCount()) { panel.classList.remove("open"); return; }
     panel.classList.add("open");
@@ -1361,6 +1413,7 @@
         if (v) nt.anchor = v; else delete nt.anchor;
         afterChange();
       }));
+      renderAppearancePanel(f, body);
       var na = document.createElement("div");
       na.className = "props-actions";
       var nDel = document.createElement("button");
@@ -1391,6 +1444,7 @@
       body.appendChild(selectField("Estilo", n.kind, KINDS_NODE, function (v) {
         snapshot(); n.kind = v; afterChange();
       }));
+      renderAppearancePanel(f, body);
       var acts = document.createElement("div");
       acts.className = "props-actions";
       var bTop = document.createElement("button");
@@ -1418,6 +1472,7 @@
       body.appendChild(selectField("Origen", e.from, opts, function (v) { snapshot(); e.from = v; afterChange(); }));
       body.appendChild(selectField("Destino", e.to, opts, function (v) { snapshot(); e.to = v; afterChange(); }));
       body.appendChild(selectField("Estilo", e.kind || "line", KINDS_EDGE, function (v) { snapshot(); e.kind = v; afterChange(); }));
+      renderAppearancePanel(f, body);
       var acts2 = document.createElement("div");
       acts2.className = "props-actions";
       var bWp = document.createElement("button");
@@ -1486,6 +1541,7 @@
 
     var acts = document.createElement("div");
     acts.className = "props-actions";
+    renderAppearancePanel(f, body);
     var bNone = document.createElement("button");
     bNone.type = "button"; bNone.className = "btn btn--sm btn--ghost";
     bNone.textContent = "Quitar selección";
@@ -1534,6 +1590,7 @@
   function renderTools() {
     FIGS.forEach(function (f) {
       var bar = document.querySelector('[data-tools="' + f + '"]');
+      if (!bar) return;
       bar.innerHTML = "";
       bar.appendChild(toolButton("+ Caja", function () {
         snapshot();
@@ -1579,6 +1636,7 @@
         connecting ? "btn--primary" : "",
         "Pulsa el botón y después la caja de origen y la de destino"
       ));
+      studioFigureTools(f, bar);
       bar.appendChild(toolButton("Seleccionar todo", function () { selectAll(f); }, "btn--ghost",
         "Elige todas las cajas, notas y flechas de esta figura para moverlas juntas"));
       bar.appendChild(toolButton("Deshacer", undo, "btn--ghost"));
@@ -1586,7 +1644,7 @@
       bar.appendChild(toolButton("Exportar SVG", function () { exportSvg(f); }, "btn--ghost"));
       bar.appendChild(toolButton("Restablecer figura", function () {
         snapshot();
-        model.figures[f] = clone(baseline.figures[f]);
+        model.figures[f] = baseline.figures[f] ? clone(baseline.figures[f]) : { w: 640, h: 220, nodes: [], edges: [] };
         selClear();
         afterChange();
       }, "btn--ghost"));
@@ -1607,7 +1665,7 @@
 
   /* ---------------- exportar SVG ---------------- */
 
-  var INLINE_PROPS = ["fill", "stroke", "stroke-width", "stroke-dasharray", "font-size", "font-weight", "font-family"];
+  var INLINE_PROPS = ["fill", "stroke", "stroke-width", "stroke-dasharray", "stroke-linecap", "stroke-linejoin", "opacity", "fill-opacity", "stroke-opacity", "font-size", "font-weight", "font-style", "font-family", "text-anchor"];
 
   function exportSvg(f) {
     var selBefore = state.sel, editBefore = state.editing;
@@ -1630,6 +1688,7 @@
         if (v && v !== "none" || p === "fill" || p === "stroke") target.setAttribute(p, v);
       });
       target.removeAttribute("class");
+      target.removeAttribute("style");
     }
     // despues del copiado de estilos, para no desalinear el recorrido por indice:
     // si las notas estan ocultas en pantalla, tampoco salen en el SVG exportado
@@ -1651,7 +1710,7 @@
     var blob = new Blob([out], { type: "image/svg+xml;charset=utf-8" });
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
-    a.href = url; a.download = "cms-api-" + f + ".svg";
+    a.href = url; a.download = BASENAME + "-" + f + ".svg";
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
 
@@ -1720,6 +1779,8 @@
 
   function attachCanvas(f) {
     var svg = document.querySelector('svg[data-svg="' + f + '"]');
+    if (!svg || svg._docuwebAttached) return;
+    svg._docuwebAttached = true;
     var drag = null;
 
     svg.addEventListener("pointerdown", function (evt) {
@@ -1919,6 +1980,10 @@
   }
   function attachAnswers() {
     document.querySelectorAll("[data-answer]").forEach(function (ta) {
+      if (ta._docuwebAttached) return;
+      ta._docuwebAttached = true;
+      var question = ta.closest("[data-decision]").querySelector(".decision-q");
+      ta.setAttribute("aria-label", question ? question.textContent : "Respuesta a la decisión");
       ta.addEventListener("input", function () {
         var k = ta.getAttribute("data-answer");
         var a = answers();
@@ -1983,6 +2048,8 @@
     renderTools();
   }
 
+  /* STUDIO_SCRIPT */
+
   /* ---------------- arranque ---------------- */
 
   function init() {
@@ -1994,6 +2061,8 @@
         if (parsed && parsed.figures) { model = parsed; restored = true; }
       }
     } catch (err) { /* almacenamiento no disponible */ }
+
+    initStudio(restored);
 
     var notesOn = true;
     try {
@@ -2029,6 +2098,7 @@
       if (!window.confirm("Se descartan los cambios sin grabar y vuelven los diagramas de la última versión grabada. ¿Continuar?")) return;
       snapshot();
       model = clone(baseline);
+      restoreContent();
       selClear();
       renderMeta();
       renderAll(); renderProps(); renderTools(); renderAnswers();
@@ -2040,8 +2110,14 @@
     });
 
     document.addEventListener("keydown", function (evt) {
+      if (evt.key === "Tab" && !overlay.hidden) {
+        var focusable = overlay.querySelectorAll('button:not(:disabled),input,select,textarea');
+        var first = focusable[0], last = focusable[focusable.length - 1];
+        if (evt.shiftKey && document.activeElement === first) { evt.preventDefault(); last.focus(); }
+        else if (!evt.shiftKey && document.activeElement === last) { evt.preventDefault(); first.focus(); }
+      }
       if (evt.key === "Escape" && !overlay.hidden) { evt.preventDefault(); closeModal(); return; }
-      if (!state.editing) return;
+      if (!state.editing || evt.target.isContentEditable) return;
       var tag = (evt.target.tagName || "").toLowerCase();
       if (tag === "input" || tag === "select" || tag === "textarea") return;
       var mod = evt.ctrlKey || evt.metaKey;

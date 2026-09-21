@@ -7,45 +7,25 @@ continuar esto, lee este fichero entero antes de tocar nada, y después
 
 ## Estado actual
 
-El proyecto **está terminado y funciona**. Lo que queda son tareas de publicación,
-verificación y mejoras opcionales. No hay nada roto ni a medias.
+El proyecto **está terminado y funciona**. Lo que queda son comprobaciones y mejoras
+opcionales. No hay nada roto ni a medias.
 
 Ficheros:
 
 - `index.html` y `template.html` son **generados**. No los edites a mano: se pierden en la
   siguiente compilación.
 - Se generan con `python src/build.py`, ejecutado **desde la raíz del repositorio**.
-- Las fuentes son `src/motor.html` (estilos y guion), `src/demo-cuerpo.html` (el cuerpo de la
+- Las fuentes son `src/motor.html` (motor base), `src/studio.js` y `src/studio.css` (edición y presentación), `src/templates.json` (catálogo), `src/demo-cuerpo.html` (el cuerpo de la
   demo) y `src/demo-datos.json` (sus diagramas). El cuerpo y los datos de la plantilla vacía
   están dentro de `src/build.py`.
 - Todo cambio en el motor se hace en `src/motor.html` y se recompila.
 
-## Pendiente que solo puede hacer una persona
+## Verificación
 
-Necesitan la cuenta personal de GitHub del autor. **No usar la cuenta que pueda estar
-autenticada en `gh` en la máquina de trabajo: es la de la empresa.**
-
-1. **Crear el repositorio** `docuweb` en la cuenta personal, público.
-2. **Subirlo.** El repositorio local ya está inicializado, con rama `main`, un commit y la
-   identidad correcta fijada en su configuración local. Solo falta:
-   ```
-   git remote add origin https://github.com/<usuario>/docuweb.git
-   git push -u origin main
-   ```
-3. **Publicar la demo** en GitHub Pages: ajustes → Pages → rama `main`, carpeta raíz. Queda
-   en `https://<usuario>.github.io/docuweb/`. Después, añadir ese enlace al principio de los
-   dos README, que es lo que hace que un repositorio de plantilla se entienda de un vistazo.
-4. **Marcarlo como Template repository** en los ajustes, para habilitar «Use this template».
-5. **Capturas para el README.** Hacen falta tres: el documento en modo lectura, el modo
-   edición con una caja seleccionada y su panel, y el diálogo de grabar versión. Guardarlas
-   en `docs/` y enlazarlas desde los dos README. Un asistente no puede generarlas.
-
-## Verificación pendiente
-
-**Nadie ha abierto todavía `index.html` ni `template.html` en un navegador.** Se ha
-verificado la sintaxis del guion, la validez del JSON y que todas las referencias entre
-cajas y flechas resuelven, pero no el resultado visual. Antes de publicar, abrir ambos y
-comprobar:
+Hay pruebas de estructura y navegador en `tests/`, incluidas carga de los siete documentos,
+edición, guardado y reapertura con historial, cancelación, PDF, móvil y diagramas.
+Consulta `docs/development.md` para ejecutarlas y conocer sus límites.
+Antes de publicar, revisar también manualmente en los navegadores de destino:
 
 - Las figuras se dibujan y ninguna flecha atraviesa una caja que no le toca.
 - *Editar diagramas* muestra las barras; arrastrar una caja, un codo y una etiqueta funciona.
@@ -64,7 +44,7 @@ Si algo falla, el motor es `src/motor.html`; recompilar con `python src/build.py
   El esquema del JSON y los nombres de campo ya son neutros; lo que hay que traducir es la
   prosa.
 - **Idioma del interfaz.** Barra de herramientas, diálogos y ayuda están en castellano,
-  como literales dentro de `src/motor.html`. Internacionalizarlo bien significa extraer esos
+  como literales dentro de `src/motor.html` y `src/studio.js`. Internacionalizarlo bien significa extraer esos
   literales a un objeto de cadenas y elegir idioma por `navigator.language` o por un atributo
   del documento. Es un trabajo acotado pero real, y conviene decidir si merece la pena antes
   de hacerlo.
@@ -84,7 +64,7 @@ Ninguna es necesaria. Están aquí para que no haya que redescubrirlas.
   ellas. Como los diagramas son datos, una comparación real es posible: qué cajas se movieron,
   qué flechas aparecieron, qué respuestas se escribieron.
 - **Exportar a PNG**, además de SVG, para pegar en herramientas que no admiten vectores.
-- **Reglas de alineación** al arrastrar, del tipo que enseña una línea guía cuando dos cajas
+- **Guías visuales** al arrastrar, del tipo que enseña una línea guía cuando dos cajas
   comparten borde.
 
 ## Restricción que no se debe romper
@@ -101,3 +81,11 @@ cuerpo debe ser siempre el marcador neutro que lleva ahora.
 Antes de publicar, y antes de añadir cualquier documento de ejemplo nuevo, pasar una búsqueda
 sin distinguir mayúsculas por los nombres propios del origen —empresa, productos, sistemas,
 repositorios, clientes— sobre `index.html`, `template.html` y `src/`. No debe devolver nada.
+
+## Mejoras implementadas
+
+- Cinco plantillas de propósito y tres estilos independientes del contenido.
+- Edición de texto y celdas, bloques nuevos y recuperación del borrador completo.
+- Alineación, distribución, duplicación, ajuste al texto y diagramas predefinidos.
+- Impresión A4 / PDF con respuestas completas y controles ocultos.
+- Integración con el versionado existente y figuras dinámicas, incluso cero figuras.

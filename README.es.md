@@ -36,7 +36,9 @@ red, ni archivar tal cual quedó el día que se decidió algo.
 
 ## Empezar
 
-**Como persona:** descarga [`template.html`](template.html), ábrelo y pulsa *Editar diagramas*.
+**Como persona:** abre [`index.html`](index.html), pulsa *Plantillas* y elige el tipo de documento.
+Abre el HTML descargado y usa *Editar texto* o *Editar diagramas*. También puedes empezar
+con [`template.html`](template.html).
 
 **Como quien dirige a un asistente:** dale el repositorio y esta frase:
 
@@ -44,6 +46,38 @@ red, ni archivar tal cual quedó el día que se decidió algo.
 
 **Ver antes de decidir:** abre [`index.html`](index.html), un documento de ejemplo completo
 y tocable sobre sacar las escrituras de un monolito.
+
+## Plantillas y presentación
+
+| Plantilla | Para qué sirve |
+|---|---|
+| [Propuesta técnica](templates/propuesta-tecnica.html) | Problema, alternativas, arquitectura y validación |
+| [Informe ejecutivo](templates/informe-ejecutivo.html) | Hallazgos, indicadores y próximos pasos |
+| [Plan de proyecto](templates/plan-proyecto.html) | Alcance, hitos, responsables y riesgos |
+| [Comparación de alternativas](templates/comparacion-alternativas.html) | Criterios y evidencia para elegir |
+| [Registro de decisión](templates/registro-decision.html) | Contexto, resolución y consecuencias |
+
+El selector **Estilo** cambia entre Técnico, Editorial y Ejecutivo conservando el contenido.
+**Tema** permite elegir claro, oscuro o seguir el sistema. Cada plantilla se descarga como
+un documento independiente, con su propio historial.
+
+**Editar texto** permite escribir en títulos, párrafos, celdas y pies de figura. Al final
+del documento puedes añadir secciones, avisos, tablas, diagramas y decisiones, y deshacer
+o rehacer cambios. El contenido y la apariencia quedan incluidos en el versionado existente.
+
+En los diagramas puedes duplicar cajas, alinearlas, distribuirlas y ajustarlas al texto.
+El botón **Diagramas…** añade estructuras de flujo, capas, antes/después o etapas.
+
+Cada sección muestra **Subir**, **Bajar** y **Eliminar sección** al activar **Editar texto**.
+Puedes deshacer estas acciones; el orden y las eliminaciones se conservan al guardar.
+
+El panel de diagramas permite cambiar colores de línea, relleno y texto; usar línea
+continua, segmentos, puntos o guion-punto; ajustar grosor, esquinas y opacidad; y elegir
+las puntas de ambos extremos. También incluye formato del texto, selección múltiple,
+copiar/pegar apariencia y restablecerla. Los ajustes se conservan en las versiones y el SVG.
+
+**Imprimir / PDF** prepara una salida A4 sin controles, con diagramas adaptados y respuestas
+completas. Elige Guardar como PDF en la impresión de tu navegador.
 
 ## Cómo está hecho
 
@@ -80,15 +114,19 @@ en [AGENTS.md](AGENTS.md).
 
 ## Compatibilidad
 
-Chrome, Edge, Firefox y Safari recientes. El guion está escrito sin sintaxis moderna, así
-que también funciona en navegadores algo antiguos. En Mac el modificador de selección
+Dirigido a Chrome, Edge, Firefox y Safari recientes. Las pruebas automatizadas se ejecutan
+en Chromium; Firefox y Safari requieren verificación manual. En Mac el modificador de selección
 múltiple es Cmd, porque Ctrl+clic es el clic derecho; el documento lo detecta solo.
 
 ## Idioma del interfaz
 
 El andamiaje del documento —barra de herramientas, diálogos, ayuda— está en castellano.
 El motor no tiene todavía cadenas en inglés; traducirlo es tocar los literales de
-`src/motor.html`. Ver [TODO.md](TODO.md).
+`src/motor.html` y `src/studio.js`. Ver [TODO.md](TODO.md).
+
+## Desarrollo
+
+Compila con `python src/build.py`. Consulta [las fuentes y las pruebas](docs/development.md).
 
 ## Licencia
 

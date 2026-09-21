@@ -6,12 +6,21 @@ ambas salidas. Lo unico que cambia entre un documento y otro es el cuerpo HTML y
 el JSON de los diagramas.
 """
 import io, json, re, sys
+from pathlib import Path
+import os
+from html import escape
+os.chdir(Path(__file__).resolve().parent.parent)
 
 MOTOR = "src/motor.html"
 CUERPO = "src/demo-cuerpo.html"
 DATOS = "src/demo-datos.json"
 
 motor = io.open(MOTOR, encoding="utf-8").read()
+motor = motor.replace("/* STUDIO_STYLES */", Path("src/studio.css").read_text(encoding="utf-8"))
+motor = motor.replace("/* STUDIO_SCRIPT */", Path("src/studio.js").read_text(encoding="utf-8") + "\n" + Path("src/drawing.js").read_text(encoding="utf-8"))
+catalog = json.loads(Path("src/templates.json").read_text(encoding="utf-8"))
+catalog_json = json.dumps(catalog, ensure_ascii=False).replace("<", "\\u003c")
+motor = motor.replace('<script id="template-data" type="application/json">[]</script>', '<script id="template-data" type="application/json">' + catalog_json + '</script>')
 
 # --- 1. el cuerpo del documento queda entre marcas explicitas ---------------
 ini = motor.index("  <header>")
@@ -130,3 +139,15 @@ io.open("template.html", "w", encoding="utf-8", newline="").write(plantilla)
 
 print("index.html   %7d bytes" % len(demo.encode("utf-8")))
 print("template.html %6d bytes" % len(plantilla.encode("utf-8")))
+
+# Purpose-specific documents remain standalone HTML files.
+Path("templates").mkdir(exist_ok=True)
+for entry in catalog:
+    data = {"version": 1, "meta": {"rev": 1, "savedAt": "", "savedBy": "", "history": []},
+            "answers": {}, "figures": entry["figures"],
+            "document": {"html": entry["html"], "design": entry["design"], "theme": "auto"}}
+    html = ensambla(entry["html"], data, escape(entry["title"]),
+                    "docuweb · " + escape(entry["title"]), escape(entry["description"], quote=True))
+    html = html.replace('<html lang="es">', '<html lang="es" data-design="' + entry["design"] + '">', 1)
+    Path("templates", entry["id"] + ".html").write_text(html, encoding="utf-8")
+print("templates/    %d documentos" % len(catalog))

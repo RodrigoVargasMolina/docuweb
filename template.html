@@ -189,11 +189,11 @@
   /* ---------- panel ---------- */
   .props{
     position:fixed;right:16px;bottom:16px;z-index:50;
-    width:300px;max-width:calc(100vw - 32px);
+    width:360px;max-width:calc(100vw - 32px);
     background:var(--surface);border:1px solid var(--border-strong);
     border-radius:var(--radius);box-shadow:0 4px 20px rgba(25,25,25,.2);
     padding:16px;display:none;flex-direction:column;gap:12px;
-    max-height:min(70vh,560px);overflow:auto;
+    max-height:min(80vh,760px);overflow:auto;
   }
   .props.open{display:flex}
   .props header{display:flex;align-items:center;gap:8px}
@@ -301,6 +301,100 @@
     ol.decisions li{grid-template-columns:24px 1fr;gap:10px;padding:14px}
     .props{left:16px;right:16px;bottom:8px;width:auto}
   }
+  /* Document styles are independent from content and diagram semantics. */
+  :root { --radius:8px; }
+  #document-content{display:flex;flex-direction:column;gap:48px;min-width:0}
+  #document-content>header{padding:24px 0 32px;border-bottom:1px solid var(--border)}
+  #document-content>section{min-width:0}
+  .appbar .brandmark{flex-basis:100%;font-size:11px}
+  .appbar-inner{gap:8px}
+  .document-controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .document-controls label{font-size:12px;color:var(--ink-muted);display:flex;gap:6px;align-items:center}
+  .document-controls select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px}
+  .content-tools{display:none;padding:12px 0;border-top:1px solid var(--border);gap:8px;flex-wrap:wrap}
+  body.editing-content .content-tools{display:flex}
+  [contenteditable=true]{outline:1px dashed var(--border-strong);outline-offset:5px;cursor:text;white-space:pre-wrap;min-height:1.2em}
+  [contenteditable=true]:focus{outline:2px solid var(--info);border-radius:2px}
+  .metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .metric{border:1px solid var(--border);border-radius:var(--radius);padding:22px;background:var(--surface-2)}
+  .metric h3{font-size:13px;color:var(--ink-muted);margin-bottom:12px}
+  .metric p{font-size:26px;font-weight:600;line-height:1.2}
+  .callout{padding:22px;border-left:4px solid var(--brand-ink);background:var(--brand-tint);border-radius:0 var(--radius) var(--radius) 0;display:grid;gap:10px}
+  .template-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+  .template-card{white-space:normal;text-align:left;line-height:1.5;padding:20px;display:flex;flex-direction:column;gap:8px}
+  .template-card small{font-size:12px;color:var(--ink-muted)}
+  .template-preview{height:48px;display:flex;gap:5px;align-items:flex-end}
+  .template-preview i{display:block;width:22%;background:var(--border);height:60%;border-radius:3px}
+  .template-preview i:first-child{height:100%;background:var(--brand-ink)}
+  .modal{max-height:85vh;overflow:auto}
+  :root[data-design=editorial] #document-content{gap:60px}
+  :root[data-design=editorial] .page{max-width:920px}
+  :root[data-design=editorial] #document-content h1{font:500 clamp(38px,6vw,62px)/1.08 Georgia,serif;letter-spacing:-.035em}
+  :root[data-design=editorial] #document-content h2{font-family:Georgia,serif;font-size:30px;font-weight:500}
+  :root[data-design=editorial] #document-content h2::after{display:none}
+  :root[data-design=editorial] #document-content>section{padding-top:24px;border-top:1px solid var(--border)}
+  :root[data-design=editorial] .lede{font-size:20px;line-height:1.7}
+  :root[data-design=executive] #document-content>header{padding:32px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border)}
+  :root[data-design=executive] #document-content h1{font-size:clamp(32px,5vw,48px);max-width:22ch}
+  :root[data-design=executive] #document-content h2::after{width:28px;height:3px;margin-top:10px}
+  :root[data-design=executive] #document-content>section{gap:18px}
+  :root[data-design=technical] #document-content h2{font-size:22px}
+  :root[data-design=technical] .canvas{background-image:radial-gradient(var(--border) .6px,transparent .6px);background-size:16px 16px}
+  .answer-print{display:none;white-space:pre-wrap;overflow-wrap:anywhere}
+  ol.decisions li>.answer{grid-column:2;min-width:0}
+  .answer-print{flex:1;min-width:0}
+  .appearance-group{border-top:1px solid var(--border);margin-top:14px;padding-top:12px}
+  .appearance-group summary{font-size:13px;font-weight:600;cursor:pointer;padding:4px 0}
+  .appearance-fields{display:flex;flex-direction:column;gap:12px;padding-top:12px}
+  .appearance-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .color-controls{display:flex;gap:6px;align-items:center}
+  .color-controls input[type=color]{width:40px;height:36px;padding:3px;flex:none;cursor:pointer}
+  .color-controls input[type=text]{min-width:0;flex:1;font-family:monospace}
+  .color-field>.btn{align-self:flex-start}
+  .appearance-actions{border-top:1px solid var(--border);padding-top:12px;margin:12px 0}
+  .section-controls{display:flex;gap:8px;flex-wrap:wrap;padding:10px;background:var(--surface-2);border:1px dashed var(--border);border-radius:var(--radius)}
+  @media print{.section-controls{display:none!important}}
+  #props-body{display:flex;flex-direction:column;gap:8px}
+  .props>header{position:sticky;top:-16px;background:var(--surface);z-index:1;padding:10px 0}
+  .tablewrap th,.tablewrap td{overflow-wrap:anywhere}
+  @media(max-width:600px){
+    .metric-grid,.template-grid{grid-template-columns:1fr}
+    .appbar{position:static}
+    .appbar-inner>.btn{flex-grow:1}
+    .document-controls{width:100%}
+    :root[data-design=executive] #document-content>header{padding:22px}
+    #document-content{gap:36px}
+  }
+  @page{size:A4;margin:17mm 16mm 18mm}
+  @media print{
+    :root,:root[data-theme],:root:not([data-theme=light]){
+      --surface:#fff;--surface-2:#f3f4f5;--ink:#191919;--ink-muted:#50565a;
+      --border:#c9cdd0;--border-strong:#747b80;--brand:#78be20;--brand-ink:#436d10;
+      --brand-tint:#f2f8e7;--info:#096889;--danger:#a40014;--danger-tint:#fff0f0;--note-tint:#edf6fa;--note-ink:#075e80;
+      color-scheme:light;
+    }
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{background:white;font-size:10pt}
+    .appbar,.content-tools,.notice,.props,.overlay,.figtools,body.editing .figtools{display:none!important}
+    .page{display:block!important;max-width:none!important;padding:0!important;margin:0!important}
+    #document-content{display:block!important}
+    #document-content>header{margin-bottom:9mm;padding-top:0}
+    #document-content>section{display:block;margin:0 0 9mm;padding-top:0}
+    #document-content>section>*+*{margin-top:4mm}
+    #document-content h1{font-size:30pt!important}
+    #document-content h2{font-size:18pt!important;break-after:avoid}
+    h3{break-after:avoid}p,li{orphans:3;widows:3}
+    figure,.metric,.note,.callout,ol.decisions li{break-inside:avoid}
+    .canvas{overflow:visible;padding:8px;background-image:none!important}
+    .canvas svg{width:100%!important;min-width:0!important;max-height:180mm}
+    .tablewrap{overflow:visible}table{width:100%;min-width:0!important;table-layout:fixed}
+    thead{display:table-header-group}tr{break-inside:avoid}
+    .answer textarea{display:none!important}.answer-print{display:block}
+    [contenteditable]{outline:none!important}
+    .sel-ring,.handle,.wp,.marquee{display:none!important}
+    footer{margin-top:8mm;padding-top:4mm;border-top:1px solid var(--border)}
+  }
+
 </style>
 </head>
 <body>
@@ -310,10 +404,14 @@
     <span class="brandmark">Ámbito o proyecto</span>
     <button type="button" class="revbadge" id="btn-history" title="Ver el historial de versiones de este fichero">v1</button>
     <span id="status" class="saved">sin cambios</span>
-    <button type="button" class="btn btn--sm" id="btn-notes" aria-pressed="true" title="Muestra u oculta las notas de revisión en los tres diagramas">Notas</button>
+    <button type="button" class="btn btn--sm" id="btn-notes" aria-pressed="true" title="Muestra u oculta las notas de revisión">Notas</button>
     <button type="button" class="btn btn--sm btn--ghost" id="btn-help" title="Cómo se edita este documento">Ayuda</button>
+    <button type="button" class="btn btn--sm" id="btn-templates">Plantillas</button>
+    <button type="button" class="btn" id="btn-content" aria-pressed="false">Editar texto</button>
     <button type="button" class="btn" id="btn-edit" aria-pressed="false">Editar diagramas</button>
     <button type="button" class="btn btn--primary" id="btn-save">Grabar versión</button>
+    <button type="button" class="btn btn--sm" id="btn-print">Imprimir / PDF</button>
+    <div class="document-controls"><label>Estilo <select id="design-select"><option value="technical">Técnico</option><option value="editorial">Editorial</option><option value="executive">Ejecutivo</option></select></label><label>Tema <select id="theme-select"><option value="auto">Sistema</option><option value="light">Claro</option><option value="dark">Oscuro</option></select></label></div>
     <button type="button" class="btn btn--ghost btn--sm" id="btn-reset" title="Vuelve a los diagramas originales de este fichero">Restablecer</button>
   </div>
 </div>
@@ -325,6 +423,7 @@
     <button type="button" class="btn btn--sm" id="notice-dismiss">Entendido</button>
   </div>
 
+  <div id="document-content">
   <!-- ═══════════════ CONTENIDO DEL DOCUMENTO ═══════════════
        Todo lo que hay entre esta marca y la de cierre es tuyo.
        El resto del fichero es el motor: no hace falta tocarlo.
@@ -377,6 +476,16 @@
     </p>
   </footer>
   <!-- ═══════════════ FIN DEL CONTENIDO ═══════════════ -->
+  </div>
+  <div class="content-tools" aria-label="Añadir contenido">
+    <button class="btn btn--sm" type="button" data-add-block="section">+ Sección</button>
+    <button class="btn btn--sm" type="button" data-add-block="callout">+ Aviso</button>
+    <button class="btn btn--sm" type="button" data-add-block="table">+ Tabla</button>
+    <button class="btn btn--sm" type="button" data-add-block="figure">+ Diagrama</button>
+    <button class="btn btn--sm" type="button" data-add-block="decision">+ Decisión</button>
+    <button class="btn btn--sm" type="button" id="btn-content-undo">Deshacer</button>
+    <button class="btn btn--sm" type="button" id="btn-content-redo">Rehacer</button>
+  </div>
 </div>
 
 <div class="overlay" id="overlay" hidden>
@@ -458,18 +567,20 @@
 }
 </script>
 
+<script id="template-data" type="application/json">[{"id": "propuesta-tecnica", "title": "Propuesta técnica", "description": "Del problema a una recomendación con alternativas y decisiones.", "design": "technical", "html": "\u003cheader>\u003cp class=\"kicker\">Documento de trabajo\u003c/p>\u003ch1>Título de la propuesta\u003c/h1>\u003cp class=\"lede\">Resume el cambio propuesto, a quién beneficia y por qué merece la pena.\u003c/p>\u003cdiv class=\"meta\">\u003cspan class=\"pill is-draft\">Borrador\u003c/span>\u003cspan class=\"pill\">Fecha por completar\u003c/span>\u003c/div>\u003c/header>\u003csection>\u003ch2>Problema y alcance\u003c/h2>\u003cp>Describe el problema con evidencia. Delimita qué se incluye y qué queda fuera.\u003c/p>\u003c/section>\u003csection>\u003ch2>Alternativas\u003c/h2>\u003cdiv class=\"tablewrap\">\u003ctable>\u003cthead>\u003ctr>\u003cth>Opción\u003c/th>\u003cth>Beneficio\u003c/th>\u003cth>Coste o limitación\u003c/th>\u003c/tr>\u003c/thead>\u003ctbody>\u003ctr>\u003ctd>Situación actual\u003c/td>\u003ctd>Por documentar\u003c/td>\u003ctd>Por documentar\u003c/td>\u003c/tr>\u003ctr>\u003ctd>Propuesta\u003c/td>\u003ctd>Por documentar\u003c/td>\u003ctd>Por documentar\u003c/td>\u003c/tr>\u003c/tbody>\u003c/table>\u003c/div>\u003c/section>\u003csection>\u003ch2>Arquitectura propuesta\u003c/h2>\u003cfigure data-fig=\"f1\">\u003cdiv class=\"figtools\" data-tools=\"f1\">\u003c/div>\u003cdiv class=\"canvas canvas--mid\">\u003csvg data-svg=\"f1\" role=\"img\" aria-label=\"Entrada, proceso y resultado\">\u003c/svg>\u003c/div>\u003cfigcaption>Explica qué cambia y qué información pasa entre las piezas.\u003c/figcaption>\u003c/figure>\u003c/section>\u003csection>\u003ch2>Validación y riesgos\u003c/h2>\u003cp>Define cómo comprobar el resultado, qué podría fallar y cómo revertir el cambio.\u003c/p>\u003c/section>\u003csection>\u003ch2>Decisión pendiente\u003c/h2>\u003cp class=\"deccount\" id=\"dec-count\">\u003c/p>\u003col class=\"decisions\">\u003cli data-decision=\"1\">\u003cspan class=\"num\">01\u003c/span>\u003cdiv>\u003cp class=\"decision-q\">¿Se aprueba la propuesta?\u003c/p>\u003cp class=\"decision-w\">Indica responsable, condiciones y fecha de revisión.\u003c/p>\u003c/div>\u003cdiv class=\"answer\">\u003cspan class=\"lbl\">Respuesta:\u003c/span>\u003ctextarea data-answer=\"1\" rows=\"1\" placeholder=\"sin responder\">\u003c/textarea>\u003c/div>\u003c/li>\u003c/ol>\u003c/section>\u003cfooter>\u003cp>Fuentes, responsable y fecha de actualización: por completar.\u003c/p>\u003c/footer>", "figures": {"f1": {"w": 704, "h": 224, "nodes": [{"id": "n0", "x": 32, "y": 64, "w": 176, "h": 64, "kind": "box", "title": "Entrada"}, {"id": "n1", "x": 256, "y": 64, "w": 176, "h": 64, "kind": "new", "title": "Proceso"}, {"id": "n2", "x": 480, "y": 64, "w": 176, "h": 64, "kind": "box", "title": "Resultado"}], "edges": [{"id": "e0", "from": "n0", "to": "n1", "label": "envía"}, {"id": "e1", "from": "n1", "to": "n2", "label": "envía"}]}}}, {"id": "informe-ejecutivo", "title": "Informe ejecutivo", "description": "Hallazgos, indicadores y próximos pasos para decidir.", "design": "executive", "html": "\u003cheader>\u003cp class=\"kicker\">Documento de trabajo\u003c/p>\u003ch1>Título del informe\u003c/h1>\u003cp class=\"lede\">Escribe la conclusión principal y la decisión que necesita el lector.\u003c/p>\u003cdiv class=\"meta\">\u003cspan class=\"pill is-draft\">Borrador\u003c/span>\u003cspan class=\"pill\">Fecha por completar\u003c/span>\u003c/div>\u003c/header>\u003csection>\u003ch2>Indicadores\u003c/h2>\u003cdiv class=\"metric-grid\">\u003cdiv class=\"metric\">\u003ch3>Resultado\u003c/h3>\u003cp>Por medir\u003c/p>\u003c/div>\u003cdiv class=\"metric\">\u003ch3>Plazo\u003c/h3>\u003cp>Por medir\u003c/p>\u003c/div>\u003cdiv class=\"metric\">\u003ch3>Recursos\u003c/h3>\u003cp>Por medir\u003c/p>\u003c/div>\u003c/div>\u003c/section>\u003csection>\u003ch2>Hallazgos\u003c/h2>\u003cp>Resume los hallazgos y explica la evidencia que los sostiene.\u003c/p>\u003c/section>\u003csection>\u003cdiv class=\"callout\">\u003ch3>Recomendación\u003c/h3>\u003cp>Describe la acción recomendada y su efecto esperado.\u003c/p>\u003c/div>\u003c/section>\u003csection>\u003ch2>Próximos pasos\u003c/h2>\u003cdiv class=\"tablewrap\">\u003ctable>\u003cthead>\u003ctr>\u003cth>Acción\u003c/th>\u003cth>Responsable\u003c/th>\u003cth>Fecha\u003c/th>\u003c/tr>\u003c/thead>\u003ctbody>\u003ctr>\u003ctd>Por definir\u003c/td>\u003ctd>Por asignar\u003c/td>\u003ctd>Por acordar\u003c/td>\u003c/tr>\u003ctr>\u003ctd>Por definir\u003c/td>\u003ctd>Por asignar\u003c/td>\u003ctd>Por acordar\u003c/td>\u003c/tr>\u003c/tbody>\u003c/table>\u003c/div>\u003c/section>\u003csection>\u003ch2>Decisión pendiente\u003c/h2>\u003cp class=\"deccount\" id=\"dec-count\">\u003c/p>\u003col class=\"decisions\">\u003cli data-decision=\"1\">\u003cspan class=\"num\">01\u003c/span>\u003cdiv>\u003cp class=\"decision-q\">¿Qué acción se autoriza?\u003c/p>\u003cp class=\"decision-w\">Indica alcance, responsable y recursos acordados.\u003c/p>\u003c/div>\u003cdiv class=\"answer\">\u003cspan class=\"lbl\">Respuesta:\u003c/span>\u003ctextarea data-answer=\"1\" rows=\"1\" placeholder=\"sin responder\">\u003c/textarea>\u003c/div>\u003c/li>\u003c/ol>\u003c/section>\u003cfooter>\u003cp>Fuentes, responsable y fecha de actualización: por completar.\u003c/p>\u003c/footer>", "figures": {}}, {"id": "plan-proyecto", "title": "Plan de proyecto", "description": "Objetivos, fases, responsables y riesgos en un mismo documento.", "design": "executive", "html": "\u003cheader>\u003cp class=\"kicker\">Documento de trabajo\u003c/p>\u003ch1>Nombre del proyecto\u003c/h1>\u003cp class=\"lede\">Describe el resultado que se busca y cómo se medirá su éxito.\u003c/p>\u003cdiv class=\"meta\">\u003cspan class=\"pill is-draft\">Borrador\u003c/span>\u003cspan class=\"pill\">Fecha por completar\u003c/span>\u003c/div>\u003c/header>\u003csection>\u003ch2>Objetivo y alcance\u003c/h2>\u003cp>Define entregables, criterios de aceptación y exclusiones.\u003c/p>\u003c/section>\u003csection>\u003ch2>Fases e hitos\u003c/h2>\u003cdiv class=\"tablewrap\">\u003ctable>\u003cthead>\u003ctr>\u003cth>Fase\u003c/th>\u003cth>Entregable\u003c/th>\u003cth>Responsable\u003c/th>\u003cth>Fecha\u003c/th>\u003c/tr>\u003c/thead>\u003ctbody>\u003ctr>\u003ctd>Preparación\u003c/td>\u003ctd>Por definir\u003c/td>\u003ctd>Por asignar\u003c/td>\u003ctd>Por acordar\u003c/td>\u003c/tr>\u003ctr>\u003ctd>Ejecución\u003c/td>\u003ctd>Por definir\u003c/td>\u003ctd>Por asignar\u003c/td>\u003ctd>Por acordar\u003c/td>\u003c/tr>\u003ctr>\u003ctd>Validación\u003c/td>\u003ctd>Por definir\u003c/td>\u003ctd>Por asignar\u003c/td>\u003ctd>Por acordar\u003c/td>\u003c/tr>\u003c/tbody>\u003c/table>\u003c/div>\u003c/section>\u003csection>\u003ch2>Riesgos y dependencias\u003c/h2>\u003cdiv class=\"tablewrap\">\u003ctable>\u003cthead>\u003ctr>\u003cth>Riesgo\u003c/th>\u003cth>Impacto\u003c/th>\u003cth>Mitigación\u003c/th>\u003c/tr>\u003c/thead>\u003ctbody>\u003ctr>\u003ctd>Por identificar\u003c/td>\u003ctd>Por evaluar\u003c/td>\u003ctd>Por definir\u003c/td>\u003c/tr>\u003c/tbody>\u003c/table>\u003c/div>\u003c/section>\u003csection>\u003ch2>Decisión pendiente\u003c/h2>\u003cp class=\"deccount\" id=\"dec-count\">\u003c/p>\u003col class=\"decisions\">\u003cli data-decision=\"1\">\u003cspan class=\"num\">01\u003c/span>\u003cdiv>\u003cp class=\"decision-q\">¿Se confirma el alcance y el calendario?\u003c/p>\u003cp class=\"decision-w\">Recoge las condiciones necesarias para iniciar el proyecto.\u003c/p>\u003c/div>\u003cdiv class=\"answer\">\u003cspan class=\"lbl\">Respuesta:\u003c/span>\u003ctextarea data-answer=\"1\" rows=\"1\" placeholder=\"sin responder\">\u003c/textarea>\u003c/div>\u003c/li>\u003c/ol>\u003c/section>\u003cfooter>\u003cp>Fuentes, responsable y fecha de actualización: por completar.\u003c/p>\u003c/footer>", "figures": {}}, {"id": "comparacion-alternativas", "title": "Comparación de alternativas", "description": "Criterios, evidencias y compromisos para justificar una elección.", "design": "editorial", "html": "\u003cheader>\u003cp class=\"kicker\">Documento de trabajo\u003c/p>\u003ch1>Comparación de alternativas\u003c/h1>\u003cp class=\"lede\">Explica la necesidad y cuáles son las opciones que se están evaluando.\u003c/p>\u003cdiv class=\"meta\">\u003cspan class=\"pill is-draft\">Borrador\u003c/span>\u003cspan class=\"pill\">Fecha por completar\u003c/span>\u003c/div>\u003c/header>\u003csection>\u003ch2>Criterios de evaluación\u003c/h2>\u003cp>Define qué importa y cómo se evaluará cada criterio antes de puntuar las opciones.\u003c/p>\u003c/section>\u003csection>\u003ch2>Comparación\u003c/h2>\u003cdiv class=\"tablewrap\">\u003ctable>\u003cthead>\u003ctr>\u003cth>Criterio\u003c/th>\u003cth>Alternativa A\u003c/th>\u003cth>Alternativa B\u003c/th>\u003c/tr>\u003c/thead>\u003ctbody>\u003ctr>\u003ctd>Adecuación\u003c/td>\u003ctd>Por evaluar\u003c/td>\u003ctd>Por evaluar\u003c/td>\u003c/tr>\u003ctr>\u003ctd>Coste total\u003c/td>\u003ctd>Por estimar\u003c/td>\u003ctd>Por estimar\u003c/td>\u003c/tr>\u003ctr>\u003ctd>Riesgo\u003c/td>\u003ctd>Por evaluar\u003c/td>\u003ctd>Por evaluar\u003c/td>\u003c/tr>\u003ctr>\u003ctd>Plazo\u003c/td>\u003ctd>Por estimar\u003c/td>\u003ctd>Por estimar\u003c/td>\u003c/tr>\u003c/tbody>\u003c/table>\u003c/div>\u003c/section>\u003csection>\u003ch2>Recomendación y compromisos\u003c/h2>\u003cp>Justifica la elección con evidencia y explicita qué se acepta perder.\u003c/p>\u003c/section>\u003csection>\u003ch2>Decisión pendiente\u003c/h2>\u003cp class=\"deccount\" id=\"dec-count\">\u003c/p>\u003col class=\"decisions\">\u003cli data-decision=\"1\">\u003cspan class=\"num\">01\u003c/span>\u003cdiv>\u003cp class=\"decision-q\">¿Qué alternativa se elige?\u003c/p>\u003cp class=\"decision-w\">Anota las condiciones de la elección y cuándo revisarla.\u003c/p>\u003c/div>\u003cdiv class=\"answer\">\u003cspan class=\"lbl\">Respuesta:\u003c/span>\u003ctextarea data-answer=\"1\" rows=\"1\" placeholder=\"sin responder\">\u003c/textarea>\u003c/div>\u003c/li>\u003c/ol>\u003c/section>\u003cfooter>\u003cp>Fuentes, responsable y fecha de actualización: por completar.\u003c/p>\u003c/footer>", "figures": {}}, {"id": "registro-decision", "title": "Registro de decisión", "description": "Contexto, decisión, consecuencias y condiciones de revisión.", "design": "editorial", "html": "\u003cheader>\u003cp class=\"kicker\">Documento de trabajo\u003c/p>\u003ch1>Título de la decisión\u003c/h1>\u003cp class=\"lede\">Resume el asunto que requiere una decisión y su ámbito.\u003c/p>\u003cdiv class=\"meta\">\u003cspan class=\"pill is-draft\">Borrador\u003c/span>\u003cspan class=\"pill\">Fecha por completar\u003c/span>\u003c/div>\u003c/header>\u003csection>\u003ch2>Contexto\u003c/h2>\u003cp>Describe las restricciones, antecedentes y hechos que motivan la decisión.\u003c/p>\u003c/section>\u003csection>\u003ch2>Alternativas consideradas\u003c/h2>\u003cp>Explica las opciones evaluadas y por qué se descartan o se mantienen.\u003c/p>\u003c/section>\u003csection>\u003ch2>Decisión pendiente\u003c/h2>\u003cp class=\"deccount\" id=\"dec-count\">\u003c/p>\u003col class=\"decisions\">\u003cli data-decision=\"1\">\u003cspan class=\"num\">01\u003c/span>\u003cdiv>\u003cp class=\"decision-q\">¿Cuál es la decisión acordada?\u003c/p>\u003cp class=\"decision-w\">Registra la resolución, quién la toma y en qué fecha.\u003c/p>\u003c/div>\u003cdiv class=\"answer\">\u003cspan class=\"lbl\">Respuesta:\u003c/span>\u003ctextarea data-answer=\"1\" rows=\"1\" placeholder=\"sin responder\">\u003c/textarea>\u003c/div>\u003c/li>\u003c/ol>\u003c/section>\u003csection>\u003ch2>Consecuencias\u003c/h2>\u003cp>Describe beneficios, costes, riesgos y obligaciones que se aceptan.\u003c/p>\u003c/section>\u003csection>\u003ch2>Cuándo revisar\u003c/h2>\u003cp>Define señales o cambios de contexto que justificarían revisar la decisión.\u003c/p>\u003c/section>\u003cfooter>\u003cp>Fuentes, responsable y fecha de actualización: por completar.\u003c/p>\u003c/footer>", "figures": {}}]</script>
 <script>
 (function () {
   "use strict";
 
   var SVGNS = "http://www.w3.org/2000/svg";
   var STORE_KEY = "docuweb:borrador:" + (location.pathname || "doc");
-  var FIGS = ["f1", "f2", "f3"];
+  var FIGS = [];
   var SNAP = 4;
 
   var dataEl = document.getElementById("diagram-data");
   var baseline = JSON.parse(dataEl.textContent);
   var model = clone(baseline);
+  FIGS = Object.keys(model.figures);
 
   var state = {
     editing: false,
@@ -530,6 +641,7 @@
   function selPrune() {
     var f = state.sel.fig;
     if (!f) return;
+    if (!model.figures[f]) { selClear(); return; }
     state.sel.items = state.sel.items.filter(function (i) {
       return i.type === "node" ? !!node(f, i.id) : !!edge(f, i.id);
     });
@@ -597,12 +709,12 @@
   var NOTE_PAD = 12, NOTE_LH = 17, NOTE_SIZE = 12.5;
 
   function noteLines(n) {
-    return wrapText(n.text, Math.max(n.w - NOTE_PAD * 2, 40), NOTE_SIZE);
+    return wrapText(n.text, Math.max(n.w - NOTE_PAD * 2, 40), drawingFontSize(n, NOTE_SIZE));
   }
   // la nota crece con su contenido: nunca recorta lo escrito
   function fitNoteHeight(n) {
     var lines = noteLines(n).length || 1;
-    n.h = NOTE_PAD * 2 + lines * NOTE_LH + (n.by ? 16 : 0);
+    n.h = NOTE_PAD * 2 + lines * noteLineHeight(n) + (n.by ? drawingFontSize(n, NOTE_SIZE) + 4 : 0);
     return n.h;
   }
 
@@ -665,8 +777,8 @@
     var dead = n.kind === "dead" || n.kind === "chipdead";
     var tCls = "t-title" + (small ? " sm" : "") + (dead ? " t-dead" : "");
     var sCls = "t-sub" + (small ? " sm" : "") + (dead ? " t-dead" : "");
-    var tBase = small ? 13.5 : 15;
-    var sBase = small ? 12 : 12.5;
+    var tBase = drawingFontSize(n, small ? 13.5 : 15);
+    var sBase = appearanceOf(n).fontSize == null ? (small ? 12 : 12.5) : Math.max(9, tBase - 2.5);
 
     if (n.kind === "divider") {
       var vertical = n.h > n.w;
@@ -681,7 +793,7 @@
       return;
     }
     if (n.kind === "label") {
-      var anchor = n.align || "middle";
+      var anchor = appearanceOf(n).align || n.align || "middle";
       var lx = anchor === "end" ? n.x + n.w : anchor === "start" ? n.x : n.x + n.w / 2;
       g.appendChild(textEl(lx, n.y + 16, n.title || "", "t-sub", anchor));
       return;
@@ -689,7 +801,7 @@
     if (n.kind === "note") {
       var nl = noteLines(n);
       nl.forEach(function (ln, i) {
-        g.appendChild(textEl(n.x + NOTE_PAD, n.y + NOTE_PAD + 13 + i * NOTE_LH, ln, "t-note", "start"));
+        g.appendChild(textEl(n.x + NOTE_PAD, n.y + NOTE_PAD + drawingFontSize(n, NOTE_SIZE) + i * noteLineHeight(n), ln, "t-note", "start"));
       });
       if (n.by) {
         g.appendChild(textEl(n.x + n.w - NOTE_PAD, n.y + n.h - NOTE_PAD + 2, n.by, "t-noteby", "end"));
@@ -703,17 +815,19 @@
     if (n.sub2) lines.push({ s: n.sub2, cls: sCls, size: fitSize(n.sub2, maxW, sBase) });
     if (!lines.length) return;
 
-    var gap = 18;
+    var gap = Math.max(18, tBase * 1.3);
     var startY;
     if (n.top) {
-      startY = n.y + 26;
+      startY = n.y + 11 + tBase;
     } else {
       var total = (lines.length - 1) * gap;
       startY = n.y + n.h / 2 - total / 2 + 5;
     }
     lines.forEach(function (ln, i) {
-      var t = textEl(n.x + n.w / 2, startY + i * gap, ln.s, ln.cls);
-      t.setAttribute("font-size", ln.size);
+      var align = appearanceOf(n).align || "middle";
+      var tx = align === "start" ? n.x + pad : align === "end" ? n.x + n.w - pad : n.x + n.w / 2;
+      var t = textEl(tx, startY + i * gap, ln.s, ln.cls, align);
+      t.style.fontSize = ln.size + "px";
       g.appendChild(t);
     });
   }
@@ -775,11 +889,12 @@
         g.appendChild(el("rect", { x: n.x, y: n.y, width: n.w, height: n.h, rx: 4 }, "n-" + n.kind));
       }
       renderNodeText(g, n);
+      decorateNode(g, n);
       gNodes.appendChild(g);
     });
 
     // aristas
-    d.edges.forEach(function (e) {
+    d.edges.forEach(function (e, index) {
       var p = edgePath(f, e);
       if (!p) return;
       var kind = e.kind || "line";
@@ -798,16 +913,18 @@
         // flecha cuando esta se mueve, y ademas se puede separar de ella
         if (e.lo) { lx += e.lo.dx; ly += e.lo.dy; }
         // zona de agarre propia: el texto no recibe el puntero
-        var lw = textWidth(e.label, 12) + 12;
+        var labelSize = drawingFontSize(e, 12);
+        var lw = textWidth(e.label, labelSize) + 12;
         g.appendChild(el("rect", {
           x: anchor === "middle" ? lx - lw / 2 : lx - 6,
-          y: ly - 13, width: lw, height: 18, rx: 2,
+          y: ly - labelSize - 1, width: lw, height: labelSize + 6, rx: 2,
           "data-elabel": e.id
         }, "hitlbl"));
         var lbl = textEl(lx, ly, e.label, "t-edge" + (kind === "new" ? " new" : kind === "dead" ? " dead" : ""), anchor);
-        lbl.setAttribute("font-size", 12);
+        lbl.style.fontSize = labelSize + "px";
         g.appendChild(lbl);
       }
+      decorateEdge(g, line, e, defs, f, index);
       gEdges.appendChild(g);
     });
 
@@ -823,6 +940,7 @@
       }
       g.appendChild(el("rect", { x: n.x, y: n.y, width: n.w, height: n.h, rx: 4 }, "n-note"));
       renderNodeText(g, n);
+      decorateNode(g, n);
       gNotes.appendChild(g);
     });
 
@@ -894,19 +1012,24 @@
   function undo() {
     if (!state.undo.length) return;
     state.redo.push(JSON.stringify(model));
+    var savedMeta = clone(meta());
     model = JSON.parse(state.undo.pop());
+    model.meta = savedMeta;
     selPrune();
     afterChange();
   }
   function redo() {
     if (!state.redo.length) return;
     state.undo.push(JSON.stringify(model));
+    var savedMeta = clone(meta());
     model = JSON.parse(state.redo.pop());
+    model.meta = savedMeta;
     selPrune();
     afterChange();
   }
 
   function afterChange() {
+    restoreContent();
     markDirty();
     renderAll();
     renderProps();
@@ -997,13 +1120,16 @@
   /* ---------------- modal ---------------- */
 
   var overlay = document.getElementById("overlay");
+  var modalReturnFocus = null;
 
   function closeModal() {
     overlay.hidden = true;
+    if (modalReturnFocus && modalReturnFocus.isConnected) modalReturnFocus.focus();
     document.getElementById("modal-body").innerHTML = "";
     document.getElementById("modal-actions").innerHTML = "";
   }
   function openModal(title, buildBody, buttons) {
+    modalReturnFocus = document.activeElement;
     document.getElementById("modal-title").textContent = title;
     var body = document.getElementById("modal-body");
     var acts = document.getElementById("modal-actions");
@@ -1018,8 +1144,8 @@
       acts.appendChild(el2);
     });
     overlay.hidden = false;
-    var first = body.querySelector("input");
-    if (first) { first.focus(); first.select(); }
+    var first = overlay.querySelector("input,button,select,textarea");
+    if (first) { first.focus(); if (first.select) first.select(); }
   }
 
   overlay.addEventListener("pointerdown", function (evt) {
@@ -1164,6 +1290,10 @@
   }
 
   function doSave(who, note) {
+    if (state.saving) return;
+    syncContent();
+    var wasTextEditing = textEditing;
+    setTextEditing(false);
     var m = meta();
     var metaBefore = JSON.parse(JSON.stringify(m));
     m.rev = m.rev + 1;
@@ -1203,12 +1333,17 @@
     var html = "<!doctype html>\n" + document.documentElement.outerHTML;
 
     function restaurar() {
+      state.saving = false;
+      document.body.inert = false;
+      setTextEditing(wasTextEditing);
       if (wasEditing) setEditing(true);
       state.sel = sel;
       renderAll();
       renderProps();
     }
 
+    state.saving = true;
+    document.body.inert = true;
     writeToDisk(filename, html).then(function (res) {
       if (res === "cancel") {
         // no se grabo nada: la version no debe avanzar
@@ -1241,7 +1376,12 @@
   function openHelp() {
     openModal("Cómo se edita", function (body) {
       var bloques = [
-        ["Editar", "El botón Editar diagramas abre las barras de herramientas de las tres figuras. "
+        ["Texto y bloques", "Editar texto permite escribir en títulos, párrafos, tablas y pies de figura. Al final del documento puedes añadir secciones, tablas, avisos, diagramas y decisiones. Deshacer y Rehacer también recuperan el contenido."],
+        ["Plantillas y estilo", "Plantillas descarga un documento nuevo. Estilo cambia la apariencia del documento actual; Tema permite elegir claro, oscuro o seguir el sistema. Todo se conserva al grabar una versión."],
+        ["Apariencia", "Selecciona una caja o línea para cambiar colores, relleno, patrón, grosor, esquinas y texto. Las flechas admiten puntas en ambos extremos. Puedes aplicar cambios a una selección múltiple, copiar y pegar apariencia o volver a los valores del tipo."],
+        ["Diagramas", "Selecciona cajas para duplicarlas, alinearlas, distribuirlas o ajustarlas al texto. Diagramas añade un flujo, capas, un antes y después o una secuencia."],
+        ["Imprimir / PDF", "Abre la impresión del navegador y elige Guardar como PDF. Se ocultan los controles y se incluyen las respuestas completas."],
+        ["Editar", "El botón Editar diagramas abre las barras de herramientas de las figuras. "
           + "Fuera de ese modo el documento solo se lee."],
         ["Mover y cambiar", "Arrastra cajas, codos de flecha y etiquetas. Tira de la esquina para "
           + "redimensionar. Doble clic sobre una caja abre su panel. Supr borra lo elegido."],
@@ -1373,9 +1513,14 @@
   }
 
   function renderProps() {
+    renderTools();
     var panel = document.getElementById("props");
     var body = document.getElementById("props-body");
     var title = document.getElementById("props-title");
+    var panelKey = state.sel.fig + ":" + state.sel.items.map(function (it) { return it.type + ":" + it.id; }).join(",");
+    var panelScroll = panel._selectionKey === panelKey ? panel.scrollTop : 0;
+    panel._selectionKey = panelKey;
+    requestAnimationFrame(function () { if (panel._selectionKey === panelKey) panel.scrollTop = panelScroll; });
     body.innerHTML = "";
     if (!state.editing || !selCount()) { panel.classList.remove("open"); return; }
     panel.classList.add("open");
@@ -1407,6 +1552,7 @@
         if (v) nt.anchor = v; else delete nt.anchor;
         afterChange();
       }));
+      renderAppearancePanel(f, body);
       var na = document.createElement("div");
       na.className = "props-actions";
       var nDel = document.createElement("button");
@@ -1437,6 +1583,7 @@
       body.appendChild(selectField("Estilo", n.kind, KINDS_NODE, function (v) {
         snapshot(); n.kind = v; afterChange();
       }));
+      renderAppearancePanel(f, body);
       var acts = document.createElement("div");
       acts.className = "props-actions";
       var bTop = document.createElement("button");
@@ -1464,6 +1611,7 @@
       body.appendChild(selectField("Origen", e.from, opts, function (v) { snapshot(); e.from = v; afterChange(); }));
       body.appendChild(selectField("Destino", e.to, opts, function (v) { snapshot(); e.to = v; afterChange(); }));
       body.appendChild(selectField("Estilo", e.kind || "line", KINDS_EDGE, function (v) { snapshot(); e.kind = v; afterChange(); }));
+      renderAppearancePanel(f, body);
       var acts2 = document.createElement("div");
       acts2.className = "props-actions";
       var bWp = document.createElement("button");
@@ -1532,6 +1680,7 @@
 
     var acts = document.createElement("div");
     acts.className = "props-actions";
+    renderAppearancePanel(f, body);
     var bNone = document.createElement("button");
     bNone.type = "button"; bNone.className = "btn btn--sm btn--ghost";
     bNone.textContent = "Quitar selección";
@@ -1580,6 +1729,7 @@
   function renderTools() {
     FIGS.forEach(function (f) {
       var bar = document.querySelector('[data-tools="' + f + '"]');
+      if (!bar) return;
       bar.innerHTML = "";
       bar.appendChild(toolButton("+ Caja", function () {
         snapshot();
@@ -1625,6 +1775,7 @@
         connecting ? "btn--primary" : "",
         "Pulsa el botón y después la caja de origen y la de destino"
       ));
+      studioFigureTools(f, bar);
       bar.appendChild(toolButton("Seleccionar todo", function () { selectAll(f); }, "btn--ghost",
         "Elige todas las cajas, notas y flechas de esta figura para moverlas juntas"));
       bar.appendChild(toolButton("Deshacer", undo, "btn--ghost"));
@@ -1632,7 +1783,7 @@
       bar.appendChild(toolButton("Exportar SVG", function () { exportSvg(f); }, "btn--ghost"));
       bar.appendChild(toolButton("Restablecer figura", function () {
         snapshot();
-        model.figures[f] = clone(baseline.figures[f]);
+        model.figures[f] = baseline.figures[f] ? clone(baseline.figures[f]) : { w: 640, h: 220, nodes: [], edges: [] };
         selClear();
         afterChange();
       }, "btn--ghost"));
@@ -1653,7 +1804,7 @@
 
   /* ---------------- exportar SVG ---------------- */
 
-  var INLINE_PROPS = ["fill", "stroke", "stroke-width", "stroke-dasharray", "font-size", "font-weight", "font-family"];
+  var INLINE_PROPS = ["fill", "stroke", "stroke-width", "stroke-dasharray", "stroke-linecap", "stroke-linejoin", "opacity", "fill-opacity", "stroke-opacity", "font-size", "font-weight", "font-style", "font-family", "text-anchor"];
 
   function exportSvg(f) {
     var selBefore = state.sel, editBefore = state.editing;
@@ -1676,6 +1827,7 @@
         if (v && v !== "none" || p === "fill" || p === "stroke") target.setAttribute(p, v);
       });
       target.removeAttribute("class");
+      target.removeAttribute("style");
     }
     // despues del copiado de estilos, para no desalinear el recorrido por indice:
     // si las notas estan ocultas en pantalla, tampoco salen en el SVG exportado
@@ -1697,7 +1849,7 @@
     var blob = new Blob([out], { type: "image/svg+xml;charset=utf-8" });
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
-    a.href = url; a.download = "cms-api-" + f + ".svg";
+    a.href = url; a.download = BASENAME + "-" + f + ".svg";
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
 
@@ -1766,6 +1918,8 @@
 
   function attachCanvas(f) {
     var svg = document.querySelector('svg[data-svg="' + f + '"]');
+    if (!svg || svg._docuwebAttached) return;
+    svg._docuwebAttached = true;
     var drag = null;
 
     svg.addEventListener("pointerdown", function (evt) {
@@ -1965,6 +2119,10 @@
   }
   function attachAnswers() {
     document.querySelectorAll("[data-answer]").forEach(function (ta) {
+      if (ta._docuwebAttached) return;
+      ta._docuwebAttached = true;
+      var question = ta.closest("[data-decision]").querySelector(".decision-q");
+      ta.setAttribute("aria-label", question ? question.textContent : "Respuesta a la decisión");
       ta.addEventListener("input", function () {
         var k = ta.getAttribute("data-answer");
         var a = answers();
@@ -2029,6 +2187,559 @@
     renderTools();
   }
 
+    /* Content, appearance and diagrams share the existing versioned model. */
+  var contentRoot = document.getElementById("document-content");
+  var textEditing = false;
+  var textSession = null;
+  var lastDocumentHTML = "";
+  var templateCatalog = JSON.parse(document.getElementById("template-data").textContent);
+  var EDITABLE = "h1,h2,h3,p,th,td,figcaption,.pill";
+
+  function cleanContent(root) {
+    root.querySelectorAll('[data-block-tools]').forEach(function (e) { e.remove(); });
+    root.querySelectorAll("[contenteditable]").forEach(function (e) { e.removeAttribute("contenteditable"); });
+    root.querySelectorAll("svg[data-svg],.figtools").forEach(function (e) { e.innerHTML = ""; });
+    root.querySelectorAll("svg[data-svg]").forEach(function (e) { e.removeAttribute("viewBox"); });
+    root.querySelectorAll(".answer-print").forEach(function (e) { e.remove(); });
+    root.querySelectorAll("[data-answer]").forEach(function (e) { e.textContent = ""; e.removeAttribute("style"); });
+    root.querySelectorAll(".is-answered").forEach(function (e) { e.classList.remove("is-answered"); });
+    root.querySelectorAll(".deccount").forEach(function (e) { e.textContent = ""; });
+    return root;
+  }
+  function captureContent() { return cleanContent(contentRoot.cloneNode(true)).innerHTML; }
+  function syncContent() {
+    if (!model.document) model.document = { design: "technical", theme: "auto" };
+    model.document.html = captureContent();
+    lastDocumentHTML = model.document.html;
+  }
+  function applyAppearance() {
+    var doc = model.document || {};
+    document.documentElement.setAttribute("data-design", doc.design || "technical");
+    if (!doc.theme || doc.theme === "auto") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", doc.theme);
+    document.getElementById("design-select").value = doc.design || "technical";
+    document.getElementById("theme-select").value = doc.theme || "auto";
+  }
+  function restoreContent() {
+    var html = model.document && model.document.html;
+    if (typeof html === "string" && html !== lastDocumentHTML) {
+      contentRoot.innerHTML = html;
+      lastDocumentHTML = html;
+      FIGS = Object.keys(model.figures).filter(function (f) { return !!contentRoot.querySelector('svg[data-svg="' + f + '"]'); });
+      FIGS.forEach(attachCanvas);
+      attachAnswers();
+      setTextEditing(textEditing);
+    }
+    applyAppearance();
+    var title = contentRoot.querySelector("h1");
+    if (title) document.title = title.textContent.trim() || "Documento";
+  }
+  function setTextEditing(on) {
+    textSession = null;
+    textEditing = on;
+    renderSectionControls(on);
+    document.body.classList.toggle("editing-content", on);
+    var btn = document.getElementById("btn-content");
+    btn.textContent = on ? "Terminar texto" : "Editar texto";
+    btn.setAttribute("aria-pressed", String(on));
+    contentRoot.querySelectorAll(EDITABLE).forEach(function (e) {
+      if (e.closest(".figtools,.deccount,.answer") || e.querySelector("textarea,input,button")) return;
+      if (on) e.setAttribute("contenteditable", "true");
+      else e.removeAttribute("contenteditable");
+    });
+  }
+  function insertPlainText(text) {
+    beginTextChange(document.activeElement);
+    var selection = window.getSelection();
+    if (!selection.rangeCount) return;
+    var range = selection.getRangeAt(0);
+    if (!contentRoot.contains(range.commonAncestorContainer)) return;
+    range.deleteContents();
+    var node = document.createTextNode(text);
+    range.insertNode(node);
+    range.setStartAfter(node); range.collapse(true);
+    selection.removeAllRanges(); selection.addRange(range);
+    syncContent(); markDirty();
+  }
+  function changeSection(index, action) {
+    var root = cleanContent(contentRoot.cloneNode(true));
+    var sections = Array.from(root.children).filter(function (e) { return e.tagName === "SECTION"; });
+    var section = sections[index];
+    if (!section || (action === "up" && index === 0) || (action === "down" && index === sections.length - 1)) return;
+    snapshot();
+    if (action === "remove") {
+      section.querySelectorAll('[data-fig]').forEach(function (e) { delete model.figures[e.getAttribute('data-fig')]; });
+      section.querySelectorAll('[data-answer]').forEach(function (e) { delete model.answers[e.getAttribute('data-answer')]; });
+      section.remove();
+      selClear();
+    } else if (action === "up") root.insertBefore(section, sections[index - 1]);
+    else root.insertBefore(sections[index + 1], section);
+    model.document.html = root.innerHTML;
+    afterChange();
+  }
+  function renderSectionControls(on) {
+    contentRoot.querySelectorAll('[data-block-tools]').forEach(function (e) { e.remove(); });
+    if (!on) return;
+    var sections = Array.from(contentRoot.children).filter(function (e) { return e.tagName === "SECTION"; });
+    sections.forEach(function (section, index) {
+      var bar = document.createElement('div'); bar.className = 'section-controls'; bar.setAttribute('data-block-tools', '');
+      [['up', 'Subir'], ['down', 'Bajar'], ['remove', 'Eliminar sección']].forEach(function (pair) {
+        var button = toolButton(pair[1], function () { changeSection(index, pair[0]); }, 'btn--ghost');
+        button.disabled = pair[0] === 'up' && index === 0 || pair[0] === 'down' && index === sections.length - 1;
+        button.setAttribute('aria-label', pair[1] + ': ' + (section.querySelector('h2') ? section.querySelector('h2').textContent : 'sección ' + (index + 1)));
+        bar.appendChild(button);
+      });
+      section.insertBefore(bar, section.firstChild);
+    });
+  }
+  function beginTextChange(target) {
+    if (target && target.isContentEditable && textSession !== target) {
+      snapshot();
+      textSession = target;
+    }
+  }
+  function newDecision(id) {
+    return '<section><h2>Decisión pendiente</h2><ol class="decisions"><li data-decision="' + id + '">'
+      + '<span class="num">' + String(id).padStart(2, "0") + '</span><div><p class="decision-q">¿Qué hay que decidir?</p>'
+      + '<p class="decision-w">Explica las consecuencias y quién debe responder.</p></div>'
+      + '<div class="answer"><span class="lbl">Respuesta:</span><textarea data-answer="' + id + '" rows="1" placeholder="sin responder"></textarea></div></li></ol></section>';
+  }
+  function figureHTML(id) {
+    return '<section><h2>Diagrama</h2><figure data-fig="' + id + '"><div class="figtools" data-tools="' + id + '"></div>'
+      + '<div class="canvas canvas--mid"><svg data-svg="' + id + '" role="img" aria-label="Diagrama del documento"></svg></div>'
+      + '<figcaption>Describe lo que muestra el diagrama.</figcaption></figure></section>';
+  }
+  function addBlock(kind) {
+    snapshot();
+    var root = cleanContent(contentRoot.cloneNode(true));
+    var section = '<section><h2>Nueva sección</h2><p>Escribe aquí el contenido.</p></section>';
+    if (kind === "callout") section = '<section><div class="callout"><h3>Idea destacada</h3><p>Explica el hallazgo o la recomendación.</p></div></section>';
+    if (kind === "table") section = '<section><h2>Comparación</h2><div class="tablewrap"><table><thead><tr><th>Criterio</th><th>Alternativa A</th><th>Alternativa B</th></tr></thead><tbody><tr><td>Beneficio</td><td>Por completar</td><td>Por completar</td></tr><tr><td>Limitación</td><td>Por completar</td><td>Por completar</td></tr></tbody></table></div></section>';
+    if (kind === "decision") {
+      var ids = Array.from(root.querySelectorAll("[data-decision]")).map(function (e) { return Number(e.getAttribute("data-decision")) || 0; });
+      section = newDecision(Math.max.apply(Math, [0].concat(ids)) + 1);
+    }
+    if (kind === "figure") {
+      var id = uid("f", Object.keys(model.figures).map(function (f) { return { id: f }; }));
+      model.figures[id] = diagramPreset("flow");
+      section = figureHTML(id);
+    }
+    var footer = root.querySelector("footer");
+    if (footer) footer.insertAdjacentHTML("beforebegin", section);
+    else root.insertAdjacentHTML("beforeend", section);
+    model.document.html = root.innerHTML;
+    afterChange();
+    var added = contentRoot.querySelector("section:last-of-type");
+    if (added) { added.scrollIntoView({ behavior: "smooth", block: "center" }); var heading = added.querySelector("[contenteditable]"); if (heading) heading.focus(); }
+  }
+  function diagramPreset(kind) {
+    var labels = kind === "layers" ? ["Presentación", "Aplicación", "Datos"] : kind === "sequence" ? ["Preparar", "Ejecutar", "Validar"] : ["Entrada", "Proceso", "Resultado"];
+    var vertical = kind === "layers";
+    var nodes = labels.map(function (t, i) { return { id: "n" + i, x: vertical ? 180 : 32 + i * 224, y: vertical ? 32 + i * 112 : 64, w: 176, h: 64, kind: i === 1 ? "new" : "box", title: t }; });
+    var edges = [0, 1].map(function (i) { return { id: "e" + i, from: "n" + i, to: "n" + (i + 1), label: kind === "sequence" ? "continúa" : "envía" }; });
+    if (kind === "beforeafter") {
+      nodes = [{id:"n0",x:32,y:64,w:220,h:72,kind:"dead",title:"Situación actual",sub:"limitación por resolver"}, {id:"n1",x:352,y:64,w:220,h:72,kind:"new",title:"Situación propuesta",sub:"mejora esperada"}];
+      edges = [{id:"e0",from:"n0",to:"n1",label:"transformación",kind:"new"}];
+    }
+    return { w: vertical ? 540 : 704, h: vertical ? 384 : 224, nodes: nodes, edges: edges };
+  }
+  function insertDiagramPreset(f, kind) {
+    snapshot();
+    var preset = diagramPreset(kind), d = fig(f), mapping = {};
+    var offset = d.nodes.length ? Math.max.apply(Math, d.nodes.map(function (n) { return n.y + n.h; })) + 48 : 0;
+    preset.nodes.forEach(function (n) { var old = n.id; n.id = uid("n", d.nodes); mapping[old] = n.id; n.y += offset; d.nodes.push(n); });
+    preset.edges.forEach(function (e) { e.id = uid("e", d.edges); e.from = mapping[e.from]; e.to = mapping[e.to]; d.edges.push(e); });
+    d.w = Math.max(d.w, preset.w); d.h = Math.max(d.h, offset + preset.h);
+    state.sel = { fig: f, items: preset.nodes.map(function (n) { return { type: "node", id: n.id }; }) };
+    closeModal(); afterChange();
+  }
+  function openDiagramPresets(f) {
+    openModal("Añadir diagrama", function (body) {
+      [["flow","Flujo"],["layers","Arquitectura por capas"],["beforeafter","Antes y después"],["sequence","Secuencia de etapas"]].forEach(function (pair) {
+        body.appendChild(toolButton(pair[1], function () { insertDiagramPreset(f, pair[0]); }));
+      });
+    }, [{label:"Cerrar",onClick:closeModal}]);
+  }
+  function descendants(f, roots) {
+    var found = {}, out = [];
+    function visit(n) { if (!n || found[n.id]) return; found[n.id] = true; out.push(n); childrenOf(f, n.id).forEach(visit); }
+    roots.forEach(visit); return out;
+  }
+  function selectedRoots(f) {
+    var ids = selIds("node");
+    return ids.map(function (id) { return node(f,id); }).filter(function (n) {
+      if (!n) return false;
+      var p = n.parent, seen = {};
+      while (p && !seen[p]) { if (ids.indexOf(p) >= 0) return false; seen[p] = true; var parent = node(f,p); p = parent && parent.parent; }
+      return true;
+    });
+  }
+  function duplicateSelection(f) {
+    var roots = selectedRoots(f); if (!roots.length) return;
+    snapshot();
+    var d = fig(f), mapping = {}, copies = descendants(f, roots).map(function (n) {
+      var c = clone(n); c.id = uid("n", d.nodes); mapping[n.id] = c.id; c.x += 24; c.y += 24; d.nodes.push(c); return c;
+    });
+    copies.forEach(function (n) { if (mapping[n.parent]) n.parent = mapping[n.parent]; if (mapping[n.anchor]) n.anchor = mapping[n.anchor]; });
+    d.edges.slice().forEach(function (e) {
+      if (!mapping[e.from] || !mapping[e.to]) return;
+      var c = clone(e); c.id = uid("e",d.edges); c.from = mapping[e.from]; c.to = mapping[e.to];
+      if (c.wp) { c.wp.x += 24; c.wp.y += 24; } d.edges.push(c);
+    });
+    state.sel = {fig:f,items:roots.map(function (n) {return {type:"node",id:mapping[n.id]};})};
+    afterChange();
+  }
+  function arrangeSelection(f, action) {
+    var roots = selectedRoots(f); if (!roots.length) return;
+    if (action.indexOf("distribute") === 0 && roots.length < 3) return;
+    snapshot();
+    var deltas = {};
+    if (action === "fit") {
+      roots.forEach(function (n) {
+        if (n.kind === "note") { fitNoteHeight(n); return; }
+        if (childrenOf(f,n.id).length || n.kind === "divider") return;
+        var texts = [n.title,n.sub,n.sub2].filter(Boolean);
+        var fontSize = drawingFontSize(n, 15);
+        var weightFactor = appearanceOf(n).bold ? 1.15 : 1;
+        n.w = Math.max(100, Math.ceil(Math.max.apply(Math,[0].concat(texts.map(function (s) {return textWidth(s,fontSize) * weightFactor;}))) + 32));
+        n.h = Math.max(52, texts.length * Math.max(20, fontSize * 1.3) + 24);
+      });
+    } else {
+      var axis = action === "left" || action === "distribute-x" ? "x" : "y";
+      var dim = axis === "x" ? "w" : "h";
+      roots.sort(function(a,b){return a[axis]-b[axis];});
+      var first = roots[0][axis], cursor = first;
+      var gap = roots.length > 1 ? (roots[roots.length-1][axis]+roots[roots.length-1][dim]-first-roots.reduce(function(sum,n){return sum+n[dim];},0))/(roots.length-1) : 0;
+      roots.forEach(function(n){
+        var target = action.indexOf("distribute") === 0 ? cursor : first;
+        var delta = target-n[axis];
+        descendants(f,[n]).forEach(function(k){k[axis]+=delta; deltas[k.id]={axis:axis,value:delta};});
+        cursor += n[dim]+gap;
+      });
+      fig(f).edges.forEach(function(e){var a=deltas[e.from],b=deltas[e.to]; if(e.wp&&a&&b&&a.axis===b.axis&&a.value===b.value)e.wp[a.axis]+=a.value;});
+    }
+    afterChange();
+  }
+  function studioFigureTools(f, bar) {
+    bar.appendChild(toolButton("Diagramas…",function(){openDiagramPresets(f);},"btn--ghost"));
+    var active = state.sel.fig === f && selIds("node").length > 0;
+    var duplicate = toolButton("Duplicar",function(){duplicateSelection(f);},"btn--ghost"); duplicate.disabled=!active; bar.appendChild(duplicate);
+    var select = document.createElement("select"); select.className="btn btn--sm"; select.setAttribute("aria-label","Organizar cajas");
+    [["","Organizar…"],["left","Alinear izquierda"],["top","Alinear arriba"],["distribute-x","Distribuir horizontal"],["distribute-y","Distribuir vertical"],["fit","Ajustar al texto"]].forEach(function(pair){var option=document.createElement("option");option.value=pair[0];option.textContent=pair[1];select.appendChild(option);});
+    select.disabled=!active;
+    select.addEventListener("change",function(){if(select.value)arrangeSelection(f,select.value);});bar.appendChild(select);
+  }
+  function preparePrint() {
+    contentRoot.querySelectorAll(".answer-print").forEach(function(e){e.remove();});
+    contentRoot.querySelectorAll("[data-answer]").forEach(function(ta){
+      var p=document.createElement("div");p.className="answer-print";p.textContent=ta.value||"Sin responder";ta.parentNode.appendChild(p);
+    });
+  }
+  function newTemplate(template) {
+    var root = document.documentElement.cloneNode(true);
+    var fresh = {version:1,meta:{rev:1,savedAt:"",savedBy:"",history:[]},answers:{},figures:clone(template.figures),document:{html:template.html,design:template.design,theme:"auto"}};
+    root.querySelector("#document-content").innerHTML=template.html;
+    root.querySelector("#diagram-data").textContent="\n"+JSON.stringify(fresh,null,2).replace(/</g,"\\u003c")+"\n";
+    root.querySelector("title").textContent=template.title;
+    root.setAttribute("data-design",template.design);root.removeAttribute("data-theme");
+    root.querySelector("body").classList.remove("editing","editing-content");
+    root.querySelector("#overlay").hidden=true;
+    root.querySelector("#modal-body").innerHTML="";root.querySelector("#modal-actions").innerHTML="";
+    root.querySelector("#props").classList.remove("open");root.querySelector("#props-body").innerHTML="";
+    root.querySelector("#notice").classList.remove("open");
+    root.querySelector("#btn-history").textContent="v1";
+    root.querySelector("#status").className="saved";root.querySelector("#status").textContent="sin cambios";
+    root.querySelector(".brandmark").textContent="docuweb · "+template.title;
+    root.querySelector("#btn-edit").textContent="Editar diagramas";root.querySelector("#btn-edit").setAttribute("aria-pressed","false");
+    root.querySelector("#btn-content").textContent="Editar texto";root.querySelector("#btn-content").setAttribute("aria-pressed","false");
+    downloadBlob(template.id+".html","<!doctype html>\n"+root.outerHTML);
+    closeModal();notice("Plantilla descargada. Abre "+template.id+".html para empezar un documento nuevo.");
+  }
+  function openTemplates() {
+    openModal("Un documento para cada propósito",function(body){
+      var p=document.createElement("p");p.textContent="Elige una estructura. Se descargará un documento nuevo, listo para editar y compartir.";body.appendChild(p);
+      var grid=document.createElement("div");grid.className="template-grid";
+      templateCatalog.forEach(function(t){
+        var card=toolButton("",function(){newTemplate(t);},"template-card");
+        var preview=document.createElement("span");preview.className="template-preview";preview.setAttribute("aria-hidden","true");preview.innerHTML="<i></i><i></i><i></i>";
+        var title=document.createElement("strong");title.textContent=t.title;
+        var detail=document.createElement("small");detail.textContent=t.description;
+        card.appendChild(preview);card.appendChild(title);card.appendChild(detail);grid.appendChild(card);
+      });body.appendChild(grid);
+    },[{label:"Cerrar",onClick:closeModal}]);
+  }
+  function initStudio(restored) {
+    if (!baseline.document) baseline.document={html:captureContent(),design:"technical",theme:"auto"};
+    // The visible HTML remains authoritative for documents filled in by hand.
+    baseline.document.html=captureContent();
+    if (!model.document) model.document=clone(baseline.document);
+    if (!restored) model.document.html=baseline.document.html;
+    restoreContent();
+    document.getElementById("btn-content").addEventListener("click",function(){setTextEditing(!textEditing);});
+    document.getElementById("btn-templates").addEventListener("click",openTemplates);
+    document.getElementById("btn-print").addEventListener("click",function(){preparePrint();window.print();});
+    window.addEventListener("beforeprint",preparePrint);
+    document.querySelectorAll("[data-add-block]").forEach(function(btn){btn.addEventListener("click",function(){addBlock(btn.getAttribute("data-add-block"));});});
+    document.getElementById("btn-content-undo").addEventListener("click",undo);
+    document.getElementById("btn-content-redo").addEventListener("click",redo);
+    [["design-select","design"],["theme-select","theme"]].forEach(function(pair){document.getElementById(pair[0]).addEventListener("change",function(e){snapshot();model.document[pair[1]]=e.target.value;applyAppearance();markDirty();});});
+    contentRoot.addEventListener("focusout",function(){textSession=null;});
+    contentRoot.addEventListener("beforeinput",function(e){beginTextChange(e.target);});
+    contentRoot.addEventListener("input",function(e){if(e.target.isContentEditable){beginTextChange(e.target);syncContent();var h=contentRoot.querySelector("h1");if(h)document.title=h.textContent;markDirty();}});
+    contentRoot.addEventListener("paste",function(e){if(!e.target.isContentEditable)return;e.preventDefault();insertPlainText(e.clipboardData.getData("text/plain"));});
+    contentRoot.addEventListener("drop",function(e){if(e.target.isContentEditable)e.preventDefault();});
+    contentRoot.addEventListener("keydown",function(e){
+      if(!e.target.isContentEditable)return;
+      if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();insertPlainText("\n");}
+      if((e.ctrlKey||e.metaKey)&&(e.key.toLowerCase()==="z"||e.key.toLowerCase()==="y")){e.preventDefault();if(e.shiftKey||e.key.toLowerCase()==="y")redo();else undo();}
+    });
+  }
+
+  /* Optional appearance overrides leave semantic kinds and old documents intact. */
+  var DRAW_PATTERNS = {
+    solid: [], dashed: [6, 4], dotted: [0.1, 3], dashdot: [7, 3, 0.1, 3], longdash: [12, 5]
+  };
+  var appearanceClipboard = null;
+  var appearanceOpenGroups = { "Borde y relleno": true, "Texto": false, "Extremos de línea": true };
+  var appearanceFields = ["stroke", "fill", "textColor", "strokeWidth", "dash", "radius", "opacity", "fontSize", "bold", "italic", "align", "linecap", "startHead", "endHead"];
+
+  function appearanceOf(item) { return item.appearance || {}; }
+  function validColor(value) { return /^#[0-9a-f]{6}$/i.test(value || ""); }
+  function appearanceNumber(item, key, fallback, min, max) {
+    var value = appearanceOf(item)[key];
+    return typeof value === "number" && isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
+  }
+  function drawingFontSize(item, fallback) { return appearanceNumber(item, "fontSize", fallback, 9, 40); }
+  function noteLineHeight(n) { return drawingFontSize(n, NOTE_SIZE) * 1.36; }
+  function defaultStroke(item, isEdge) {
+    if (item.kind === "new") return "var(--brand-ink)";
+    if (item.kind === "dead" || item.kind === "chipdead") return "var(--danger)";
+    if (item.kind === "note") return "var(--note-ink)";
+    if (item.kind === "divider") return "var(--info)";
+    return isEdge ? "var(--ink-muted)" : "var(--border-strong)";
+  }
+  function applyStroke(shape, item, isEdge) {
+    if (!shape) return;
+    var a = appearanceOf(item);
+    if (validColor(a.stroke)) shape.style.stroke = a.stroke;
+    if (a.strokeWidth != null) {
+      shape.style.strokeWidth = appearanceNumber(item, "strokeWidth", 1.5, 0, 12);
+      // Interior blocks normally have no outline; setting a width enables one.
+      if (!isEdge && item.kind === "chip" && !validColor(a.stroke)) shape.style.stroke = defaultStroke(item, false);
+    }
+    if (Object.prototype.hasOwnProperty.call(DRAW_PATTERNS, a.dash)) {
+      var scale = appearanceNumber(item, "strokeWidth", 1.5, 0.5, 12);
+      shape.style.strokeDasharray = DRAW_PATTERNS[a.dash].length ? DRAW_PATTERNS[a.dash].map(function (v) { return v * scale; }).join(" ") : "none";
+      if (item.kind === "chip" && !validColor(a.stroke)) shape.style.stroke = defaultStroke(item, false);
+      if (a.dash === "dotted" || a.dash === "dashdot") shape.style.strokeLinecap = "round";
+    }
+    if (["butt", "round", "square"].indexOf(a.linecap) >= 0) shape.style.strokeLinecap = a.linecap;
+  }
+  function applyTextAppearance(group, item) {
+    var a = appearanceOf(item);
+    group.querySelectorAll("text").forEach(function (t) {
+      if (validColor(a.textColor)) t.style.fill = a.textColor;
+      if (typeof a.bold === "boolean") t.style.fontWeight = a.bold ? "700" : "400";
+      if (typeof a.italic === "boolean") t.style.fontStyle = a.italic ? "italic" : "normal";
+    });
+  }
+  function decorateNode(group, n) {
+    var a = appearanceOf(n);
+    var shape = group.querySelector('[class^="n-"]');
+    applyStroke(shape, n, false);
+    if (shape && shape.tagName.toLowerCase() === "rect") {
+      if (a.fill === "none" || validColor(a.fill)) shape.style.fill = a.fill;
+      if (a.radius != null) shape.setAttribute("rx", appearanceNumber(n, "radius", 4, 0, Math.min(n.w, n.h) / 2));
+      // Keep transparent and borderless shapes easy to select.
+      shape.style.pointerEvents = "all";
+    }
+    if (a.opacity != null) group.style.opacity = appearanceNumber(n, "opacity", 1, 0.1, 1);
+    applyTextAppearance(group, n);
+    if (["note", "label", "divider"].indexOf(n.kind) >= 0 && a.fontSize != null) {
+      group.querySelectorAll("text").forEach(function (t) { t.style.fontSize = drawingFontSize(n, 12.5) + "px"; });
+    }
+    var tail = group.querySelector(".e-note");
+    if (tail) applyStroke(tail, n, false);
+    var dot = group.querySelector(".p-note");
+    if (dot && validColor(a.stroke)) dot.style.fill = a.stroke;
+  }
+  function makeArrowMarker(defs, id, type, color) {
+    var m = el("marker", { id: id, viewBox: "0 0 12 12", refX: 10, refY: 6, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" });
+    var shape;
+    if (type === "circle") shape = el("circle", { cx: 6, cy: 6, r: 4 });
+    else if (type === "diamond") shape = el("path", { d: "M1,6 L6,1 L11,6 L6,11 z" });
+    else if (type === "open") shape = el("path", { d: "M2,2 L10,6 L2,10", fill: "none", "stroke-width": 1.5 });
+    else shape = el("path", { d: "M1,1 L11,6 L1,11 z" });
+    if (type === "open") { shape.style.stroke = color; shape.style.fill = "none"; }
+    else shape.style.fill = color;
+    m.appendChild(shape); defs.appendChild(m);
+    return "url(#" + id + ")";
+  }
+  function decorateEdge(group, line, e, defs, f, index) {
+    var a = appearanceOf(e);
+    applyStroke(line, e, true);
+    if (a.opacity != null) group.style.opacity = appearanceNumber(e, "opacity", 1, 0.1, 1);
+    applyTextAppearance(group, e);
+    var color = validColor(a.stroke) ? a.stroke : defaultStroke(e, true);
+    [["start", a.startHead || "none"], ["end", a.endHead || "arrow"]].forEach(function (pair) {
+      if (pair[1] === "none" || a.strokeWidth === 0) line.removeAttribute("marker-" + pair[0]);
+      else line.setAttribute("marker-" + pair[0], makeArrowMarker(defs, f + "-edge-" + index + "-" + pair[0], pair[1], color));
+    });
+  }
+
+  function drawingSelection(f) {
+    return state.sel.items.map(function (it) { return { type: it.type, item: it.type === "node" ? node(f, it.id) : edge(f, it.id) }; }).filter(function (it) { return !!it.item; });
+  }
+  function supportsAppearance(entry, key) {
+    if (["stroke", "strokeWidth", "dash", "linecap"].indexOf(key) >= 0 && entry.type === "node" && entry.item.kind === "label") return false;
+    if (["startHead", "endHead"].indexOf(key) >= 0) return entry.type === "edge";
+    if (["fill", "radius"].indexOf(key) >= 0) return entry.type === "node" && ["divider", "label"].indexOf(entry.item.kind) < 0;
+    if (key === "align") return entry.type === "node" && ["divider", "note"].indexOf(entry.item.kind) < 0;
+    return true;
+  }
+  function commonAppearance(entries, key) {
+    var applicable = entries.filter(function (entry) { return supportsAppearance(entry, key); });
+    var values = applicable.map(function (entry) { return appearanceOf(entry.item)[key]; });
+    if (!values.length) return undefined;
+    return values.every(function (v) { return v === values[0]; }) ? values[0] : "mixed";
+  }
+  function setAppearance(f, key, value) {
+    snapshot();
+    drawingSelection(f).forEach(function (entry) {
+      if (!supportsAppearance(entry, key)) return;
+      if (!entry.item.appearance) entry.item.appearance = {};
+      if (value === undefined) delete entry.item.appearance[key];
+      else entry.item.appearance[key] = value;
+      if (entry.item.kind === "note") fitNoteHeight(entry.item);
+    });
+    afterChange();
+  }
+  function appearanceSelect(f, entries, key, label, options) {
+    var current = commonAppearance(entries, key);
+    var choices = [["", "Del tipo de elemento"]].concat(options);
+    if (current === "mixed") choices.unshift(["mixed", "Varios valores"]);
+    var fieldEl = selectField(label, current == null ? "" : String(current), choices, function (v) {
+      if (v === "mixed") return;
+      setAppearance(f, key, v === "" ? undefined : key === "bold" || key === "italic" ? v === "true" : v);
+    });
+    var input = fieldEl.querySelector("select");
+    input.setAttribute("aria-label", label); input.dataset.appearance = key;
+    return fieldEl;
+  }
+  function appearanceNumberField(f, entries, key, label, min, max, step, scale) {
+    var current = commonAppearance(entries, key), wrap = document.createElement("div");
+    wrap.className = "field";
+    var labelEl = document.createElement("label"), input = document.createElement("input");
+    input.type = "number"; input.min = min; input.max = max; input.step = step;
+    input.id = "appearance-" + key; labelEl.htmlFor = input.id; labelEl.textContent = label;
+    input.dataset.appearance = key;
+    input.value = typeof current === "number" ? Math.round(current * (scale || 1) * 100) / 100 : "";
+    input.placeholder = current === "mixed" ? "Varios valores" : "Automático";
+    input.addEventListener("change", function () {
+      if (!input.checkValidity()) { input.reportValidity(); return; }
+      setAppearance(f, key, input.value === "" ? undefined : Number(input.value) / (scale || 1));
+    });
+    wrap.appendChild(labelEl); wrap.appendChild(input); return wrap;
+  }
+  function appearanceColor(f, entries, key, label, transparent) {
+    var current = commonAppearance(entries, key);
+    var wrap = document.createElement("div"); wrap.className = "field color-field";
+    var labelEl = document.createElement("label"); labelEl.textContent = label;
+    var row = document.createElement("div"); row.className = "color-controls";
+    var picker = document.createElement("input"); picker.type = "color";
+    picker.value = validColor(current) ? current : effectiveColor(f, entries, key);
+    picker.setAttribute("aria-label", label); picker.dataset.appearance = key;
+    var hex = document.createElement("input"); hex.type = "text"; hex.maxLength = 7;
+    hex.setAttribute("aria-label", label + " hexadecimal");
+    hex.value = validColor(current) ? current : "";
+    hex.placeholder = current === "mixed" ? "Varios" : current === "none" ? "Sin relleno" : "Automático";
+    hex.pattern = "#[0-9a-fA-F]{6}";
+    picker.addEventListener("input", function () { hex.value = picker.value; });
+    picker.addEventListener("change", function () { setAppearance(f, key, picker.value); });
+    hex.addEventListener("change", function () {
+      if (!hex.checkValidity()) { hex.reportValidity(); return; }
+      setAppearance(f, key, hex.value || undefined);
+    });
+    var reset = toolButton("Auto", function () { setAppearance(f, key, undefined); }, "btn--ghost", "Usar el color del tipo de elemento");
+    row.appendChild(picker); row.appendChild(hex); row.appendChild(reset);
+    wrap.appendChild(labelEl); wrap.appendChild(row);
+    if (transparent) {
+      var clear = toolButton("Sin relleno", function () { setAppearance(f, key, "none"); }, "btn--ghost");
+      clear.dataset.appearance = "transparent"; clear.setAttribute("aria-pressed", String(current === "none")); wrap.appendChild(clear);
+    }
+    return wrap;
+  }
+  function effectiveColor(f, entries, key) {
+    var svg = document.querySelector('svg[data-svg="' + f + '"]');
+    var entry = entries.filter(function (e) { return supportsAppearance(e, key); })[0];
+    if (!entry || !svg) return "#ffffff";
+    var attr = entry.type === "node" ? "data-node" : "data-edge";
+    var group = Array.from(svg.querySelectorAll("[" + attr + "]")).filter(function (g) { return g.getAttribute(attr) === entry.item.id; })[0];
+    var shape = group && group.querySelector(key === "textColor" ? "text" : entry.type === "node" ? '[class^="n-"]' : 'polyline:not(.hit)');
+    var color = shape ? getComputedStyle(shape).getPropertyValue(key === "stroke" ? "stroke" : "fill") : "";
+    var rgb = color.match(/^rgba?\((\d+),?\s+(\d+),?\s+(\d+)/);
+    return rgb ? "#" + rgb.slice(1, 4).map(function (v) { return Number(v).toString(16).padStart(2, "0"); }).join("") : "#ffffff";
+  }
+  function appearanceGroup(body, title, expanded) {
+    var details = document.createElement("details"); details.className = "appearance-group";
+    details.open = appearanceOpenGroups[title] == null ? expanded : appearanceOpenGroups[title];
+    details.addEventListener("toggle", function () { if (details.isConnected) appearanceOpenGroups[title] = details.open; });
+    var summary = document.createElement("summary"); summary.textContent = title; details.appendChild(summary);
+    var fields = document.createElement("div"); fields.className = "appearance-fields"; details.appendChild(fields); body.appendChild(details); return fields;
+  }
+  function renderAppearancePanel(f, body) {
+    var entries = drawingSelection(f);
+    if (!entries.length) return;
+    var boxEntries = entries.filter(function (e) { return supportsAppearance(e, "fill"); });
+    var hasEdges = entries.some(function (e) { return e.type === "edge"; });
+    var hasStroke = entries.some(function (e) { return supportsAppearance(e, "stroke"); });
+    var fields = appearanceGroup(body, hasStroke ? "Borde y relleno" : "Apariencia", true);
+    if (hasStroke) {
+      fields.appendChild(appearanceColor(f, entries, "stroke", "Color de línea", false));
+      fields.appendChild(appearanceSelect(f, entries, "dash", "Patrón de línea", [["solid", "Continua ━━━━━"], ["dashed", "Segmentos ━ ━ ━"], ["dotted", "Puntos · · · ·"], ["dashdot", "Guion-punto ━ · ━ ·"], ["longdash", "Segmentos largos ━━ ━━"]]));
+    }
+    var grid = document.createElement("div"); grid.className = "appearance-grid";
+    if (hasStroke) grid.appendChild(appearanceNumberField(f, entries, "strokeWidth", "Grosor (px)", 0, 12, 0.25));
+    grid.appendChild(appearanceNumberField(f, entries, "opacity", "Opacidad (%)", 10, 100, 5, 100)); fields.appendChild(grid);
+    if (boxEntries.length) {
+      fields.appendChild(appearanceColor(f, entries, "fill", "Relleno", true));
+      fields.appendChild(appearanceNumberField(f, entries, "radius", "Esquinas (px)", 0, 100, 1));
+    }
+    var text = appearanceGroup(body, "Texto", false);
+    text.appendChild(appearanceColor(f, entries, "textColor", "Color del texto", false));
+    text.appendChild(appearanceNumberField(f, entries, "fontSize", "Tamaño del texto (px)", 9, 40, 0.5));
+    text.appendChild(appearanceSelect(f, entries, "bold", "Peso", [["false", "Normal"], ["true", "Negrita"]]));
+    text.appendChild(appearanceSelect(f, entries, "italic", "Inclinación", [["false", "Normal"], ["true", "Cursiva"]]));
+    if (entries.some(function (e) { return supportsAppearance(e, "align"); })) text.appendChild(appearanceSelect(f, entries, "align", "Alineación del texto", [["start", "Izquierda"], ["middle", "Centro"], ["end", "Derecha"]]));
+    if (hasEdges) {
+      var ends = appearanceGroup(body, "Extremos de línea", true);
+      var options = [["none", "Sin punta"], ["arrow", "Flecha"], ["open", "Flecha abierta"], ["circle", "Círculo"], ["diamond", "Rombo"]];
+      ends.appendChild(appearanceSelect(f, entries, "startHead", "Inicio", options));
+      ends.appendChild(appearanceSelect(f, entries, "endHead", "Final", options));
+      ends.appendChild(appearanceSelect(f, entries, "linecap", "Terminación del trazo", [["butt", "Recta"], ["round", "Redonda"], ["square", "Cuadrada"]]));
+    }
+    var actions = document.createElement("div"); actions.className = "props-actions appearance-actions";
+    var copy = toolButton("Copiar apariencia", function () {
+      appearanceClipboard = clone(appearanceOf(entries[0].item)); renderProps();
+    }, "btn--ghost");
+    copy.disabled = entries.length !== 1; actions.appendChild(copy);
+    var paste = toolButton("Pegar apariencia", function () {
+      if (!appearanceClipboard) return;
+      snapshot();
+      drawingSelection(f).forEach(function (entry) {
+        entry.item.appearance = {};
+        appearanceFields.forEach(function (key) { if (supportsAppearance(entry, key) && appearanceClipboard[key] !== undefined) entry.item.appearance[key] = appearanceClipboard[key]; });
+        if (entry.item.kind === "note") fitNoteHeight(entry.item);
+      }); afterChange();
+    }, "btn--ghost");
+    paste.disabled = !appearanceClipboard; actions.appendChild(paste);
+    actions.appendChild(toolButton("Restablecer apariencia", function () {
+      snapshot(); entries.forEach(function (entry) { delete entry.item.appearance; if (entry.item.kind === "note") fitNoteHeight(entry.item); }); afterChange();
+    }, "btn--ghost"));
+    body.appendChild(actions);
+  }
+
+
   /* ---------------- arranque ---------------- */
 
   function init() {
@@ -2040,6 +2751,8 @@
         if (parsed && parsed.figures) { model = parsed; restored = true; }
       }
     } catch (err) { /* almacenamiento no disponible */ }
+
+    initStudio(restored);
 
     var notesOn = true;
     try {
@@ -2075,6 +2788,7 @@
       if (!window.confirm("Se descartan los cambios sin grabar y vuelven los diagramas de la última versión grabada. ¿Continuar?")) return;
       snapshot();
       model = clone(baseline);
+      restoreContent();
       selClear();
       renderMeta();
       renderAll(); renderProps(); renderTools(); renderAnswers();
@@ -2086,8 +2800,14 @@
     });
 
     document.addEventListener("keydown", function (evt) {
+      if (evt.key === "Tab" && !overlay.hidden) {
+        var focusable = overlay.querySelectorAll('button:not(:disabled),input,select,textarea');
+        var first = focusable[0], last = focusable[focusable.length - 1];
+        if (evt.shiftKey && document.activeElement === first) { evt.preventDefault(); last.focus(); }
+        else if (!evt.shiftKey && document.activeElement === last) { evt.preventDefault(); first.focus(); }
+      }
       if (evt.key === "Escape" && !overlay.hidden) { evt.preventDefault(); closeModal(); return; }
-      if (!state.editing) return;
+      if (!state.editing || evt.target.isContentEditable) return;
       var tag = (evt.target.tagName || "").toLowerCase();
       if (tag === "input" || tag === "select" || tag === "textarea") return;
       var mod = evt.ctrlKey || evt.metaKey;

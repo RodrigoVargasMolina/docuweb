@@ -1,0 +1,90 @@
+[
+  {
+    "id": "propuesta-tecnica",
+    "title": "Propuesta técnica",
+    "description": "Del problema a una recomendación con alternativas y decisiones.",
+    "design": "technical",
+    "html": "<header><p class=\"kicker\">Documento de trabajo</p><h1>Título de la propuesta</h1><p class=\"lede\">Resume el cambio propuesto, a quién beneficia y por qué merece la pena.</p><div class=\"meta\"><span class=\"pill is-draft\">Borrador</span><span class=\"pill\">Fecha por completar</span></div></header><section><h2>Problema y alcance</h2><p>Describe el problema con evidencia. Delimita qué se incluye y qué queda fuera.</p></section><section><h2>Alternativas</h2><div class=\"tablewrap\"><table><thead><tr><th>Opción</th><th>Beneficio</th><th>Coste o limitación</th></tr></thead><tbody><tr><td>Situación actual</td><td>Por documentar</td><td>Por documentar</td></tr><tr><td>Propuesta</td><td>Por documentar</td><td>Por documentar</td></tr></tbody></table></div></section><section><h2>Arquitectura propuesta</h2><figure data-fig=\"f1\"><div class=\"figtools\" data-tools=\"f1\"></div><div class=\"canvas canvas--mid\"><svg data-svg=\"f1\" role=\"img\" aria-label=\"Entrada, proceso y resultado\"></svg></div><figcaption>Explica qué cambia y qué información pasa entre las piezas.</figcaption></figure></section><section><h2>Validación y riesgos</h2><p>Define cómo comprobar el resultado, qué podría fallar y cómo revertir el cambio.</p></section><section><h2>Decisión pendiente</h2><p class=\"deccount\" id=\"dec-count\"></p><ol class=\"decisions\"><li data-decision=\"1\"><span class=\"num\">01</span><div><p class=\"decision-q\">¿Se aprueba la propuesta?</p><p class=\"decision-w\">Indica responsable, condiciones y fecha de revisión.</p></div><div class=\"answer\"><span class=\"lbl\">Respuesta:</span><textarea data-answer=\"1\" rows=\"1\" placeholder=\"sin responder\"></textarea></div></li></ol></section><footer><p>Fuentes, responsable y fecha de actualización: por completar.</p></footer>",
+    "figures": {
+      "f1": {
+        "w": 704,
+        "h": 224,
+        "nodes": [
+          {
+            "id": "n0",
+            "x": 32,
+            "y": 64,
+            "w": 176,
+            "h": 64,
+            "kind": "box",
+            "title": "Entrada"
+          },
+          {
+            "id": "n1",
+            "x": 256,
+            "y": 64,
+            "w": 176,
+            "h": 64,
+            "kind": "new",
+            "title": "Proceso"
+          },
+          {
+            "id": "n2",
+            "x": 480,
+            "y": 64,
+            "w": 176,
+            "h": 64,
+            "kind": "box",
+            "title": "Resultado"
+          }
+        ],
+        "edges": [
+          {
+            "id": "e0",
+            "from": "n0",
+            "to": "n1",
+            "label": "envía"
+          },
+          {
+            "id": "e1",
+            "from": "n1",
+            "to": "n2",
+            "label": "envía"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "informe-ejecutivo",
+    "title": "Informe ejecutivo",
+    "description": "Hallazgos, indicadores y próximos pasos para decidir.",
+    "design": "executive",
+    "html": "<header><p class=\"kicker\">Documento de trabajo</p><h1>Título del informe</h1><p class=\"lede\">Escribe la conclusión principal y la decisión que necesita el lector.</p><div class=\"meta\"><span class=\"pill is-draft\">Borrador</span><span class=\"pill\">Fecha por completar</span></div></header><section><h2>Indicadores</h2><div class=\"metric-grid\"><div class=\"metric\"><h3>Resultado</h3><p>Por medir</p></div><div class=\"metric\"><h3>Plazo</h3><p>Por medir</p></div><div class=\"metric\"><h3>Recursos</h3><p>Por medir</p></div></div></section><section><h2>Hallazgos</h2><p>Resume los hallazgos y explica la evidencia que los sostiene.</p></section><section><div class=\"callout\"><h3>Recomendación</h3><p>Describe la acción recomendada y su efecto esperado.</p></div></section><section><h2>Próximos pasos</h2><div class=\"tablewrap\"><table><thead><tr><th>Acción</th><th>Responsable</th><th>Fecha</th></tr></thead><tbody><tr><td>Por definir</td><td>Por asignar</td><td>Por acordar</td></tr><tr><td>Por definir</td><td>Por asignar</td><td>Por acordar</td></tr></tbody></table></div></section><section><h2>Decisión pendiente</h2><p class=\"deccount\" id=\"dec-count\"></p><ol class=\"decisions\"><li data-decision=\"1\"><span class=\"num\">01</span><div><p class=\"decision-q\">¿Qué acción se autoriza?</p><p class=\"decision-w\">Indica alcance, responsable y recursos acordados.</p></div><div class=\"answer\"><span class=\"lbl\">Respuesta:</span><textarea data-answer=\"1\" rows=\"1\" placeholder=\"sin responder\"></textarea></div></li></ol></section><footer><p>Fuentes, responsable y fecha de actualización: por completar.</p></footer>",
+    "figures": {}
+  },
+  {
+    "id": "plan-proyecto",
+    "title": "Plan de proyecto",
+    "description": "Objetivos, fases, responsables y riesgos en un mismo documento.",
+    "design": "executive",
+    "html": "<header><p class=\"kicker\">Documento de trabajo</p><h1>Nombre del proyecto</h1><p class=\"lede\">Describe el resultado que se busca y cómo se medirá su éxito.</p><div class=\"meta\"><span class=\"pill is-draft\">Borrador</span><span class=\"pill\">Fecha por completar</span></div></header><section><h2>Objetivo y alcance</h2><p>Define entregables, criterios de aceptación y exclusiones.</p></section><section><h2>Fases e hitos</h2><div class=\"tablewrap\"><table><thead><tr><th>Fase</th><th>Entregable</th><th>Responsable</th><th>Fecha</th></tr></thead><tbody><tr><td>Preparación</td><td>Por definir</td><td>Por asignar</td><td>Por acordar</td></tr><tr><td>Ejecución</td><td>Por definir</td><td>Por asignar</td><td>Por acordar</td></tr><tr><td>Validación</td><td>Por definir</td><td>Por asignar</td><td>Por acordar</td></tr></tbody></table></div></section><section><h2>Riesgos y dependencias</h2><div class=\"tablewrap\"><table><thead><tr><th>Riesgo</th><th>Impacto</th><th>Mitigación</th></tr></thead><tbody><tr><td>Por identificar</td><td>Por evaluar</td><td>Por definir</td></tr></tbody></table></div></section><section><h2>Decisión pendiente</h2><p class=\"deccount\" id=\"dec-count\"></p><ol class=\"decisions\"><li data-decision=\"1\"><span class=\"num\">01</span><div><p class=\"decision-q\">¿Se confirma el alcance y el calendario?</p><p class=\"decision-w\">Recoge las condiciones necesarias para iniciar el proyecto.</p></div><div class=\"answer\"><span class=\"lbl\">Respuesta:</span><textarea data-answer=\"1\" rows=\"1\" placeholder=\"sin responder\"></textarea></div></li></ol></section><footer><p>Fuentes, responsable y fecha de actualización: por completar.</p></footer>",
+    "figures": {}
+  },
+  {
+    "id": "comparacion-alternativas",
+    "title": "Comparación de alternativas",
+    "description": "Criterios, evidencias y compromisos para justificar una elección.",
+    "design": "editorial",
+    "html": "<header><p class=\"kicker\">Documento de trabajo</p><h1>Comparación de alternativas</h1><p class=\"lede\">Explica la necesidad y cuáles son las opciones que se están evaluando.</p><div class=\"meta\"><span class=\"pill is-draft\">Borrador</span><span class=\"pill\">Fecha por completar</span></div></header><section><h2>Criterios de evaluación</h2><p>Define qué importa y cómo se evaluará cada criterio antes de puntuar las opciones.</p></section><section><h2>Comparación</h2><div class=\"tablewrap\"><table><thead><tr><th>Criterio</th><th>Alternativa A</th><th>Alternativa B</th></tr></thead><tbody><tr><td>Adecuación</td><td>Por evaluar</td><td>Por evaluar</td></tr><tr><td>Coste total</td><td>Por estimar</td><td>Por estimar</td></tr><tr><td>Riesgo</td><td>Por evaluar</td><td>Por evaluar</td></tr><tr><td>Plazo</td><td>Por estimar</td><td>Por estimar</td></tr></tbody></table></div></section><section><h2>Recomendación y compromisos</h2><p>Justifica la elección con evidencia y explicita qué se acepta perder.</p></section><section><h2>Decisión pendiente</h2><p class=\"deccount\" id=\"dec-count\"></p><ol class=\"decisions\"><li data-decision=\"1\"><span class=\"num\">01</span><div><p class=\"decision-q\">¿Qué alternativa se elige?</p><p class=\"decision-w\">Anota las condiciones de la elección y cuándo revisarla.</p></div><div class=\"answer\"><span class=\"lbl\">Respuesta:</span><textarea data-answer=\"1\" rows=\"1\" placeholder=\"sin responder\"></textarea></div></li></ol></section><footer><p>Fuentes, responsable y fecha de actualización: por completar.</p></footer>",
+    "figures": {}
+  },
+  {
+    "id": "registro-decision",
+    "title": "Registro de decisión",
+    "description": "Contexto, decisión, consecuencias y condiciones de revisión.",
+    "design": "editorial",
+    "html": "<header><p class=\"kicker\">Documento de trabajo</p><h1>Título de la decisión</h1><p class=\"lede\">Resume el asunto que requiere una decisión y su ámbito.</p><div class=\"meta\"><span class=\"pill is-draft\">Borrador</span><span class=\"pill\">Fecha por completar</span></div></header><section><h2>Contexto</h2><p>Describe las restricciones, antecedentes y hechos que motivan la decisión.</p></section><section><h2>Alternativas consideradas</h2><p>Explica las opciones evaluadas y por qué se descartan o se mantienen.</p></section><section><h2>Decisión pendiente</h2><p class=\"deccount\" id=\"dec-count\"></p><ol class=\"decisions\"><li data-decision=\"1\"><span class=\"num\">01</span><div><p class=\"decision-q\">¿Cuál es la decisión acordada?</p><p class=\"decision-w\">Registra la resolución, quién la toma y en qué fecha.</p></div><div class=\"answer\"><span class=\"lbl\">Respuesta:</span><textarea data-answer=\"1\" rows=\"1\" placeholder=\"sin responder\"></textarea></div></li></ol></section><section><h2>Consecuencias</h2><p>Describe beneficios, costes, riesgos y obligaciones que se aceptan.</p></section><section><h2>Cuándo revisar</h2><p>Define señales o cambios de contexto que justificarían revisar la decisión.</p></section><footer><p>Fuentes, responsable y fecha de actualización: por completar.</p></footer>",
+    "figures": {}
+  }
+]

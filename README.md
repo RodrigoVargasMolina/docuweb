@@ -36,8 +36,7 @@ archive exactly as they stood the day something was decided.
 
 ## Getting started
 
-**As a person:** download [`template.html`](template.html), open it and press *Editar
-diagramas*.
+**As a person:** open [`index.html`](index.html), choose *Plantillas* and select a document type. Open the downloaded HTML and use *Editar texto* or *Editar diagramas*. You can also start from [`template.html`](template.html).
 
 **As someone directing an assistant:** hand it the repository and this sentence:
 
@@ -45,6 +44,31 @@ diagramas*.
 
 **To see before deciding:** open [`index.html`](index.html), a complete, clickable example
 about moving writes out of a monolith.
+
+## Templates and presentation
+
+Five standalone templates are included: [technical proposal](templates/propuesta-tecnica.html),
+[executive report](templates/informe-ejecutivo.html), [project plan](templates/plan-proyecto.html),
+[alternatives comparison](templates/comparacion-alternativas.html) and
+[decision record](templates/registro-decision.html). Their content and interface are in Spanish.
+
+**Estilo** switches between Technical, Editorial and Executive presentation without changing
+the content. **Tema** selects light, dark or system appearance. **Plantillas** downloads a
+separate document with a fresh history.
+
+**Editar texto** edits headings, paragraphs, table cells and captions. Controls at the bottom
+add sections, callouts, tables, diagrams and decisions, with undo and redo. Text and appearance
+are included in the existing save/version workflow.
+
+Diagram tools duplicate, align, distribute and fit boxes to text. **Diagramas…** inserts flow,
+layered architecture, before/after and sequence presets. **Imprimir / PDF** provides an A4
+print layout with controls hidden, scaled diagrams and complete answers; choose Save as PDF
+in your browser's print dialog.
+
+Each section has Move up, Move down and Delete controls in text editing mode, with undo.
+Diagram properties include stroke/fill/text colors, five stroke patterns, width, corners,
+opacity, text formatting, independent endpoint markers and appearance copy/paste/reset.
+These settings survive versioned saves and standalone SVG exports.
 
 ## How it is built
 
@@ -82,15 +106,19 @@ language-neutral.
 
 ## Compatibility
 
-Recent Chrome, Edge, Firefox and Safari. The script avoids modern syntax, so older browsers
-work too. On Mac the multi-select modifier is Cmd, because Ctrl+click is the right-click; the
+Targets recent Chrome, Edge, Firefox and Safari. Automated checks run in Chromium;
+Firefox and Safari still require manual verification. On Mac the multi-select modifier is Cmd, because Ctrl+click is the right-click; the
 document detects this on its own.
 
 ## Interface language
 
 The document chrome — toolbar, dialogs, help — is in Spanish. The engine carries no
-user-facing English strings yet; translating it means touching the literals in `src/motor.html`.
+user-facing English strings yet; translating it means touching the literals in `src/motor.html` and `src/studio.js`.
 See [TODO.md](TODO.md).
+
+## Development
+
+Build with `python src/build.py`. See [source and test documentation](docs/development.md) (Spanish).
 
 ## License
 
