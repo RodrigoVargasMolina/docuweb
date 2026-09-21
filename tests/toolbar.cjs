@@ -31,6 +31,33 @@ module.exports = async function({run,open,click,change,screenshot,cdp}) {
   assert.ok(await run(`document.querySelector('#modal-body .histempty').getBoundingClientRect().width>200`),'and it has room to read');
   await run(`Array.from(document.querySelectorAll('#modal-actions button')).find(b=>b.textContent==='Cerrar').click()`);
   await screenshot('cabecera-escritorio');
+
+  // ocultar la barra: queda solo el interruptor, en el mismo sitio y tenue
+  const sitio=()=>run(`(function(){const r=document.getElementById('btn-chrome').getBoundingClientRect();return {arriba:Math.round(r.top),ancho:Math.round(r.width)}})()`);
+  const conBarra=await sitio();
+  const altoConBarra=await run(`Math.round(document.querySelector('.appbar').getBoundingClientRect().height)`);
+  await click('btn-chrome');
+  assert.equal(await run(`document.body.classList.contains('chrome-hidden')`),true);
+  assert.equal(await visible('btn-save'),false,'the toolbar is gone');
+  assert.equal(await visible('btn-chrome'),true,'but the way back is not');
+  assert.ok(await run(`Math.round(document.querySelector('.appbar').getBoundingClientRect().height)`)<altoConBarra/2,
+    'and the document gets the space back');
+  const sinBarra=await sitio();
+  assert.ok(Math.abs(sinBarra.arriba-conBarra.arriba)<=8,'the switch does not jump around when pressed');
+  // discreto no es invisible: si es lo unico que queda, tiene que encontrarse sin buscarlo
+  const pinta=await run(`(function(){const e=document.getElementById('btn-chrome');const s=getComputedStyle(e);const r=e.getBoundingClientRect();
+    return {ancho:Math.round(r.width),alto:Math.round(r.height),fondo:s.backgroundColor,borde:s.borderTopWidth,opacidad:Number(s.opacity),texto:e.textContent}})()`);
+  assert.ok(pinta.ancho>=56&&pinta.alto>=28,'big enough to see and to hit: '+pinta.ancho+'x'+pinta.alto);
+  assert.notEqual(pinta.fondo,'rgba(0, 0, 0, 0)','it has a surface of its own');
+  assert.equal(pinta.borde,'1px','and an edge');
+  assert.equal(pinta.opacidad,1,'and it is not faded out');
+  assert.ok(/Barra/.test(pinta.texto),'and it says what it brings back');
+  assert.equal(await run(`document.getElementById('btn-chrome').getAttribute('aria-expanded')`),'false');
+  assert.equal(await run(`document.getElementById('btn-chrome').getAttribute('aria-label')`),'Mostrar la barra');
+  await screenshot('cabecera-oculta');
+  await click('btn-chrome');
+  assert.equal(await visible('btn-save'),true,'and it comes back');
+  assert.equal(await run(`document.getElementById('btn-chrome').getAttribute('aria-label')`),'Ocultar la barra');
   await change('theme-select','light');
   assert.equal(await run(`document.getElementById('status').textContent`),'Sin guardar');
   await change('lang-select','en');

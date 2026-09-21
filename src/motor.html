@@ -362,7 +362,8 @@
 <body>
 
 <div class="appbar">
-  <div class="appbar-inner">
+  <div class="appbar-inner" id="appbar-inner">
+    <button type="button" class="btn btn--sm" id="btn-chrome" aria-controls="appbar-inner" aria-expanded="true" aria-label="Ocultar la barra" title="Ocultar la barra">▴</button>
     <div class="appbar-heading">
     <button type="button" class="btn mobile-control" id="btn-menu" data-panel="preferences" aria-controls="preferences" aria-expanded="false" data-i18n-aria-label="appbar.preferences" aria-label="Preferencias">☰</button>
     <div class="document-identity"><span class="product-name">docuweb · </span><span class="brandmark">docuweb</span></div>
@@ -577,6 +578,9 @@
     lang = next;
     try { localStorage.setItem(LANG_KEY, lang); } catch (err) { /* modo privado */ }
     applyStatic();
+    // el rótulo del interruptor de la barra cambia según su estado, así que no lleva
+    // `data-i18n` y hay que volver a ponerlo a mano
+    setChrome(chromeVisible());
     // vuelve a pintar barras, paneles y avisos, que se construyen con t()
     afterChange();
   }
@@ -1519,7 +1523,11 @@
     status.textContent = t("status.clean");
 
     var filename = BASENAME + "-v" + m.rev + ".html";
+    // la barra escondida es preferencia de quien mira: el fichero se graba con ella puesta
+    var barraOculta = !chromeVisible();
+    document.body.classList.remove("chrome-hidden");
     var html = "<!doctype html>\n" + document.documentElement.outerHTML;
+    if (barraOculta) document.body.classList.add("chrome-hidden");
 
     function restaurar() {
       state.saving = false;
@@ -2463,6 +2471,27 @@
     });
   }
 
+  /* ---------------- la barra: mostrar u ocultar ----------------
+     Preferencia de quien mira, no del documento: vive en el navegador, como las notas y
+     el idioma, y `doSave` la quita del cuerpo antes de grabar. Un documento se abre
+     enseñando con qué se edita. */
+
+  var CHROME_KEY = "docuweb:barra";
+
+  function setChrome(on) {
+    document.body.classList.toggle("chrome-hidden", !on);
+    var b = document.getElementById("btn-chrome");
+    // quitada, el botón lleva su palabra: es lo único que queda para volver
+    b.textContent = on ? "▴" : "▾ " + t("appbar.chrome.short");
+    b.setAttribute("aria-expanded", String(on));
+    var etiqueta = t(on ? "appbar.chrome.hide" : "appbar.chrome.show");
+    b.setAttribute("aria-label", etiqueta);
+    b.setAttribute("title", etiqueta);
+    try { localStorage.setItem(CHROME_KEY, on ? "1" : "0"); } catch (err) { /* nada */ }
+  }
+
+  function chromeVisible() { return !document.body.classList.contains("chrome-hidden"); }
+
   /* ---------------- notas: mostrar u ocultar ---------------- */
 
   var NOTES_KEY = "docuweb:notas";
@@ -2549,14 +2578,17 @@
     initStudio(restored);
 
     var notesOn = true;
+    var chromeOn = true;
     try {
       var pref = localStorage.getItem(NOTES_KEY);
       if (pref === "0") notesOn = false;
+      if (localStorage.getItem(CHROME_KEY) === "0") chromeOn = false;
     } catch (err) { /* nada */ }
 
     renderMeta();
     renderAll();
     renderTools();
+    setChrome(chromeOn);
     setNotes(notesOn);
     renderAnswers();
     attachAnswers();
@@ -2574,6 +2606,7 @@
     }
 
     document.getElementById("btn-edit").addEventListener("click", function () { setEdit(!state.editing); });
+    document.getElementById("btn-chrome").addEventListener("click", function () { setChrome(!chromeVisible()); });
     document.getElementById("btn-notes").addEventListener("click", function () { setNotes(state.hideNotes); });
     document.getElementById("btn-save").addEventListener("click", openSaveDialog);
     document.getElementById("btn-history").addEventListener("click", openHistory);

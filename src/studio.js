@@ -464,7 +464,7 @@
     root.querySelector("#diagram-data").textContent="\n"+fileJSON(fresh)+"\n";
     root.querySelector("title").textContent=v.title;
     root.setAttribute("data-design",template.design);root.removeAttribute("data-theme");
-    root.querySelector("body").classList.remove("editing","editing-content");
+    root.querySelector("body").classList.remove("editing","editing-content","chrome-hidden");
     root.querySelector("#overlay").hidden=true;
     root.querySelector("#modal-body").innerHTML="";root.querySelector("#modal-actions").innerHTML="";
     root.querySelector("#props").classList.remove("open");root.querySelector("#props-body").innerHTML="";
