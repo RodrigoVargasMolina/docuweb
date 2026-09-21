@@ -39,6 +39,7 @@
       FIGS = Object.keys(model.figures).filter(function (f) { return !!contentRoot.querySelector('svg[data-svg="' + f + '"]'); });
       FIGS.forEach(attachCanvas);
       attachAnswers();
+      marcaEnlaces(contentRoot);
       setTextEditing(textEditing);
     }
     applyAppearance();
@@ -50,13 +51,100 @@
     textEditing = on;
     renderSectionControls(on);
     document.body.classList.toggle("editing-content", on);
-    var btn = document.getElementById("btn-content");
-    btn.textContent = on ? t("appbar.finishText") : t("appbar.editText");
-    btn.setAttribute("aria-pressed", String(on));
     contentRoot.querySelectorAll(EDITABLE).forEach(function (e) {
       if (e.closest(".figtools,.deccount,.answer") || e.querySelector("textarea,input,button")) return;
       if (on) e.setAttribute("contenteditable", "true");
       else e.removeAttribute("contenteditable");
+    });
+  }
+  /* ---------------- enlaces en el texto ----------------
+     Un enlace es un <a> normal dentro del cuerpo, asi que viaja en el HTML como el
+     resto y se imprime como el resto. Lo unico que hace falta cuidar es a donde
+     apunta: `safeHref` decide eso, tanto aqui como al abrir un fichero que venga de
+     otra mano. */
+  function linkInSelection() {
+    var sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return null;
+    var range = sel.getRangeAt(0);
+    if (!contentRoot.contains(range.commonAncestorContainer)) return null;
+    var nodo = range.commonAncestorContainer;
+    if (nodo.nodeType === 3) nodo = nodo.parentNode;
+    // el cursor puede estar dentro del enlace, o la seleccion puede envolverlo entero:
+    // seleccionar un titulo que ya es un enlace tiene que encontrarlo igual
+    var a = nodo.closest("a");
+    if (!a) {
+      a = Array.prototype.filter.call(nodo.querySelectorAll("a"), function (cand) {
+        return range.intersectsNode(cand);
+      })[0] || null;
+    }
+    return a && contentRoot.contains(a) ? a : null;
+  }
+  function openLinkDialog() {
+    var existente = linkInSelection();
+    var sel = window.getSelection();
+    var range = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
+    var dentro = range && contentRoot.contains(range.commonAncestorContainer);
+    if (!existente && (!dentro || range.collapsed)) { notice(t("link.selectFirst")); return; }
+    var valor = existente ? existente.getAttribute("href") || "" : "";
+    var guardado = range ? range.cloneRange() : null;
+
+    var botones = [{ label: t("modal.linkApply"), cls: "btn--primary", onClick: function () {
+      var href = safeHref(valor);
+      if (!href) { notice(t("link.rejected")); return; }
+      closeModal(); aplicaEnlace(existente, guardado, href);
+    } }];
+    if (existente) botones.push({ label: t("modal.linkRemove"), cls: "", onClick: function () {
+      closeModal(); quitaEnlace(existente);
+    } });
+    botones.push({ label: t("modal.cancel"), cls: "btn--ghost", onClick: closeModal });
+
+    openModal(t("modal.linkTitle"), function (body) {
+      var p = document.createElement("p");
+      p.textContent = t("link.help");
+      body.appendChild(p);
+      body.appendChild(field(t("link.address"), valor, function (v) { valor = v; }));
+    }, botones);
+  }
+  function aplicaEnlace(existente, range, href) {
+    snapshot();
+    if (existente) {
+      existente.setAttribute("href", href);
+    } else {
+      var a = document.createElement("a");
+      a.setAttribute("href", href);
+      a.appendChild(range.extractContents());
+      range.insertNode(a);
+    }
+    afterTextChange();
+  }
+  function quitaEnlace(a) {
+    snapshot();
+    while (a.firstChild) a.parentNode.insertBefore(a.firstChild, a);
+    a.remove();
+    afterTextChange();
+  }
+  function afterTextChange() {
+    contentRoot.normalize();
+    marcaEnlaces(contentRoot);
+    syncContent();
+    markDirty();
+  }
+  /* Todo `<a>` del cuerpo pasa por aqui: el que se acaba de crear y el que ya venia
+     dentro del fichero, que puede haberlo escrito cualquiera. El que no lleve a
+     ningun sitio aceptable deja de ser un enlace y se queda en texto. */
+  function marcaEnlaces(root) {
+    root.querySelectorAll("a").forEach(function (a) {
+      var href = safeHref(a.getAttribute("href"));
+      if (!href) {
+        while (a.firstChild) a.parentNode.insertBefore(a.firstChild, a);
+        a.remove();
+        return;
+      }
+      a.setAttribute("href", href);
+      if (/^https?:/i.test(href)) {
+        a.setAttribute("target", "_blank");
+        a.setAttribute("rel", "noopener noreferrer");
+      }
     });
   }
   function insertPlainText(text) {
@@ -326,8 +414,7 @@
     root.querySelector("#btn-history").textContent="v1";
     root.querySelector("#status").className="saved";root.querySelector("#status").textContent=t("status.clean");
     root.querySelector(".brandmark").textContent=t("template.brand")+" · "+v.title;
-    root.querySelector("#btn-edit").textContent=t("appbar.editDiagrams");root.querySelector("#btn-edit").setAttribute("aria-pressed","false");
-    root.querySelector("#btn-content").textContent=t("appbar.editText");root.querySelector("#btn-content").setAttribute("aria-pressed","false");
+    root.querySelector("#btn-edit").textContent=t("appbar.edit");root.querySelector("#btn-edit").setAttribute("aria-pressed","false");
     downloadBlob(template.id+".html","<!doctype html>\n"+root.outerHTML);
     closeModal();notice(t("templates.done",{file:template.id+".html"}));
   }
@@ -355,8 +442,15 @@
         button.setAttribute('aria-expanded', String(open));
       });
     });
+    /* Un panel abierto tapa el documento, asi que se cierra en cuanto dejas de usarlo:
+       al pulsar fuera de la barra, o al pulsar cualquier boton que haga algo. Los
+       botones que abren panel se excluyen -de eso ya se encarga el de arriba- y los
+       selectores de Estilo, Tema e Idioma tambien, que viven dentro del panel y hay
+       que poder cambiarlos sin que se cierre en la cara. */
     document.addEventListener('click', function (event) {
-      if (!event.target.closest('.appbar') || event.target.closest('.menu-content button,.more-content button')) closeToolbarPanels();
+      var enBarra = event.target.closest('.appbar');
+      var abrePanel = event.target.closest('[data-panel]');
+      if (!enBarra || (!abrePanel && event.target.closest('button'))) closeToolbarPanels();
     });
     document.addEventListener('keydown', function (event) {
       if (event.key !== 'Escape') return;
@@ -370,7 +464,8 @@
     if (!model.document) model.document=clone(baseline.document);
     if (!restored) model.document.html=baseline.document.html;
     restoreContent();
-    document.getElementById("btn-content").addEventListener("click",function(){setTextEditing(!textEditing);});
+    marcaEnlaces(contentRoot);
+    document.getElementById("btn-link").addEventListener("click",openLinkDialog);
     document.getElementById("btn-templates").addEventListener("click",openTemplates);
     document.getElementById("btn-print").addEventListener("click",function(){preparePrint();window.print();});
     window.addEventListener("beforeprint",preparePrint);
@@ -393,5 +488,4 @@
   function closeToolbarPanels() {
     document.querySelectorAll('.appbar .is-open').forEach(function (panel) { panel.classList.remove('is-open'); });
     document.querySelectorAll('.appbar [data-panel]').forEach(function (button) { button.setAttribute('aria-expanded','false'); });
-    document.querySelectorAll('.appbar details[open]').forEach(function (menu) { menu.open = false; });
   }

@@ -70,18 +70,19 @@ async function main(){
     // El idioma del documento manda: la interfaz abre en el suyo.
     const esperado=(file==='index.html'||file.startsWith('templates/en/'))?'en':'es';
     assert.equal(await run('document.documentElement.lang'),esperado,file+' declares its language');
-    assert.equal(await run('document.getElementById("btn-content").textContent'),esperado==='en'?'Edit text':'Editar texto',file+' interface language');
+    assert.equal(await run('document.getElementById("btn-edit").textContent'),esperado==='en'?'Edit':'Editar',file+' interface language');
     const count=await run('document.querySelectorAll("svg[data-svg]").length');
     assert.equal(await run('Array.from(document.querySelectorAll("svg[data-svg]")).filter(s=>s.children.length>0).length'),count,file+' diagrams render');
-    await click('btn-edit');await click('btn-edit');
-    await click('btn-content');
-    assert.ok(await run('document.querySelectorAll("[contenteditable=true]").length')>0,file+' editable');
-    await click('btn-content');
+    await click('btn-edit');
+    assert.ok(await run('document.querySelectorAll("[contenteditable=true]").length')>0,file+' editable text');
+    assert.equal(await run('document.body.classList.contains("editing")'),true,file+' editable diagrams');
+    await click('btn-edit');
+    assert.equal(await run('document.querySelectorAll("[contenteditable=true]").length'),0,file+' leaves editing');
     await screenshot(file.replace(/^templates\//,'').replace(/\.html$/,'').replace(/\//g,'-'));
   }
   console.log('PASS: all 12 documents (Spanish and English templates) load and edit without runtime exceptions');
   await open('template.html');
-  await click('btn-content');
+  await click('btn-edit');
   await run(`{const h=document.querySelector('#document-content h1');h.focus();h.textContent='Informe revisado <seguro>';h.dispatchEvent(new Event('input',{bubbles:true}));}`);
   await change('design-select','editorial');await change('theme-select','dark');
   await run(`document.querySelector('[data-add-block=table]').click();document.querySelector('[data-add-block=figure]').click();document.querySelector('[data-add-block=decision]').click();`);
@@ -106,11 +107,11 @@ async function main(){
   await installSaveMock();await save('Tercera versión');
   assert.equal((await model()).meta.rev,3);assert.equal((await model()).meta.history.length,2);
   console.log('PASS: cancel preserves revision; subsequent save advances to version 3');
-  await click('btn-content');
+  await click('btn-edit');
   await run(`document.querySelector('[data-add-block=section]').click()`);
   await click('btn-content-undo');assert.equal(await run('document.querySelector("#btn-history").textContent'),'v3');
   await click('btn-content-redo');
-  await click('btn-content');
+  await click('btn-edit');
   await run('window.dispatchEvent(new Event("beforeprint"))');
   await cdp('Emulation.setEmulatedMedia',{media:'print'});
   assert.equal(await run('getComputedStyle(document.querySelector(".appbar")).display'),'none');
@@ -146,7 +147,7 @@ async function main(){
   assert.equal(await run('document.querySelector("svg[data-svg]").children.length>0'),true);
   console.log('PASS: gallery downloads a separate, working document with fresh history');
   // Text undo/redo and local draft recovery must survive rebuilding the content DOM.
-  await click('btn-content');
+  await click('btn-edit');
   const initialTitle=await run('document.querySelector("h1").textContent');
   await run(`{const h=document.querySelector('h1');h.focus();h.textContent='Borrador recuperable';h.dispatchEvent(new Event('input',{bubbles:true}));}`);
   await click('btn-content-undo');assert.equal(await run('document.querySelector("h1").textContent'),initialTitle);
@@ -156,12 +157,19 @@ async function main(){
   assert.equal(await run('document.querySelector("h1").textContent'),'Borrador recuperable');
   assert.equal(await run('document.documentElement.dataset.design'),'executive');
   await click('btn-reset');
+  assert.equal(await run('document.getElementById("overlay").hidden'),false,'reset asks first');
+  assert.equal(await run('document.querySelector("h1").textContent'),'Borrador recuperable','cancelling changes nothing');
+  await run(`Array.from(document.querySelectorAll('#modal-actions button')).find(b=>b.textContent==='Cancelar').click()`);
+  assert.equal(await run('document.getElementById("overlay").hidden'),true);
+  await click('btn-reset');
+  await run(`Array.from(document.querySelectorAll('#modal-actions button')).find(b=>b.textContent==='Restablecer').click()`);
   assert.equal(await run('document.querySelector("h1").textContent'),initialTitle);
   assert.equal(await run('document.documentElement.dataset.design'),'technical');
   console.log('PASS: text undo/redo, draft recovery and reset preserve the saved baseline');
   await require('./appearance.cjs')({run,open,click,installSaveMock,save,model,screenshot,artifacts,cdp});
   await require('./toolbar.cjs')({run,open,click,change,screenshot,cdp});
-  await open('index.html');await click('btn-content');
+  await require('./enlaces.cjs')({run,open,click,installSaveMock,save,model,artifacts});
+  await open('index.html');await click('btn-edit');
   const headings=()=>run('Array.from(document.querySelectorAll("#document-content>section>h2")).map(h=>h.textContent)');
   const originalOrder=await headings();
   // La cabecera y el pie llevan los mismos controles, asi que aqui se apunta a las secciones.
@@ -183,7 +191,7 @@ async function main(){
   assert.equal(await run('document.querySelectorAll("[data-block-tools]").length'),0);
   console.log('PASS: move sections up/down, remove with diagram cleanup, undo and reopen');
   // La cabecera y el pie son bloques como cualquier otro: se mueven y se quitan.
-  await open('index.html');await click('btn-content');
+  await open('index.html');await click('btn-edit');
   const blocks=()=>run('Array.from(document.querySelectorAll("#document-content .section-controls")).map(b=>b.parentElement.tagName.toLowerCase())');
   const blockBar=sel=>`document.querySelector("#document-content>${sel} .section-controls")`;
   assert.deepEqual(await blocks(),['header','section','section','section','section','section','footer']);
@@ -205,7 +213,7 @@ async function main(){
   assert.equal(await run('document.querySelectorAll("#document-content>section").length'),5);
   console.log('PASS: header and footer behave like any block, undo brings them back and the file reopens without them');
   // Sin cabecera el documento se queda sin h1: `+ Título` tiene que poder crearlo.
-  await open('index.html');await click('btn-content');
+  await open('index.html');await click('btn-edit');
   const addBlock=k=>run(`document.querySelector('[data-add-block="${k}"]').click()`);
   const titles=()=>run('Array.from(document.querySelectorAll("#document-content>header h1")).map(h=>h.textContent)');
   const headerBar=()=>`document.querySelector("#document-content>header .section-controls")`;

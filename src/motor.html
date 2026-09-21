@@ -44,6 +44,9 @@
 
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
+  /* Los enlaces del cuerpo. En papel el color no se ve, así que el subrayado se queda. */
+  #document-content a{color:var(--brand-ink);text-underline-offset:2px}
+  #document-content a:hover{color:var(--ink)}
   img{max-width:100%}
   [hidden]{display:none!important}
   body{
@@ -154,6 +157,10 @@
 
   .t-title{fill:var(--ink);font-size:15px;font-weight:600}
   .t-title.sm{font-size:13.5px}
+  /* una caja o un texto con enlace: se ve que lleva a algún sitio antes de pulsarlo */
+  .node-link{cursor:pointer}
+  .node-link text:first-of-type{text-decoration:underline;text-underline-offset:2px}
+  body.editing .node-link{cursor:default}
   .t-sub{fill:var(--ink-muted);font-size:12.5px}
   .t-sub.sm{font-size:12px}
   .t-dead{fill:var(--danger)}
@@ -322,12 +329,7 @@
     <button type="button" class="btn btn--primary" id="btn-save"><span class="desktop-label" data-i18n="appbar.save">Guardar versión</span><span class="mobile-label" data-i18n="appbar.saveShort">Guardar</span></button>
     </div>
     <div class="appbar-actions">
-    <div class="toolbar-menu" id="editing-menu">
-    <button type="button" class="btn mobile-control" data-panel="editing-menu" aria-controls="editing-actions" aria-expanded="false" data-i18n="appbar.editMenu">Editar ▾</button>
-    <div class="menu-content" id="editing-actions">
-    <button type="button" class="btn" id="btn-content" aria-pressed="false" data-i18n="appbar.editText">Editar texto</button>
-    <button type="button" class="btn" id="btn-edit" aria-pressed="false" data-i18n="appbar.editDiagrams">Editar diagramas</button>
-    </div></div>
+    <button type="button" class="btn" id="btn-edit" aria-pressed="false" data-i18n-title="appbar.edit.title" title="Edita el texto y los diagramas del documento" data-i18n="appbar.edit">Editar</button>
     <div class="toolbar-menu secondary-menu" id="secondary-menu">
     <button type="button" class="btn mobile-control" data-panel="secondary-menu" aria-controls="secondary-actions" aria-expanded="false" data-i18n-aria-label="appbar.more" aria-label="Más">•••</button>
     <div class="menu-content" id="secondary-actions">
@@ -339,9 +341,7 @@
     </div>
     <div class="appbar-preferences" id="preferences">
     <div class="document-controls"><label><span data-i18n="appbar.style">Estilo</span> <select id="design-select"><option value="technical" data-i18n="style.technical">Técnico</option><option value="editorial" data-i18n="style.editorial">Editorial</option><option value="executive" data-i18n="style.executive">Ejecutivo</option></select></label><label><span data-i18n="appbar.theme">Tema</span> <select id="theme-select"><option value="auto" data-i18n="theme.auto">Sistema</option><option value="light" data-i18n="theme.light">Claro</option><option value="dark" data-i18n="theme.dark">Oscuro</option></select></label><label><span data-i18n="appbar.lang">Idioma</span> <select id="lang-select"><option value="es">Español</option><option value="en">English</option></select></label></div>
-    <details class="more-menu"><summary class="btn" data-i18n="appbar.more">Más</summary><div class="more-content">
-    <button type="button" class="btn btn--ghost btn--sm" id="btn-reset" data-i18n-title="appbar.reset.title" title="Vuelve a los diagramas originales de este fichero" data-i18n="appbar.reset">Restablecer documento</button>
-    </div></details>
+    <button type="button" class="btn btn--ghost btn--sm" id="btn-reset" data-i18n-title="appbar.reset.title" title="Vuelve al contenido y los ajustes guardados en este fichero" data-i18n="appbar.reset">Restablecer documento</button>
     </div>
   </div>
 </div>
@@ -384,6 +384,7 @@
     <button class="btn btn--sm" type="button" data-add-block="table" data-i18n="add.table">+ Tabla</button>
     <button class="btn btn--sm" type="button" data-add-block="figure" data-i18n="add.diagram">+ Diagrama</button>
     <button class="btn btn--sm" type="button" data-add-block="decision" data-i18n="add.decision">+ Decisión</button>
+    <button class="btn btn--sm" type="button" id="btn-link" data-i18n-title="add.link.title" title="Convierte el texto seleccionado en un enlace" data-i18n="add.link">Enlace</button>
     <button class="btn btn--sm" type="button" id="btn-content-undo" data-i18n="add.undo">Deshacer</button>
     <button class="btn btn--sm" type="button" id="btn-content-redo" data-i18n="add.redo">Rehacer</button>
   </div>
@@ -563,6 +564,33 @@
   /* ---------------- utilidades ---------------- */
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  /* Un enlace que se puede seguir sin miedo.
+
+     Este documento se abre desde el disco, con los permisos que eso da, y pasa de mano
+     en mano: lo escribe una persona, lo edita otra y lo abre una tercera. Un `href` que
+     empiece por `javascript:` se ejecuta al pulsarlo, asi que aqui solo pasan los
+     esquemas que llevan a algun sitio. Lo demas se queda fuera, lo haya escrito quien
+     lo haya escrito y lo haya escrito donde lo haya escrito: en el panel o a mano
+     dentro del fichero. Y como casi nadie teclea el `https://`, se pone solo. */
+  function safeHref(raw) {
+    var v = String(raw == null ? "" : raw).trim();
+    if (!v) return "";
+    if (/^[#/]/.test(v) || /^\.\.?\//.test(v)) return v;       // dentro del documento, o relativo
+    if (/^(https?:|mailto:|tel:)/i.test(v)) return v;
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return "mailto:" + v;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(v)) return "";             // cualquier otro esquema, fuera
+    return "https://" + v;
+  }
+
+  /* Envuelve un dibujo en un enlace, si lo tiene. Si no, lo devuelve tal cual. */
+  function linkWrap(g, link) {
+    var href = safeHref(link);
+    if (!href) return g;
+    var a = el("a", { href: href, target: "_blank", rel: "noopener noreferrer" }, "node-link");
+    a.appendChild(g);
+    return a;
+  }
 
   /* El modelo tal y como se graba dentro del fichero.
 
@@ -942,7 +970,9 @@
       }
       renderNodeText(g, n);
       decorateNode(g, n);
-      gNodes.appendChild(g);
+      // una caja con enlace es una caja dentro de un <a>: el data-node sigue en el
+      // grupo, asi que seleccionar y arrastrar funcionan igual que en cualquier otra
+      gNodes.appendChild(linkWrap(g, n.link));
     });
 
     // aristas
@@ -1369,8 +1399,9 @@
   function doSave(who, note) {
     if (state.saving) return;
     syncContent();
-    var wasTextEditing = textEditing;
-    setTextEditing(false);
+    // el fichero se graba en estado de lectura: sin contenteditable y sin seleccion
+    var estabaEditando = state.editing;
+    if (estabaEditando) setEdit(false);
     var m = meta();
     var metaBefore = JSON.parse(JSON.stringify(m));
     m.rev = m.rev + 1;
@@ -1379,12 +1410,9 @@
     m.history.push({ rev: m.rev, at: m.savedAt, by: m.savedBy, note: (note || "").trim() });
     try { if (m.savedBy) localStorage.setItem(WHO_KEY, m.savedBy); } catch (err) { /* nada */ }
 
-    var wasEditing = state.editing;
     var sel = state.sel;
-    // el fichero se graba en estado de lectura y sin seleccion
     selClear();
     state.connect = null;
-    if (wasEditing) setEditing(false);
     renderMeta();
     renderAll();
 
@@ -1411,8 +1439,7 @@
     function restaurar() {
       state.saving = false;
       document.body.inert = false;
-      setTextEditing(wasTextEditing);
-      if (wasEditing) setEditing(true);
+      if (estabaEditando) setEdit(true);
       state.sel = sel;
       renderAll();
       renderProps();
@@ -1656,6 +1683,11 @@
       }));
       body.appendChild(selectField(t("props.box.style"), n.kind, kindsNode(), function (v) {
         snapshot(); n.kind = v; afterChange();
+      }));
+      body.appendChild(field(t("props.box.link"), n.link, function (v) {
+        if (!live) { snapshot(); live = true; }
+        if (v.trim()) n.link = v.trim(); else delete n.link;
+        markDirty(); render(f);
       }));
       renderAppearancePanel(f, body);
       var acts = document.createElement("div");
@@ -2025,6 +2057,12 @@
     svg._docuwebAttached = true;
     var drag = null;
 
+    // Mientras se edita, una caja con enlace se selecciona y se arrastra como las demas:
+    // el enlace se sigue al leer, no al montar el diagrama.
+    svg.addEventListener("click", function (evt) {
+      if (state.editing && evt.target.closest("a")) evt.preventDefault();
+    });
+
     svg.addEventListener("pointerdown", function (evt) {
       if (!state.editing) return;
       if (evt.button === 2) return;              // clic derecho: no toca nada
@@ -2329,12 +2367,35 @@
   function setEditing(on) {
     state.editing = on;
     document.body.classList.toggle("editing", on);
-    document.getElementById("btn-edit").setAttribute("aria-pressed", String(on));
-    document.getElementById("btn-edit").textContent = on ? t("appbar.finishDiagrams") : t("appbar.editDiagrams");
     if (!on) { selClear(); state.connect = null; }
     renderAll();
     renderProps();
     renderTools();
+  }
+
+  /* Editar es una sola cosa.
+
+     Antes eran dos botones y dos modos, y había que saber de antemano si lo que
+     ibas a cambiar era «texto» o «diagrama» para pulsar el correcto. Nadie piensa
+     así sobre su propio documento: se entra a editarlo y ya. Los dos modos siguen
+     siendo independientes por dentro -uno pone `editing`, el otro `editing-content`-
+     y se encienden juntos. */
+  function setEdit(on) {
+    setEditing(on);
+    setTextEditing(on);
+    var btn = document.getElementById("btn-edit");
+    btn.textContent = on ? t("appbar.finishEdit") : t("appbar.edit");
+    btn.setAttribute("aria-pressed", String(on));
+  }
+
+  function doReset() {
+    snapshot();
+    model = clone(baseline);
+    restoreContent();
+    selClear();
+    renderMeta();
+    renderAll(); renderProps(); renderTools(); renderAnswers();
+    markClean(t("status.clean"));
   }
 
   /* STUDIO_SCRIPT */
@@ -2380,20 +2441,24 @@
       notice(t("restored.notice"));
     }
 
-    document.getElementById("btn-edit").addEventListener("click", function () { setEditing(!state.editing); });
+    document.getElementById("btn-edit").addEventListener("click", function () { setEdit(!state.editing); });
     document.getElementById("btn-notes").addEventListener("click", function () { setNotes(state.hideNotes); });
     document.getElementById("btn-save").addEventListener("click", openSaveDialog);
     document.getElementById("btn-history").addEventListener("click", openHistory);
     document.getElementById("btn-help").addEventListener("click", openHelp);
+    /* Restablecer tira lo que no esta grabado, asi que pregunta antes. Pregunta con
+       el dialogo del propio documento y no con el `confirm` del navegador: ese es un
+       cuadro gris del sistema, sin el idioma de la interfaz ni sitio para explicar
+       que es exactamente lo que se pierde. */
     document.getElementById("btn-reset").addEventListener("click", function () {
-      if (!window.confirm(t("confirm.reset"))) return;
-      snapshot();
-      model = clone(baseline);
-      restoreContent();
-      selClear();
-      renderMeta();
-      renderAll(); renderProps(); renderTools(); renderAnswers();
-      markClean(t("status.clean"));
+      openModal(t("modal.resetTitle"), function (body) {
+        var p = document.createElement("p");
+        p.textContent = t("confirm.reset");
+        body.appendChild(p);
+      }, [
+        { label: t("modal.reset"), cls: "btn--danger", onClick: function () { closeModal(); doReset(); } },
+        { label: t("modal.cancel"), cls: "btn--ghost", onClick: closeModal }
+      ]);
     });
     document.getElementById("props-close").addEventListener("click", function () { select(null, null, null); });
     document.getElementById("notice-dismiss").addEventListener("click", function () {

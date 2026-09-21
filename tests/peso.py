@@ -29,9 +29,9 @@ KB = 1024
 # Techos. Con holgura sobre lo que se mide hoy: no estan para afinar bytes, sino para
 # que un cambio que anada decenas de kilobytes no pase sin que nadie lo vea.
 TECHOS = {
-    'index.html': 175 * KB,      # la demo, con su contenido y sus diagramas
-    'template.html': 165 * KB,   # el documento vacio: casi todo es motor
-    'plantilla': 165 * KB,       # cada uno de los diez documentos de templates/
+    'index.html': 180 * KB,      # la demo, con su contenido y sus diagramas
+    'template.html': 170 * KB,   # el documento vacio: casi todo es motor
+    'plantilla': 170 * KB,       # cada uno de los diez documentos de templates/
 }
 
 

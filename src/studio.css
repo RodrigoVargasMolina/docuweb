@@ -19,11 +19,6 @@
   .appbar .dirty::before{display:none}
   .appbar-actions{gap:24px;flex-wrap:wrap}
   .appbar-preferences{background:var(--surface-2);margin:0 -16px;padding:10px 16px;border-top:1px solid var(--border);gap:24px;flex-wrap:wrap}
-  .more-menu{position:relative}
-  .more-menu summary{display:flex;align-items:center;gap:8px;list-style:none}
-  .more-menu summary::-webkit-details-marker{display:none}
-  .more-menu summary::after{content:'▾'}
-  .more-content{position:absolute;top:calc(100% + 6px);right:0;z-index:45;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px}
   .mobile-control,.mobile-label{display:none}
   .document-controls{display:flex;flex-wrap:wrap;gap:24px;align-items:center}
   .document-controls label{font-size:12px;color:var(--ink-muted);display:flex;gap:6px;align-items:center}
@@ -95,7 +90,6 @@
     .document-controls{flex-direction:column;align-items:stretch;gap:8px}
     .document-controls label{justify-content:space-between}
     .document-controls select{min-width:60%}
-    .more-content{left:0;right:auto}
     .document-controls{width:100%}
     :root[data-design=executive] #document-content>header{padding:22px}
     #document-content{gap:36px}

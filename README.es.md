@@ -51,6 +51,10 @@ lo que hace que lo encuentre la siguiente persona con el mismo problema.
   sabiendo qué versión es. El historial completo viaja con él.
 - **Graba donde vive.** En Chrome y Edge, fijas la carpeta una vez y las versiones caen ahí
   mismo, sin pasar por Descargas.
+- **Enlaces.** Desde una palabra del texto o desde una caja del diagrama: al repositorio, al
+  panel, al ticket. Se escribe `ejemplo.com` y se completa solo. Un enlace que no lleve a
+  ninguna parte razonable —un `javascript:`, por ejemplo— el motor lo desactiva al abrir el
+  fichero, venga de donde venga.
 - **Exporta a SVG** cada figura, con los colores resueltos, para llevarla a una presentación.
 - **Tema claro y oscuro**, y funciona en móvil.
 
@@ -65,7 +69,7 @@ vez está en tu disco no necesita este repositorio para nada.
 | [`index.html`](index.html) | Documento de ejemplo, completo y tocable. Vale también como punto de partida. |
 | [`template.html`](template.html) | Documento vacío, solo la estructura mínima. |
 | [`templates/`](templates/) | Cinco documentos ya redactados por propósito, en español; `templates/en/` tiene las versiones inglesas. |
-| `src/`, `tests/`, `docs/` | Fuentes y comprobaciones. No hacen falta para usar un documento. |
+| `src/`, `tests/` | Fuentes y comprobaciones. No hacen falta para usar un documento. |
 
 1. **Llévate uno.** Desde GitHub, *Download raw file*: el clic normal enseña el código, no el
    documento. O abre cualquier documento docuweb, pulsa **Plantillas** y elige el tipo: se
@@ -73,7 +77,7 @@ vez está en tu disco no necesita este repositorio para nada.
    el catálogo dentro, así que de uno cualquiera salen los demás.
 2. **Ábrelo con doble clic.** Sin servidor y sin instalar nada. Chrome o Edge si quieres que
    las versiones caigan en la carpeta del documento en vez de en Descargas.
-3. **Rellénalo** con *Editar texto* y *Editar diagramas*, o dáselo a un asistente: el cuerpo
+3. **Rellénalo** con *Editar*, o dáselo a un asistente: el cuerpo
    es HTML normal y los diagramas son JSON, así que no hay nada que aprender antes.
 4. **Graba una versión.** Sale `propuesta-tecnica-v2.html`, con el número, la fecha, el autor
    y la nota de cambio escritos dentro. **Ese fichero nuevo es el que pasas**; el anterior
@@ -109,7 +113,8 @@ El selector **Estilo** cambia entre Técnico, Editorial y Ejecutivo conservando 
 entre español e inglés: un documento abre en el idioma que declara en `<html lang>`, y tu
 elección se recuerda en el navegador sin tocar el fichero.
 
-**Editar texto** permite escribir en títulos, párrafos, celdas y pies de figura. Al final
+**Editar** permite escribir en títulos, párrafos, celdas y pies de figura, y abre a la vez los
+diagramas: es un solo botón, no dos modos que haya que elegir de antemano. Al final
 del documento puedes añadir títulos, secciones, avisos, tablas, diagramas y decisiones, y
 deshacer o rehacer cambios. El contenido y la apariencia quedan incluidos en el versionado
 existente.
@@ -118,7 +123,7 @@ En los diagramas puedes duplicar cajas, alinearlas, distribuirlas y ajustarlas a
 El botón **Diagramas…** añade estructuras de flujo, capas, antes/después o etapas.
 
 Cada bloque —la cabecera, las secciones y el pie— muestra **Subir**, **Bajar** y su botón
-de eliminación al activar **Editar texto**. Puedes deshacer estas acciones; el orden y las
+de eliminación al activar **Editar**. Puedes deshacer estas acciones; el orden y las
 eliminaciones se conservan al guardar.
 
 El panel de diagramas permite cambiar colores de línea, relleno y texto; usar línea

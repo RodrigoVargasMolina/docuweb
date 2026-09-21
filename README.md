@@ -51,6 +51,10 @@ makes the next person with the same problem find it.
   version it is. The full history travels with it.
 - **Saves where it lives.** On Chrome and Edge, pin the folder once and every version lands
   right there, never in Downloads.
+- **Links.** From a word in the text or from a box in a diagram: to the repository, the
+  dashboard, the ticket. Type `example.com` and the scheme is filled in for you. A link that
+  leads nowhere sensible — a `javascript:` one, say — is disarmed when the file opens, no
+  matter who wrote it.
 - **SVG export** per figure, with colours resolved, ready to drop into a deck.
 - **Light and dark themes**, and it works on a phone.
 
@@ -65,7 +69,7 @@ your disk it needs nothing from this repository.
 | [`index.html`](index.html) | A complete, clickable example document. Works as a starting point too. |
 | [`template.html`](template.html) | An empty document: the bare structure. |
 | [`templates/`](templates/) | Five documents already written, one per purpose, in Spanish; `templates/en/` holds the English versions. |
-| `src/`, `tests/`, `docs/` | Sources and checks. Not needed to use a document. |
+| `src/`, `tests/` | Sources and checks. Not needed to use a document. |
 
 1. **Take one with you.** From GitHub, use *Download raw file*: a plain click shows the
    source, not the document. Or open any docuweb document, press **Plantillas** and pick a
@@ -73,7 +77,7 @@ your disk it needs nothing from this repository.
    document carries the catalogue, so any one of them yields the rest.
 2. **Open it by double-click.** No server, nothing to install. Chrome or Edge if you want
    versions to land in the document's own folder instead of Downloads.
-3. **Fill it in** with *Editar texto* and *Editar diagramas*, or hand it to an assistant:
+3. **Fill it in** with *Editar*, or hand it to an assistant:
    the body is plain HTML and the diagrams are JSON, so there is nothing to learn first.
 4. **Save a version.** Out comes `propuesta-tecnica-v2.html`, with the number, date, author
    and change note written inside. **That new file is the one you pass on**; the previous one
@@ -110,7 +114,8 @@ the content. **Tema** selects light, dark or system appearance. **Idioma** switc
 interface between Spanish and English: a document opens in the language it declares in
 `<html lang>`, and your choice is remembered in the browser without touching the file.
 
-**Editar texto** edits headings, paragraphs, table cells and captions. Controls at the bottom
+**Editar** edits headings, paragraphs, table cells and captions, and opens the diagrams at the
+same time. Controls at the bottom
 add titles, sections, callouts, tables, diagrams and decisions, with undo and redo. Text and
 appearance are included in the existing save/version workflow.
 
