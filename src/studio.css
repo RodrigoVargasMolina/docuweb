@@ -41,7 +41,6 @@
   .template-preview{height:48px;display:flex;gap:5px;align-items:flex-end}
   .template-preview i{display:block;width:22%;background:var(--border);height:60%;border-radius:3px}
   .template-preview i:first-child{height:100%;background:var(--brand-ink)}
-  .modal{max-height:85vh;overflow:auto}
   :root[data-design=editorial] #document-content{gap:60px}
   :root[data-design=editorial] .page{max-width:920px}
   :root[data-design=editorial] #document-content h1{font:500 clamp(38px,6vw,62px)/1.08 Georgia,serif;letter-spacing:-.035em}

@@ -12,6 +12,19 @@ module.exports = async function({run,open,click,change,screenshot,cdp}) {
   const pastilla=await run(`{const s=getComputedStyle(document.getElementById('btn-history'));({borde:s.borderTopWidth,fondo:s.backgroundColor})}`);
   assert.equal(pastilla.borde,'1px');
   assert.notEqual(pastilla.fondo,'rgba(0, 0, 0, 0)');
+  // la ayuda es larga: tiene que abrirse por el titulo, no por el final
+  await click('btn-help');
+  assert.equal(await run(`document.querySelector('.modal').scrollTop`),0,'help opens at its title');
+  assert.ok(await run(`document.querySelector('.modal').scrollHeight>document.querySelector('.modal').clientHeight`),
+    'and it is long enough for that to matter');
+  assert.ok(await run(`document.querySelector('.modal').contains(document.activeElement)`),'focus stays in the dialog');
+  // el titulo tiene que estar alcanzable: ni por encima del borde de la ventana ni fuera de ella
+  const caja=await run(`(function(){const r=document.querySelector('.modal').getBoundingClientRect();return {top:Math.round(r.top),alto:Math.round(r.height),ventana:innerHeight}})()`);
+  assert.ok(caja.top>=0,'the dialog does not start above the top of the window');
+  assert.ok(caja.alto<=caja.ventana,'and it never grows taller than the window');
+  assert.ok(caja.alto<=760,'nor into a wall of text');
+  await run(`Array.from(document.querySelectorAll('#modal-actions button')).find(b=>b.textContent==='Cerrar').click()`);
+
   // el historial vacio se lee en una linea, no partido palabra por palabra
   await click('btn-history');
   assert.equal(await run(`document.querySelectorAll('#modal-body .histrow').length`),0,'the empty notice is not a row');

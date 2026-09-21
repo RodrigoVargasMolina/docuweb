@@ -171,6 +171,7 @@ async function main(){
   await require('./enlaces.cjs')({run,open,click,installSaveMock,save,model,artifacts});
   await require('./ancho.cjs')({run,open,click,installSaveMock,save,model,artifacts,cdp});
   await require('./doblar.cjs')({run,open,click,model});
+  await require('./medida.cjs')({run,open,click,installSaveMock,save});
   await open('index.html');await click('btn-edit');
   const headings=()=>run('Array.from(document.querySelectorAll("#document-content>section>h2")).map(h=>h.textContent)');
   const originalOrder=await headings();

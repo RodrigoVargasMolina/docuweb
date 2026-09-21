@@ -9,6 +9,10 @@
   function cleanContent(root) {
     root.querySelectorAll('[data-block-tools]').forEach(function (e) { e.remove(); });
     root.querySelectorAll("[contenteditable]").forEach(function (e) { e.removeAttribute("contenteditable"); });
+    // el ancho elegido sí se guarda —está en el `style`—; la marca de que se puede
+    // arrastrar, no: se vuelve a poner al entrar a editar
+    root.querySelectorAll("[data-measure]").forEach(function (e) { e.removeAttribute("data-measure"); });
+    root.querySelectorAll(".is-measuring").forEach(function (e) { e.classList.remove("is-measuring"); });
     root.querySelectorAll("svg[data-svg],.figtools").forEach(function (e) { e.innerHTML = ""; });
     root.querySelectorAll("svg[data-svg]").forEach(function (e) { e.removeAttribute("viewBox"); });
     root.querySelectorAll(".answer-print").forEach(function (e) { e.remove(); });
@@ -56,6 +60,60 @@
       if (on) e.setAttribute("contenteditable", "true");
       else e.removeAttribute("contenteditable");
     });
+    contentRoot.querySelectorAll("[data-measure]").forEach(function (e) { e.removeAttribute("data-measure"); });
+    if (on) medibles().forEach(function (e) { e.setAttribute("data-measure", ""); });
+  }
+
+  /* ---------------- ancho del texto ----------------
+     Los bloques de primer nivel de cada sección, más los pies de figura. Se dejan fuera
+     las respuestas, el recuento de decisiones y lo que vive dentro de una decisión: ahí
+     el ancho no lo decide quien escribe, lo decide la rejilla. */
+  var MEDIBLE = "header>p,header>h1,header>h2,header>h3,section>p,section>h1,section>h2,section>h3,footer>p,figure>figcaption";
+  function medibles() {
+    return Array.prototype.filter.call(contentRoot.querySelectorAll(MEDIBLE), function (e) {
+      return !e.closest(".answer,.deccount,.decisions,.figtools");
+    });
+  }
+  // el tirador vive justo en el borde derecho, casi todo por fuera: hacia dentro se
+  // come el sitio donde se pulsa para poner el cursor al final de la línea
+  function enElTirador(e, x) {
+    var r = e.getBoundingClientRect();
+    return x >= r.right - 1 && x <= r.right + 12;
+  }
+  var midiendo = null;
+  function empiezaMedida(ev) {
+    if (!textEditing || ev.button) return;
+    var bloque = ev.target.closest && ev.target.closest("[data-measure]");
+    if (!bloque || !enElTirador(bloque, ev.clientX)) return;
+    ev.preventDefault();
+    snapshot();
+    midiendo = { el: bloque, x0: ev.clientX, w0: bloque.getBoundingClientRect().width };
+    bloque.classList.add("is-measuring");
+  }
+  function sigueMedida(ev) {
+    if (!midiendo) return;
+    var tope = Math.round(midiendo.el.parentNode.getBoundingClientRect().width);
+    var ancho = Math.round(midiendo.w0 + (ev.clientX - midiendo.x0));
+    midiendo.el.style.maxWidth = Math.max(180, Math.min(ancho, tope)) + "px";
+    ev.preventDefault();
+  }
+  function acabaMedida() {
+    if (!midiendo) return;
+    midiendo.el.classList.remove("is-measuring");
+    midiendo = null;
+    syncContent();
+    markDirty();
+  }
+  function quitaMedida(ev) {
+    if (!textEditing) return;
+    var bloque = ev.target.closest && ev.target.closest("[data-measure]");
+    if (!bloque || !enElTirador(bloque, ev.clientX)) return;
+    ev.preventDefault();
+    snapshot();
+    bloque.style.removeProperty("max-width");
+    if (!bloque.getAttribute("style")) bloque.removeAttribute("style");
+    syncContent();
+    markDirty();
   }
   /* ---------------- enlaces en el texto ----------------
      Un enlace es un <a> normal dentro del cuerpo, asi que viaja en el HTML como el
@@ -474,6 +532,10 @@
     document.getElementById("btn-content-redo").addEventListener("click",redo);
     [["design-select","design"],["theme-select","theme"]].forEach(function(pair){document.getElementById(pair[0]).addEventListener("change",function(e){snapshot();model.document[pair[1]]=e.target.value;applyAppearance();markDirty();});});
     document.getElementById("lang-select").addEventListener("change",function(e){setLang(e.target.value);});
+    contentRoot.addEventListener("pointerdown",empiezaMedida);
+    contentRoot.addEventListener("dblclick",quitaMedida);
+    document.addEventListener("pointermove",sigueMedida);
+    document.addEventListener("pointerup",acabaMedida);
     contentRoot.addEventListener("focusout",function(){textSession=null;});
     contentRoot.addEventListener("beforeinput",function(e){beginTextChange(e.target);});
     contentRoot.addEventListener("input",function(e){if(e.target.isContentEditable){beginTextChange(e.target);syncContent();var h=contentRoot.querySelector("h1");if(h)document.title=h.textContent;markDirty();}});

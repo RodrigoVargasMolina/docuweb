@@ -115,6 +115,23 @@
   h2::after{content:"";display:block;width:4rem;height:4px;background:var(--brand);margin-top:14px}
   h3{font-size:16px;font-weight:600;margin:0}
   p{margin:0;max-width:68ch}
+  /* El ancho del texto.
+
+     Cada bloque trae una medida de lectura —62 o 68 caracteres, que es lo que se sigue
+     sin perder el renglón al saltar de línea—. Eso es una opinión razonable, no una ley:
+     en una pantalla ancha puede quedarse corta, y quien escribe el documento es quien
+     sabe qué necesita. Al editar, el borde derecho de cada bloque se arrastra. Doble clic
+     en él vuelve a la medida del estilo.
+
+     El tirador es un pseudo-elemento y no un nodo: dentro de un bloque editable, un nodo
+     de más es un sitio donde puede caer el cursor. */
+  body.editing-content [data-measure]{position:relative}
+  body.editing-content [data-measure]::after{
+    content:"";position:absolute;top:0;right:-9px;width:11px;height:100%;
+    cursor:ew-resize;border-right:2px solid var(--brand-ink);opacity:0;
+  }
+  body.editing-content [data-measure]:hover::after{opacity:.35}
+  body.editing-content [data-measure].is-measuring::after{opacity:1}
   code{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;font-size:.88em;background:var(--surface-2);padding:1px 5px;border-radius:2px}
 
   /* ---------- figuras ---------- */
@@ -253,12 +270,18 @@
   .overlay{
     position:fixed;top:0;right:0;bottom:0;left:0;inset:0;z-index:60;
     background:rgba(25,25,25,.6);
-    display:flex;align-items:center;justify-content:center;padding:16px;
+    /* `safe center`: centrado mientras quepa, y pegado arriba cuando no. Con `center` a
+       secas, un diálogo más alto que la ventana se sale por los dos lados a la vez y la
+       mitad de arriba —el título— queda fuera de alcance: no hay forma de subir hasta él. */
+    display:flex;align-items:safe center;justify-content:center;padding:16px;
   }
   .modal{
     background:var(--surface);border:1px solid var(--border-strong);
     border-radius:var(--radius);padding:22px;
-    width:420px;max-width:100%;max-height:min(80vh,640px);overflow:auto;
+    /* Alto: el que haga falta, sin pasar de la ventana ni convertirse en un muro. La
+       Ayuda son doce apartados, y sin el tope en píxeles llega a medir mil y pico en una
+       pantalla alta, que ya no se lee como un diálogo. */
+    width:420px;max-width:100%;max-height:min(85vh,760px);overflow:auto;
     display:flex;flex-direction:column;gap:14px;
     box-shadow:0 4px 20px rgba(25,25,25,.2);
   }
@@ -1309,8 +1332,21 @@
       acts.appendChild(el2);
     });
     overlay.hidden = false;
-    var first = overlay.querySelector("input,button,select,textarea");
-    if (first) { first.focus(); if (first.select) first.select(); }
+    /* Un diálogo se abre por su título.
+
+       El foco tiene que entrar en el diálogo, pero enfocar arrastra el desplazamiento
+       hasta lo enfocado: en Ayuda, que no tiene campos, el primer elemento al que se
+       puede ir es el botón Cerrar, que está al final de doce párrafos, y el diálogo
+       abría mostrando el último. Se prefiere un campo del cuerpo —que es lo que se va a
+       escribir— y, si no lo hay, el primer botón pero sin mover el desplazamiento. */
+    var caja = overlay.querySelector(".modal");
+    if (caja) caja.scrollTop = 0;
+    var first = overlay.querySelector("#modal-body input,#modal-body select,#modal-body textarea")
+      || overlay.querySelector("#modal-actions button");
+    if (first) {
+      first.focus({ preventScroll: true });
+      if (first.select) first.select();
+    }
   }
 
   overlay.addEventListener("pointerdown", function (evt) {
