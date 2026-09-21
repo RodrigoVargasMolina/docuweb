@@ -50,6 +50,10 @@
   img{max-width:100%}
   [hidden]{display:none!important}
   body{
+    /* Contenedor de consulta. Hace que `100cqw` valga el ancho de `body`, que es el de
+       la ventana ya sin la barra de desplazamiento vertical. Es justo lo que necesita
+       una figura expandida, y así no hay que medir nada desde el guion. */
+    container-type:inline-size;
     background:var(--surface);
     color:var(--ink);
     font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -115,14 +119,28 @@
 
   /* ---------- figuras ---------- */
   figure{margin:0;display:flex;flex-direction:column;gap:14px}
-  .figtools{
-    display:none;flex-wrap:wrap;gap:8px;align-items:center;
+  /* Al leer, sobre la figura solo está Expandir, discreto y a la derecha. Al editar,
+     la barra de herramientas completa, que ya es un bloque con su fondo. */
+  .figtools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
+  body.editing .figtools{
+    justify-content:flex-start;
     padding:10px;border:1px solid var(--border);border-bottom:none;
     border-radius:var(--radius) var(--radius) 0 0;background:var(--surface-2);
   }
-  body.editing .figtools{display:flex}
   .figtools .sep{flex:1}
   .figtools .hint{font-size:12px;color:var(--ink-muted)}
+  /* Una figura a todo el ancho de la ventana.
+
+     La página está centrada y limitada a 1040px, que es lo que se lee cómodo en un
+     párrafo; un diagrama ancho no tiene por qué caber ahí. Esto lo saca del centrado
+     sin sacarlo del documento: sigue donde estaba, en su sección y con su pie.
+
+     El ancho es `100cqw` y no `100vw` porque `vw` incluye el ancho de la barra de
+     desplazamiento vertical: la figura sobresaldría esos pocos píxeles y sacaría una
+     barra horizontal en toda la página. `cqw` mide el contenedor —`body`—, que ya la
+     descuenta. */
+  figure.is-wide{width:100cqw;max-width:none;margin-inline:calc(50% - 50cqw);padding-inline:16px}
+  figure.is-wide .canvas{border-radius:var(--radius)}
   .canvas{overflow:auto;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);padding:20px 16px}
   body.editing .canvas{border-radius:0 0 var(--radius) var(--radius)}
   .canvas svg{display:block;height:auto;width:100%}
@@ -915,7 +933,16 @@
     });
   }
 
+  /* Si una figura va a todo el ancho es cosa del documento, no de quien lo abre: viaja
+     en el modelo como `wide` y se aplica al dibujar, igual venga de haberlo pulsado o
+     de estar escrito a mano en el fichero. */
+  function applyFigureWidth(f) {
+    var figura = document.querySelector('figure[data-fig="' + f + '"]');
+    if (figura) figura.classList.toggle("is-wide", !!(fig(f) || {}).wide);
+  }
+
   function render(f) {
+    applyFigureWidth(f);
     var svg = document.querySelector('svg[data-svg="' + f + '"]');
     var d = fig(f);
     // durante un arrastre el viewBox se congela: si se recalculase, el mapeo
@@ -1864,11 +1891,26 @@
     return b;
   }
 
+  /* Expandir no es una herramienta de edición: quien solo lee un diagrama ancho
+     también necesita la pantalla entera. Por eso este botón está siempre, y al leer
+     es lo único que hay sobre la figura. */
+  function expandButton(f) {
+    var ancha = !!(fig(f) || {}).wide;
+    return toolButton(ancha ? t("tools.collapse") : t("tools.expand"), function () {
+      snapshot();
+      if (ancha) delete fig(f).wide; else fig(f).wide = true;
+      markDirty();
+      render(f);
+      renderTools();
+    }, "btn--ghost", ancha ? t("tools.collapse.title") : t("tools.expand.title"));
+  }
+
   function renderTools() {
     FIGS.forEach(function (f) {
       var bar = document.querySelector('[data-tools="' + f + '"]');
       if (!bar) return;
       bar.innerHTML = "";
+      if (!state.editing) { bar.appendChild(expandButton(f)); return; }
       bar.appendChild(toolButton(t("tools.box"), function () {
         snapshot();
         var d = fig(f);
@@ -1918,6 +1960,7 @@
         t("tools.selectAll.title")));
       bar.appendChild(toolButton(t("tools.undo"), undo, "btn--ghost"));
       bar.appendChild(toolButton(t("tools.redo"), redo, "btn--ghost"));
+      bar.appendChild(expandButton(f));
       bar.appendChild(toolButton(t("tools.exportSvg"), function () { exportSvg(f); }, "btn--ghost"));
       bar.appendChild(toolButton(t("tools.resetFigure"), function () {
         snapshot();

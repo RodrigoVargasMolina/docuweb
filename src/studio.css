@@ -117,6 +117,8 @@
     #document-content h2{font-size:18pt!important;break-after:avoid}
     h3{break-after:avoid}p,li{orphans:3;widows:3}
     figure,.metric,.note,.callout,ol.decisions li{break-inside:avoid}
+    /* en papel el ancho lo manda la hoja: una figura expandida vuelve a la caja */
+    figure.is-wide{width:auto!important;margin-inline:0!important;padding-inline:0!important}
     .canvas{overflow:visible;padding:8px;background-image:none!important}
     .canvas svg{width:100%!important;min-width:0!important;max-height:180mm}
     .tablewrap{overflow:visible}table{width:100%;min-width:0!important;table-layout:fixed}

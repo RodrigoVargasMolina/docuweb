@@ -169,6 +169,7 @@ async function main(){
   await require('./appearance.cjs')({run,open,click,installSaveMock,save,model,screenshot,artifacts,cdp});
   await require('./toolbar.cjs')({run,open,click,change,screenshot,cdp});
   await require('./enlaces.cjs')({run,open,click,installSaveMock,save,model,artifacts});
+  await require('./ancho.cjs')({run,open,click,installSaveMock,save,model,artifacts,cdp});
   await open('index.html');await click('btn-edit');
   const headings=()=>run('Array.from(document.querySelectorAll("#document-content>section>h2")).map(h=>h.textContent)');
   const originalOrder=await headings();
