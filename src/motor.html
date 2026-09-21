@@ -833,6 +833,25 @@
     else e[prop] = key;
   }
 
+  /* Distancia de un punto a un tramo. Sirve para saber por dónde se ha agarrado una
+     flecha: el codo nuevo tiene que nacer en ese tramo y no en otro, o la flecha da un
+     salto en cuanto empiezas a arrastrar. */
+  /* La captura del puntero es una comodidad, no un requisito: mantiene el arrastre
+     aunque el ratón se salga del dibujo. Si el puntero ya no existe -un evento
+     sintético, o uno que se soltó antes de tiempo- el navegador lanza y no pasa nada:
+     el arrastre sigue funcionando sin captura. */
+  function capturePointer(svg, id) {
+    try { svg.setPointerCapture(id); } catch (err) { /* sin captura, pero se arrastra igual */ }
+  }
+
+  function distToSegment(p, a, b) {
+    var vx = b.x - a.x, vy = b.y - a.y;
+    var len2 = vx * vx + vy * vy;
+    var t = len2 ? ((p.x - a.x) * vx + (p.y - a.y) * vy) / len2 : 0;
+    t = Math.max(0, Math.min(1, t));
+    return Math.hypot(p.x - (a.x + vx * t), p.y - (a.y + vy * t));
+  }
+
   function edgePath(f, e) {
     var a = node(f, e.from), b = node(f, e.to);
     if (!a || !b) return null;
@@ -2159,7 +2178,7 @@
           snapshot();
           if (!selHas(f, "edge", pe.id)) selSet(f, "edge", pe.id);
           drag = { mode: "end", e: pe, which: ep[1], start: svgPoint(svg, evt) };
-          svg.setPointerCapture(evt.pointerId);
+          capturePointer(svg, evt.pointerId);
           state.dragging = true;
           renderAll(); renderProps();
         }
@@ -2204,10 +2223,19 @@
         renderProps();
       } else if (edgeEl) {
         var eidSel = edgeEl.getAttribute("data-edge");
-        if (add) selToggle(f, "edge", eidSel); else selSet(f, "edge", eidSel);
-        renderAll(); renderProps();
-        evt.preventDefault();
-        return;
+        if (add) {
+          selToggle(f, "edge", eidSel);
+          renderAll(); renderProps();
+          evt.preventDefault();
+          return;
+        }
+        selSet(f, "edge", eidSel);
+        /* Arrastrar la línea la dobla, que es como se espera doblar una flecha. El codo
+           nace donde se agarra y se puede repetir en cada tramo, así que la flecha
+           rodea lo que haga falta. No nace hasta que el puntero se mueve: un clic seco
+           sigue siendo solo seleccionar. Doble clic en un codo lo quita. */
+        drag = { mode: "bend", e: edge(f, eidSel), start: svgPoint(svg, evt), i: null };
+        renderProps();
       } else {
         // lienzo vacio: se abre un marco de seleccion
         var o = svgPoint(svg, evt);
@@ -2218,14 +2246,14 @@
         };
         drag = { mode: "marquee" };
         state.dragging = true;
-        svg.setPointerCapture(evt.pointerId);
+        capturePointer(svg, evt.pointerId);
         evt.preventDefault();
         renderAll(); renderProps();
         return;
       }
 
       state.dragging = true;
-      svg.setPointerCapture(evt.pointerId);
+      capturePointer(svg, evt.pointerId);
       evt.preventDefault();
       renderAll();
     });
@@ -2263,6 +2291,26 @@
       } else if (drag.mode === "end") {
         var eb = node(f, drag.which === "from" ? drag.e.from : drag.e.to);
         setAnchor(drag.e, drag.which, nearestAnchor(eb, p));
+      } else if (drag.mode === "bend") {
+        // el codo aparece en el primer movimiento, en el tramo por el que se agarró
+        if (drag.i == null) {
+          if (Math.hypot(dx, dy) < 3) return;
+          snapshot();
+          var bp = edgePath(f, drag.e);
+          var cerca = 0, mejor = Infinity;
+          for (var bi = 0; bi < bp.pts.length - 1; bi++) {
+            var dd = distToSegment(drag.start, bp.pts[bi], bp.pts[bi + 1]);
+            if (dd < mejor) { mejor = dd; cerca = bi; }
+          }
+          var lista = waypoints(drag.e).slice();
+          drag.x0 = Math.round(drag.start.x);
+          drag.y0 = Math.round(drag.start.y);
+          lista.splice(cerca, 0, { x: drag.x0, y: drag.y0 });
+          setWaypoints(drag.e, lista);
+          drag.i = cerca;
+        }
+        var bw = waypoints(drag.e)[drag.i];
+        if (bw) { bw.x = snap(drag.x0 + dx, free); bw.y = snap(drag.y0 + dy, free); }
       } else if (drag.mode === "wp") {
         var dw = waypoints(drag.e)[drag.i];
         if (dw) { dw.x = snap(drag.x0 + dx, free); dw.y = snap(drag.y0 + dy, free); }
@@ -2277,11 +2325,13 @@
     function endDrag(evt) {
       if (!drag) return;
       var wasMarquee = drag.mode === "marquee";
+      // pulsar una flecha sin llegar a arrastrarla tampoco cambia nada: no llegó a salir codo
+      var soloSeleccion = drag.mode === "bend" && drag.i == null;
       drag = null;
       state.dragging = false;
       state.marquee = null;
       // elegir no cambia el documento: solo mover o redimensionar lo ensucian
-      if (!wasMarquee) markDirty();
+      if (!wasMarquee && !soloSeleccion) markDirty();
       renderAll();
       renderProps();
       if (evt && evt.pointerId != null && svg.hasPointerCapture(evt.pointerId)) {
