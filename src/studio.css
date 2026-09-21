@@ -10,7 +10,10 @@
   .appbar .brandmark{font-size:11px;letter-spacing:inherit;margin:0}
   .product-name{font-weight:700}
   .document-state{display:flex;align-items:center;gap:6px;white-space:nowrap;color:var(--ink-muted);font-size:12px;margin-right:16px}
-  .appbar .revbadge{background:transparent;color:var(--ink-muted);border-color:transparent;min-height:40px;padding:0 4px}
+  /* el número de versión se queda con su pastilla verde: es la única pista de que
+     el fichero lleva un historial dentro, y apagarlo lo convertía en texto suelto.
+     Solo se iguala su altura a la de los demás controles de la barra. */
+  .appbar .revbadge{min-height:40px}
   .appbar .btn,.appbar select{min-height:40px;box-shadow:none;border-color:var(--border)}
   .appbar .btn[aria-pressed=true]{background:var(--surface-2);border-color:var(--ink-muted);color:var(--ink);font-weight:600}
   .appbar #btn-help{position:absolute;right:16px;top:12px;width:40px;font-size:17px}

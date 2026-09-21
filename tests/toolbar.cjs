@@ -8,6 +8,15 @@ module.exports = async function({run,open,click,change,screenshot,cdp}) {
   assert.equal(await visible('btn-reset'),true);
   assert.equal(await run(`document.querySelectorAll('.appbar .btn--primary').length`),1);
   assert.equal(await run(`document.getElementById('status').textContent`),'Sin cambios');
+  // el numero de version se ve como una pastilla, no como texto suelto
+  const pastilla=await run(`{const s=getComputedStyle(document.getElementById('btn-history'));({borde:s.borderTopWidth,fondo:s.backgroundColor})}`);
+  assert.equal(pastilla.borde,'1px');
+  assert.notEqual(pastilla.fondo,'rgba(0, 0, 0, 0)');
+  // el historial vacio se lee en una linea, no partido palabra por palabra
+  await click('btn-history');
+  assert.equal(await run(`document.querySelectorAll('#modal-body .histrow').length`),0,'the empty notice is not a row');
+  assert.ok(await run(`document.querySelector('#modal-body .histempty').getBoundingClientRect().width>200`),'and it has room to read');
+  await run(`Array.from(document.querySelectorAll('#modal-actions button')).find(b=>b.textContent==='Cerrar').click()`);
   await screenshot('cabecera-escritorio');
   await change('theme-select','light');
   assert.equal(await run(`document.getElementById('status').textContent`),'Sin guardar');

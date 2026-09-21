@@ -253,6 +253,9 @@
   .histrow.is-current{background:var(--brand-tint)}
   .histrow .r{font-weight:600;color:var(--brand-ink);font-variant-numeric:tabular-nums}
   .histrow .who{color:var(--ink-muted);font-size:12.5px}
+  /* el aviso de que aún no hay versiones no es una fila: no lleva número ni fecha,
+     así que no puede entrar en la rejilla de 44px o se parte palabra por palabra */
+  .histempty{margin:0;padding:12px 14px;font-size:13.5px;color:var(--ink-muted)}
 
   /* ---------- aviso ---------- */
   .notice{
@@ -1522,8 +1525,8 @@
       list.className = "histlist";
       var rows = m.history.slice().reverse();
       if (!rows.length) {
-        var empty = document.createElement("div");
-        empty.className = "histrow";
+        var empty = document.createElement("p");
+        empty.className = "histempty";
         empty.textContent = t("history.empty");
         list.appendChild(empty);
       }
