@@ -1,150 +1,150 @@
   <header>
-    <p class="kicker">Plataforma de datos · propuesta</p>
-    <h1>Sacar las escrituras del monolito</h1>
+    <p class="kicker">Data platform · proposal</p>
+    <h1>Taking the writes out of the monolith</h1>
     <p class="lede">
-      El monolito atiende peticiones de clientes, genera informes y ejecuta tareas nocturnas con
-      el mismo proceso y la misma base de datos. <strong>Un cierre de mes degrada las lecturas de
-      todo el mundo.</strong> Esta propuesta separa las escrituras tras una cola y deja el camino
-      de lectura libre.
+      The monolith serves client requests, generates reports and runs nightly jobs in the same
+      process and against the same database. <strong>A month-end close degrades reads for
+      everyone.</strong> This proposal moves writes behind a queue and leaves the read path free.
     </p>
     <div class="meta">
-      <span class="pill is-draft">Borrador para validación</span>
-      <span class="pill">Documento de ejemplo</span>
+      <span class="pill is-draft">Draft for review</span>
+      <span class="pill">Example document</span>
     </div>
   </header>
 
   <section>
-    <h2>El problema de hoy</h2>
+    <h2>Today's problem</h2>
     <p>
-      Todo comparte proceso: la API que responde a clientes, la generación de informes y las tareas
-      programadas. No se puede escalar una sin escalar las demás, y una tarea pesada compite por la
-      misma conexión a base de datos que una petición de usuario.
+      Everything shares one process: the API that answers clients, report generation and scheduled
+      jobs. None of them can be scaled without scaling the others, and a heavy job competes for the
+      same database connection as a user request.
     </p>
     <figure data-fig="f1">
       <div class="figtools" data-tools="f1"></div>
-      <div class="canvas canvas--mid"><svg data-svg="f1" role="img" aria-label="El monolito contiene la API pública, los informes y las tareas programadas, y los tres compiten por la misma base de datos."></svg></div>
+      <div class="canvas canvas--mid"><svg data-svg="f1" role="img" aria-label="The monolith contains the public API, report generation and scheduled jobs, and all three compete for the same database."></svg></div>
       <figcaption>
-        <b>Tres cargas, un solo proceso.</b> La tarea nocturna y la petición de un cliente compiten
-        por el mismo grupo de conexiones. Subir réplicas para absorber el cierre de mes multiplica
-        también los informes, que es lo que no hace falta.
+        <b>Three workloads, one process.</b> The nightly job and a client request compete for the
+        same connection pool. Adding replicas to absorb the month-end close also multiplies report
+        generation, which is exactly what you do not need.
       </figcaption>
     </figure>
   </section>
 
   <section>
-    <h2>Arquitectura propuesta</h2>
+    <h2>Proposed architecture</h2>
     <p>
-      El servicio de entrada decide por operación: lo que escribe va a una cola y se aplica de forma
-      diferida; lo que solo lee pasa de largo hacia el servicio de datos. El planificador sale a su
-      propia pieza y deja de vivir dentro de lo que sirve peticiones.
+      The entry service decides per operation: anything that writes goes to a queue and is applied
+      later; anything that only reads passes straight through to the data service. The scheduler
+      moves into its own piece and stops living inside whatever serves requests.
     </p>
     <figure data-fig="f2">
       <div class="figtools" data-tools="f2"></div>
-      <div class="canvas canvas--wide"><svg data-svg="f2" role="img" aria-label="Los clientes entran por una pasarela al servicio de entrada, que encola las escrituras y reenvía las lecturas al servicio de datos; el planificador entra por red interna."></svg></div>
+      <div class="canvas canvas--wide"><svg data-svg="f2" role="img" aria-label="Clients come in through a gateway to the entry service, which queues writes and forwards reads to the data service; the scheduler comes in over the internal network."></svg></div>
       <div class="legend">
-        <span><i class="swatch sw-new"></i>pieza o camino nuevo</span>
-        <span><i class="swatch sw-out"></i>fuera del ámbito</span>
-        <span><i class="swatch sw-dead"></i>se elimina</span>
+        <span><i class="swatch sw-new"></i>new piece or path</span>
+        <span><i class="swatch sw-out"></i>out of scope</span>
+        <span><i class="swatch sw-dead"></i>removed</span>
       </div>
       <figcaption>
-        <b>La cola absorbe el pico, la lectura no se entera.</b> Una escritura devuelve un
-        identificador en cuanto entra en la cola; el consumidor la aplica a su ritmo. El camino de
-        lectura nunca espera detrás de una escritura pesada.
+        <b>The queue absorbs the peak; reads do not notice.</b> A write returns an identifier as
+        soon as it enters the queue; the consumer applies it at its own pace. The read path never
+        waits behind a heavy write.
       </figcaption>
     </figure>
 
     <div class="notes">
       <div class="note">
-        <h3>Solo dos operaciones son asíncronas</h3>
+        <h3>Only two operations are asynchronous</h3>
         <p>
-          Crear y actualizar pasan por la cola. Buscar, descargar y listar siguen siendo síncronas y
-          el servicio de entrada se limita a reenviarlas.
+          Create and update go through the queue. Search, download and list stay synchronous and the
+          entry service simply forwards them.
         </p>
-        <p class="src">sustituye esto por lo que diga tu código</p>
+        <p class="src">replace this with what your code says</p>
       </div>
       <div class="note">
-        <h3>La caché es el trabajo caro</h3>
+        <h3>The cache is the expensive part</h3>
         <p>
-          No está en el servicio de entrada sino en el de datos, que escribe y luego relee para
-          resolver referencias. Retirarla obliga a rehacer esa parte.
+          It sits in the data service, not the entry service, which writes and then reads back to
+          resolve references. Removing it means redoing that part.
         </p>
-        <p class="src">sustituye esto por lo que diga tu código</p>
+        <p class="src">replace this with what your code says</p>
       </div>
       <div class="note">
-        <h3>Separar primero, limpiar después</h3>
+        <h3>Split first, clean up after</h3>
         <p>
-          Una entrega mueve la pieza tal cual está y otra retira la caché. Juntarlas mezcla un
-          cambio verificable con el único que puede alterar resultados.
+          One delivery moves the piece as it stands, another removes the cache. Combining them mixes
+          a verifiable change with the only one that can alter results.
         </p>
-        <p class="src">secuencia propuesta</p>
+        <p class="src">proposed sequence</p>
       </div>
     </div>
   </section>
 
   <section>
-    <h2>Qué se retira</h2>
+    <h2>What gets removed</h2>
     <p>
-      Los clientes dejan de hablar con el monolito y pasan por la pasarela. Cuando el último consumidor
-      de informes migre, el monolito, su cron interno y el generador de informes dejan de tener razón
-      de ser: nadie los llama.
+      Clients stop talking to the monolith and go through the gateway. Once the last report consumer
+      migrates, the monolith, its internal cron and the report generator have no reason to exist:
+      nobody calls them.
     </p>
     <figure data-fig="f3">
       <div class="figtools" data-tools="f3"></div>
-      <div class="canvas canvas--mid"><svg data-svg="f3" role="img" aria-label="Los clientes pasan a llamar al servicio nuevo por la pasarela; el monolito, el cron interno y los informes se apagan."></svg></div>
+      <div class="canvas canvas--mid"><svg data-svg="f3" role="img" aria-label="Clients start calling the new service through the gateway; the monolith, the internal cron and report generation are switched off."></svg></div>
       <figcaption>
-        <b>Un cambio de destino, cero cambios funcionales.</b> El contrato que ven los clientes no
-        cambia; cambia a quién llaman. El monolito se apaga sin tocar ninguna aplicación cliente.
+        <b>One changed destination, zero functional changes.</b> The contract clients see does not
+        change; who they call does. The monolith is switched off without touching any client
+        application.
       </figcaption>
     </figure>
   </section>
 
   <section>
-    <h2>Quién entra y con qué credencial</h2>
+    <h2>Who gets in and with which credential</h2>
     <p>
-      Tres consumidores con tres modelos distintos. Conviene fijarlo antes de construir, porque la
-      pieza nueva nace con la capa de autorización dentro o no nace bien.
+      Three consumers with three different models. Better to settle this before building, because
+      the new piece is either born with the authorization layer inside or it is not born right.
     </p>
     <div class="tablewrap">
       <table>
-        <thead><tr><th scope="col">Consumidor</th><th scope="col">Ámbito</th><th scope="col">Autenticación</th><th scope="col">Estado</th></tr></thead>
+        <thead><tr><th scope="col">Consumer</th><th scope="col">Scope</th><th scope="col">Authentication</th><th scope="col">Status</th></tr></thead>
         <tbody>
-          <tr><td><b>clientes</b></td><td>externo</td><td>pasarela · clave por cliente</td><td><span class="tag">en curso</span></td></tr>
-          <tr><td><b>planificador</b></td><td>interno</td><td>red interna</td><td><span class="tag">por definir</span></td></tr>
-          <tr><td><b>servicio de entrada</b></td><td>externo</td><td>pasarela · clave por cliente</td><td><span class="tag is-new">por construir</span></td></tr>
+          <tr><td><b>clients</b></td><td>external</td><td>gateway · per-client key</td><td><span class="tag">in progress</span></td></tr>
+          <tr><td><b>scheduler</b></td><td>internal</td><td>internal network</td><td><span class="tag">to be defined</span></td></tr>
+          <tr><td><b>entry service</b></td><td>external</td><td>gateway · per-client key</td><td><span class="tag is-new">to be built</span></td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
   <section>
-    <h2>Decisiones abiertas</h2>
+    <h2>Open decisions</h2>
     <p class="deccount" id="dec-count"></p>
     <ol class="decisions">
       <li data-decision="1"><span class="num">01</span><div>
-        <p class="decision-q">¿La cola es necesaria o basta con un trabajo en segundo plano?</p>
-        <p class="decision-w">Es la decisión de mayor impacto: define si hay una pieza de infraestructura más que operar. Si el pico real cabe en un proceso en segundo plano, la cola sobra.</p>
+        <p class="decision-q">Is the queue necessary, or is a background job enough?</p>
+        <p class="decision-w">This is the highest-impact decision: it determines whether there is one more piece of infrastructure to operate. If the real peak fits in a background process, the queue is unnecessary.</p>
       </div>
-        <div class="answer"><span class="lbl">↳ Respuesta:</span><textarea data-answer="1" rows="1" placeholder="sin responder"></textarea></div>
+        <div class="answer"><span class="lbl">↳ Answer:</span><textarea data-answer="1" rows="1" placeholder="unanswered"></textarea></div>
       </li>
       <li data-decision="2"><span class="num">02</span><div>
-        <p class="decision-q">¿La escritura devuelve 200 o 202 con identificador consultable?</p>
-        <p class="decision-w">Si la operación pasa a ser diferida, devolver 200 miente sobre lo que ha ocurrido. Mientras no haya clientes, cambiarlo es gratis.</p>
+        <p class="decision-q">Does the write return 200 or 202 with a pollable identifier?</p>
+        <p class="decision-w">If the operation becomes deferred, returning 200 lies about what happened. While there are no clients yet, changing it is free.</p>
       </div>
-        <div class="answer"><span class="lbl">↳ Respuesta:</span><textarea data-answer="2" rows="1" placeholder="sin responder"></textarea></div>
+        <div class="answer"><span class="lbl">↳ Answer:</span><textarea data-answer="2" rows="1" placeholder="unanswered"></textarea></div>
       </li>
       <li data-decision="3"><span class="num">03</span><div>
-        <p class="decision-q">¿Quién se queda con el esquema de mensajes?</p>
-        <p class="decision-w">Productor y consumidor comparten un contrato. Duplicarlo en ambos repositorios garantiza que se desincronicen en el tercer cambio.</p>
+        <p class="decision-q">Who owns the message schema?</p>
+        <p class="decision-w">Producer and consumer share a contract. Duplicating it across both repositories guarantees they drift apart by the third change.</p>
       </div>
-        <div class="answer"><span class="lbl">↳ Respuesta:</span><textarea data-answer="3" rows="1" placeholder="sin responder"></textarea></div>
+        <div class="answer"><span class="lbl">↳ Answer:</span><textarea data-answer="3" rows="1" placeholder="unanswered"></textarea></div>
       </li>
     </ol>
   </section>
 
   <footer>
     <p>
-      Documento de ejemplo de <b>docuweb</b>. El contenido es ficticio y está aquí para enseñar la
-      forma: sustitúyelo por el tuyo. Un documento real debería decir aquí de dónde salen sus
-      diagramas y a qué fecha.
+      Example document for <b>docuweb</b>. The content is fictional and is here to show the shape:
+      replace it with your own. A real document should state here where its diagrams come from and
+      as of which date.
     </p>
   </footer>

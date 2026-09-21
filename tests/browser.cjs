@@ -60,18 +60,26 @@ async function main(){
   await cdp('Runtime.enable');await cdp('Page.enable');
   await cdp('Network.enable');await cdp('Network.setBlockedURLs',{urls:['*fonts.googleapis.com*','*fonts.gstatic.com*']});
   await cdp('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
-  const files=['index.html','template.html',...fs.readdirSync(path.join(root,'templates')).filter(n=>n.endsWith('.html')).map(n=>'templates/'+n)];
+  const templateFile=n=>'templates/'+n;
+  const files=['index.html','template.html',
+    ...fs.readdirSync(path.join(root,'templates')).filter(n=>n.endsWith('.html')).map(templateFile),
+    ...fs.readdirSync(path.join(root,'templates','en')).filter(n=>n.endsWith('.html')).map(n=>templateFile('en/'+n))];
+  assert.equal(files.length,12,'every generated document is exercised');
   for(const file of files){
     await open(file);
+    // El idioma del documento manda: la interfaz abre en el suyo.
+    const esperado=(file==='index.html'||file.startsWith('templates/en/'))?'en':'es';
+    assert.equal(await run('document.documentElement.lang'),esperado,file+' declares its language');
+    assert.equal(await run('document.getElementById("btn-content").textContent'),esperado==='en'?'Edit text':'Editar texto',file+' interface language');
     const count=await run('document.querySelectorAll("svg[data-svg]").length');
     assert.equal(await run('Array.from(document.querySelectorAll("svg[data-svg]")).filter(s=>s.children.length>0).length'),count,file+' diagrams render');
     await click('btn-edit');await click('btn-edit');
     await click('btn-content');
     assert.ok(await run('document.querySelectorAll("[contenteditable=true]").length')>0,file+' editable');
     await click('btn-content');
-    await screenshot(path.basename(file,'.html'));
+    await screenshot(file.replace(/^templates\//,'').replace(/\.html$/,'').replace(/\//g,'-'));
   }
-  console.log('PASS: all 7 documents load and edit without runtime exceptions');
+  console.log('PASS: all 12 documents (Spanish and English templates) load and edit without runtime exceptions');
   await open('template.html');
   await click('btn-content');
   await run(`{const h=document.querySelector('#document-content h1');h.focus();h.textContent='Informe revisado <seguro>';h.dispatchEvent(new Event('input',{bubbles:true}));}`);
@@ -152,25 +160,160 @@ async function main(){
   assert.equal(await run('document.documentElement.dataset.design'),'technical');
   console.log('PASS: text undo/redo, draft recovery and reset preserve the saved baseline');
   await require('./appearance.cjs')({run,open,click,installSaveMock,save,model,screenshot,artifacts,cdp});
+  await require('./toolbar.cjs')({run,open,click,change,screenshot,cdp});
   await open('index.html');await click('btn-content');
   const headings=()=>run('Array.from(document.querySelectorAll("#document-content>section>h2")).map(h=>h.textContent)');
   const originalOrder=await headings();
-  await run('document.querySelectorAll(".section-controls")[0].querySelectorAll("button")[1].click()');
+  // La cabecera y el pie llevan los mismos controles, asi que aqui se apunta a las secciones.
+  const sectionBar=n=>`document.querySelectorAll("#document-content>section .section-controls")[${n}]`;
+  await run(`${sectionBar(0)}.querySelectorAll("button")[1].click()`);
   assert.equal((await headings())[1],originalOrder[0]);
-  await run('document.querySelectorAll(".section-controls")[1].querySelectorAll("button")[0].click()');
+  await run(`${sectionBar(1)}.querySelectorAll("button")[0].click()`);
   assert.deepEqual(await headings(),originalOrder);
-  await run('document.querySelector(".section-controls").querySelectorAll("button")[2].click()');
+  await run(`${sectionBar(0)}.querySelectorAll("button")[2].click()`);
   assert.equal((await headings()).length,originalOrder.length-1);
   assert.equal(await run('document.querySelectorAll("svg[data-svg]").length'),2);
   await click('btn-content-undo');assert.deepEqual(await headings(),originalOrder);
   assert.equal(await run('document.querySelectorAll("svg[data-svg]").length'),3);
-  await run('document.querySelector(".section-controls").querySelectorAll("button")[2].click()');
+  await run(`${sectionBar(0)}.querySelectorAll("button")[2].click()`);
   await installSaveMock();const sectionHtml=await save('Secciones reorganizadas');
   const sectionPath=path.join(artifacts,'secciones.html');fs.writeFileSync(sectionPath,sectionHtml);await open(sectionPath);
   assert.equal((await headings()).length,originalOrder.length-1);
   assert.equal(Object.keys((await model()).figures).length,2);
   assert.equal(await run('document.querySelectorAll("[data-block-tools]").length'),0);
   console.log('PASS: move sections up/down, remove with diagram cleanup, undo and reopen');
+  // La cabecera y el pie son bloques como cualquier otro: se mueven y se quitan.
+  await open('index.html');await click('btn-content');
+  const blocks=()=>run('Array.from(document.querySelectorAll("#document-content .section-controls")).map(b=>b.parentElement.tagName.toLowerCase())');
+  const blockBar=sel=>`document.querySelector("#document-content>${sel} .section-controls")`;
+  assert.deepEqual(await blocks(),['header','section','section','section','section','section','footer']);
+  assert.equal(await run(`${blockBar('header')}.querySelectorAll("button")[0].disabled`),true,'the header is already first');
+  assert.equal(await run(`${blockBar('footer')}.querySelectorAll("button")[1].disabled`),true,'the footer is already last');
+  await run(`${blockBar('footer')}.querySelectorAll("button")[2].click()`);
+  assert.equal(await run('document.querySelectorAll("#document-content>footer").length'),0);
+  await run(`${blockBar('header')}.querySelectorAll("button")[2].click()`);
+  assert.equal(await run('document.querySelectorAll("#document-content>header").length'),0);
+  assert.deepEqual(await blocks(),['section','section','section','section','section']);
+  await click('btn-content-undo');assert.equal(await run('document.querySelectorAll("#document-content>header").length'),1);
+  await click('btn-content-undo');assert.equal(await run('document.querySelectorAll("#document-content>footer").length'),1);
+  assert.deepEqual(await blocks(),['header','section','section','section','section','section','footer']);
+  await run(`${blockBar('footer')}.querySelectorAll("button")[2].click()`);
+  await run(`${blockBar('header')}.querySelectorAll("button")[2].click()`);
+  await installSaveMock();const blockHtml=await save('Sin cabecera ni pie');
+  const blockPath=path.join(artifacts,'sin-cabecera.html');fs.writeFileSync(blockPath,blockHtml);await open(blockPath);
+  assert.equal(await run('document.querySelectorAll("#document-content>header,#document-content>footer").length'),0);
+  assert.equal(await run('document.querySelectorAll("#document-content>section").length'),5);
+  console.log('PASS: header and footer behave like any block, undo brings them back and the file reopens without them');
+  // Sin cabecera el documento se queda sin h1: `+ Título` tiene que poder crearlo.
+  await open('index.html');await click('btn-content');
+  const addBlock=k=>run(`document.querySelector('[data-add-block="${k}"]').click()`);
+  const titles=()=>run('Array.from(document.querySelectorAll("#document-content>header h1")).map(h=>h.textContent)');
+  const headerBar=()=>`document.querySelector("#document-content>header .section-controls")`;
+  assert.deepEqual(await titles(),['Taking the writes out of the monolith']);
+  await run(`${headerBar()}.querySelectorAll("button")[2].click()`);
+  assert.equal(await run('document.querySelectorAll("#document-content>header").length'),0);
+  assert.equal(await run('!!document.querySelector("#document-content h1")'),false);
+  await addBlock('header');
+  assert.equal(await run('document.querySelectorAll("#document-content>header").length'),1,'a new header comes back');
+  assert.equal(await run('!!document.querySelector("#document-content h1")'),true,'and brings an h1 with it');
+  assert.equal(await run('document.querySelector("#document-content>header").tagName'),'HEADER');
+  assert.equal(await run('document.title'),'Document title','the tab title follows the new h1');
+  // La cabecera nueva entra la primera, delante de las secciones.
+  assert.deepEqual(await run('Array.from(document.querySelectorAll("#document-content .section-controls")).map(b=>b.parentElement.tagName.toLowerCase())'),['header','section','section','section','section','section','footer']);
+  await run('{const h=document.querySelector("#document-content>header h1");h.focus();h.textContent="Título reescrito";h.dispatchEvent(new Event("input",{bubbles:true}));}');
+  assert.equal(await run('document.title'),'Título reescrito');
+  await installSaveMock();const titleHtml=await save('Título nuevo');
+  const titlePath=path.join(artifacts,'titulo-nuevo.html');fs.writeFileSync(titlePath,titleHtml);await open(titlePath);
+  assert.equal(await run('document.querySelector("#document-content>header h1").textContent'),'Título reescrito');
+  assert.equal(await run('document.querySelectorAll("#document-content>section").length'),5);
+  console.log('PASS: a deleted header can be rebuilt with + Título and the new title persists');
+  // La interfaz sigue al idioma del documento; el selector la cambia sin tocar el contenido.
+  await open('index.html');
+  assert.equal(await run('document.documentElement.lang'),'en');
+  assert.equal(await run('document.getElementById("btn-notes").textContent'),'Notes');
+  assert.equal(await run('document.querySelector("#btn-save .desktop-label").textContent'),'Save version');
+  const countEn=await run('document.getElementById("dec-count").textContent');
+  assert.equal(countEn,'1 of 3 answered','the decision counter is interface text');
+  await open('template.html');
+  assert.equal(await run('document.documentElement.lang'),'es');
+  assert.equal(await run('document.getElementById("btn-notes").textContent'),'Notas');
+  assert.equal(await run('document.querySelector("#btn-save .desktop-label").textContent'),'Guardar versión');
+  // El catalogo no puede tener claves sin traducir en un idioma.
+  const missing=await run(`{const c=JSON.parse(document.getElementById('i18n-data').textContent);Object.keys(c.es).filter(k=>!(k in c.en))}`);
+  assert.deepEqual(missing,[],'every Spanish key must exist in English');
+  const missingEs=await run(`{const c=JSON.parse(document.getElementById('i18n-data').textContent);Object.keys(c.en).filter(k=>!(k in c.es))}`);
+  assert.deepEqual(missingEs,[],'every English key must exist in Spanish');
+  await open('index.html');
+  const headingBefore=await run('document.querySelector("#document-content h1").textContent');
+  await change('lang-select','es');
+  assert.equal(await run('document.getElementById("btn-notes").textContent'),'Notas');
+  assert.equal(await run('document.getElementById("dec-count").textContent'),'1 de 3 respondidas');
+  assert.equal(await run('document.querySelector(".content-tools button").textContent'),'+ Título');
+  assert.equal(await run('document.querySelector("#document-content h1").textContent'),headingBefore,'the document content must not change');
+  assert.equal(await run('document.documentElement.lang'),'en','the content language stays as the document declares it');
+  await change('lang-select','en');
+  assert.equal(await run('document.getElementById("btn-notes").textContent'),'Notes');
+  // Una plantilla descargada sale en el idioma de la interfaz.
+  await run('window.__template=null;URL.createObjectURL=blob=>{blob.text().then(t=>window.__template=t);return "blob:blocked-test"};HTMLAnchorElement.prototype.click=function(){};');
+  await click('btn-templates');await run('document.querySelector(".template-card").click()');await sleep(100);
+  const enTemplate=await run('window.__template');
+  assert.ok(enTemplate.includes('Technical proposal'),'the downloaded template follows the interface language');
+  // El catalogo embebido lleva los dos idiomas: se mira el contenido del documento.
+  assert.ok(!enTemplate.includes('<h1>Título de la propuesta</h1>'),'and its body is not the Spanish one');
+  assert.ok(enTemplate.includes('<h1>Proposal title</h1>'),'the body follows the interface language too');
+  console.log('PASS: the interface follows the document language and the selector switches it without touching content');
+  // Amarres de las puntas y varios codos por flecha.
+  await open('index.html');
+  await click('btn-edit');
+  const down=sel=>run(`{const el=document.querySelector(${JSON.stringify(sel)});el.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,button:0,pointerId:1,clientX:0,clientY:0}));}`);
+  const edge2=async()=>(await model()).figures.f2.edges.find(e=>e.id==='e2');
+  await down('[data-svg="f2"] [data-edge="e2"] .hit');
+  assert.equal(await run(`document.querySelectorAll('[data-svg="f2"] [data-anch]').length`),18,'nine targets per end');
+  assert.equal(await run(`document.querySelectorAll('[data-svg="f2"] [data-endp]').length`),2);
+  // El JSON del documento solo se reescribe al grabar: hasta entonces se mira lo dibujado.
+  // Varias figuras reutilizan los ids de arista (f1 y f2 tienen una `e2`), asi que
+  // hay que acotar a f2 o se lee la flecha equivocada. Y dentro de una plantilla de
+  // Node hay que escribir \\s: un \s suelto se pierde y el regex pasa a ser /s+/.
+  const tail=()=>run(`document.querySelector('[data-svg="f2"] [data-edge="e2"] polyline').getAttribute('points').trim().split(/\\s+/)[0]`);
+  const lit=key=>run(`document.querySelector('[data-svg="f2"] [data-anch="e2|from|${key}"]').classList.contains('is-on')`);
+  const elbowHandles=()=>run(`document.querySelectorAll('[data-svg="f2"] [data-wp]').length`);
+  await down('[data-anch="e2|from|ne"]');
+  assert.equal(await tail(),'286,222','the tail moves to the top right corner of the chip');
+  assert.ok(await lit('ne'),'and that target is the one lit');
+  await down('[data-anch="e2|from|auto"]');
+  assert.ok(await lit('auto'),'the centre gives the automatic point back');
+  await down('[data-anch="e2|from|w"]');
+  assert.equal(await tail(),'74,243','and a side midpoint puts it back on the left');
+  const elbows=await elbowHandles();
+  await run(`Array.from(document.querySelectorAll('#props button')).find(b=>b.textContent==='Add elbow').click()`);
+  assert.equal(await elbowHandles(),elbows+1,'a new elbow joins the list');
+  await run(`document.querySelector('[data-wp="e2|0"]').dispatchEvent(new MouseEvent('dblclick',{bubbles:true}))`);
+  assert.equal(await elbowHandles(),elbows,'double click removes just that elbow');
+  await installSaveMock();
+  const anchorHtml=await save('Amarres y codos');
+  const anchorPath=path.join(artifacts,'amarres.html');fs.writeFileSync(anchorPath,anchorHtml);await open(anchorPath);
+  const saved=await edge2();
+  assert.equal(saved.fromAnchor,'w');assert.equal(saved.toAnchor,'w');assert.equal(saved.wps.length,elbows);
+  assert.equal(await run(`document.querySelector('[data-svg="f2"] [data-edge="e2"] polyline').getAttribute("points").trim().split(/\\s+/).length`),elbows+2,'the drawn line keeps every elbow');
+  console.log('PASS: endpoint anchors, several elbows per arrow, removal and versioned save');
+  // Documentos antiguos: un solo codo en `wp` se sigue leyendo y se normaliza a `wps`.
+  // El motor normaliza al leer, pero solo vuelca el modelo a `#diagram-data` al grabar:
+  // la migracion se comprueba en el fichero resultante, no en el script de origen.
+  const src=fs.readFileSync(path.join(root,'index.html'),'utf8');
+  const block=src.match(/<script id="diagram-data" type="application\/json">([\s\S]*?)<\/script>/);
+  const legacyData=JSON.parse(block[1].replace(/\u003c/g,'<'));
+  const legacyEdge=legacyData.figures.f2.edges.find(e=>e.id==='e2');
+  legacyEdge.wp=legacyEdge.wps[0];delete legacyEdge.wps;delete legacyEdge.fromAnchor;delete legacyEdge.toAnchor;
+  const legacyPath=path.join(artifacts,'documento-antiguo.html');
+  fs.writeFileSync(legacyPath,src.replace(block[1],()=>'\n'+JSON.stringify(legacyData,null,2).replace(/</g,'\u003c')+'\n'));
+  await open(legacyPath);
+  assert.equal(await run(`document.querySelector('[data-svg="f2"] [data-edge="e2"] polyline').getAttribute("points").trim().split(/\\s+/).length`),3,'the legacy elbow still draws');
+  await installSaveMock();
+  const migratedHtml=await save('Migrado desde wp');
+  const migratedEdge=JSON.parse(migratedHtml.match(/<script id="diagram-data" type="application\/json">([\s\S]*?)<\/script>/)[1].replace(/\u003c/g,'<')).figures.f2.edges.find(e=>e.id==='e2');
+  assert.equal(migratedEdge.wp,undefined,'the old field is migrated when the document is written');
+  assert.equal(migratedEdge.wps.length,1,'and becomes a list of one elbow');
+  console.log('PASS: a document written with the old single elbow still opens, draws and is saved as wps');
   assert.deepEqual(errors,[],'browser exceptions');
   console.log('Artifacts: '+artifacts);
 }

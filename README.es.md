@@ -21,13 +21,13 @@ red, ni archivar tal cual quedó el día que se decidió algo.
 | En vez de | Con docuweb |
 |---|---|
 | Un `.docx` con capturas pegadas del diagrama | El diagrama son datos: mueves una caja y la flecha se recoloca sola |
-| Abrir Word, Writer o Docs, con su licencia o su cuenta | Doble clic en un fichero de 150 KB, en cualquier navegador, sin instalar ni registrarte |
+| Abrir Word, Writer o Docs, con su licencia o su cuenta | Doble clic en un fichero de 160 KB, en cualquier navegador, sin instalar ni registrarte |
 | Quedarte sin documento en cuanto no hay red: Docs, Confluence, la wiki | Vive en tu disco. Se abre en un avión, en una sala sin wifi o con la VPN caída |
 | Una página de wiki que no se puede mandar | Se manda por correo y llega entero: nada de enlaces rotos ni de «pide acceso» |
 | Exportar el diagrama a PNG cada vez que cambia | No hay exportación: el dibujo vive dentro del documento y sale a SVG cuando lo necesitas |
 | Un PDF de archivo, que ya no se toca | Se archiva igual, pero cada versión lleva dentro número, fecha, autor y nota de cambio |
 | «¿Quién tiene la última versión?» | El propio fichero: `-v7` en el nombre y el historial completo dentro |
-| Redactarlo entero a mano | Le pasas el repositorio a un asistente con AGENTS.md y te lo rellena |
+| Redactarlo entero a mano | Le pasas el repositorio a un asistente: el cuerpo es HTML normal y los diagramas son JSON |
 
 Sin servidor, sin base de datos, sin cuenta y sin proveedor al que pagar. No manda nada a
 ningún sitio: la única petición que sale es la tipografía de Google, y sin conexión usa la
@@ -64,7 +64,7 @@ vez está en tu disco no necesita este repositorio para nada.
 |---|---|
 | [`index.html`](index.html) | Documento de ejemplo, completo y tocable. Vale también como punto de partida. |
 | [`template.html`](template.html) | Documento vacío, solo la estructura mínima. |
-| [`templates/`](templates/) | Cinco documentos ya redactados por propósito. |
+| [`templates/`](templates/) | Cinco documentos ya redactados por propósito, en español; `templates/en/` tiene las versiones inglesas. |
 | `src/`, `tests/`, `docs/` | Fuentes y comprobaciones. No hacen falta para usar un documento. |
 
 1. **Llévate uno.** Desde GitHub, *Download raw file*: el clic normal enseña el código, no el
@@ -73,8 +73,8 @@ vez está en tu disco no necesita este repositorio para nada.
    el catálogo dentro, así que de uno cualquiera salen los demás.
 2. **Ábrelo con doble clic.** Sin servidor y sin instalar nada. Chrome o Edge si quieres que
    las versiones caigan en la carpeta del documento en vez de en Descargas.
-3. **Rellénalo** con *Editar texto* y *Editar diagramas*, o dáselo a un asistente junto con
-   [AGENTS.md](AGENTS.md).
+3. **Rellénalo** con *Editar texto* y *Editar diagramas*, o dáselo a un asistente: el cuerpo
+   es HTML normal y los diagramas son JSON, así que no hay nada que aprender antes.
 4. **Graba una versión.** Sale `propuesta-tecnica-v2.html`, con el número, la fecha, el autor
    y la nota de cambio escritos dentro. **Ese fichero nuevo es el que pasas**; el anterior
    queda intacto, que es lo que lo hace archivable.
@@ -82,9 +82,10 @@ vez está en tu disco no necesita este repositorio para nada.
 Renómbralo a lo que trate —`migracion-pagos.html`— y las versiones siguen el nombre nuevo.
 El número no sale del nombre: sale de dentro del fichero.
 
-**Como quien dirige a un asistente:** dale el repositorio y esta frase:
+**Como quien dirige a un asistente:** dale el repositorio y una frase así:
 
-> Lee AGENTS.md y rellena template.html con el contenido de este proyecto.
+> Rellena template.html con el contenido de este proyecto. El cuerpo es el HTML que va entre
+> las dos marcas, y los diagramas son el JSON de dentro de `diagram-data`.
 
 **Ver antes de decidir:** abre [`index.html`](index.html), un documento de ejemplo completo
 sobre sacar las escrituras de un monolito. Es un documento como cualquier otro: puedes
@@ -92,26 +93,33 @@ editarlo y grabar tu propia versión.
 
 ## Plantillas y presentación
 
-| Plantilla | Para qué sirve |
-|---|---|
-| [Propuesta técnica](templates/propuesta-tecnica.html) | Problema, alternativas, arquitectura y validación |
-| [Informe ejecutivo](templates/informe-ejecutivo.html) | Hallazgos, indicadores y próximos pasos |
-| [Plan de proyecto](templates/plan-proyecto.html) | Alcance, hitos, responsables y riesgos |
-| [Comparación de alternativas](templates/comparacion-alternativas.html) | Criterios y evidencia para elegir |
-| [Registro de decisión](templates/registro-decision.html) | Contexto, resolución y consecuencias |
+Las cinco plantillas se publican en español y en inglés. Cada documento abre con la interfaz
+en el idioma que declara en `<html lang>`, así que las inglesas lo están por dentro y por fuera.
+
+| Plantilla | Español | English | Para qué sirve |
+|---|---|---|---|
+| Propuesta técnica | [Propuesta técnica](templates/propuesta-tecnica.html) | [Technical proposal](templates/en/propuesta-tecnica.html) | Problema, alternativas, arquitectura y validación |
+| Informe ejecutivo | [Informe ejecutivo](templates/informe-ejecutivo.html) | [Executive report](templates/en/informe-ejecutivo.html) | Hallazgos, indicadores y próximos pasos |
+| Plan de proyecto | [Plan de proyecto](templates/plan-proyecto.html) | [Project plan](templates/en/plan-proyecto.html) | Alcance, hitos, responsables y riesgos |
+| Comparación de alternativas | [Comparación de alternativas](templates/comparacion-alternativas.html) | [Comparison of alternatives](templates/en/comparacion-alternativas.html) | Criterios y evidencia para elegir |
+| Registro de decisión | [Registro de decisión](templates/registro-decision.html) | [Decision record](templates/en/registro-decision.html) | Contexto, resolución y consecuencias |
 
 El selector **Estilo** cambia entre Técnico, Editorial y Ejecutivo conservando el contenido.
-**Tema** permite elegir claro, oscuro o seguir el sistema.
+**Tema** permite elegir claro, oscuro o seguir el sistema. **Idioma** cambia toda la interfaz
+entre español e inglés: un documento abre en el idioma que declara en `<html lang>`, y tu
+elección se recuerda en el navegador sin tocar el fichero.
 
 **Editar texto** permite escribir en títulos, párrafos, celdas y pies de figura. Al final
-del documento puedes añadir secciones, avisos, tablas, diagramas y decisiones, y deshacer
-o rehacer cambios. El contenido y la apariencia quedan incluidos en el versionado existente.
+del documento puedes añadir títulos, secciones, avisos, tablas, diagramas y decisiones, y
+deshacer o rehacer cambios. El contenido y la apariencia quedan incluidos en el versionado
+existente.
 
 En los diagramas puedes duplicar cajas, alinearlas, distribuirlas y ajustarlas al texto.
 El botón **Diagramas…** añade estructuras de flujo, capas, antes/después o etapas.
 
-Cada sección muestra **Subir**, **Bajar** y **Eliminar sección** al activar **Editar texto**.
-Puedes deshacer estas acciones; el orden y las eliminaciones se conservan al guardar.
+Cada bloque —la cabecera, las secciones y el pie— muestra **Subir**, **Bajar** y su botón
+de eliminación al activar **Editar texto**. Puedes deshacer estas acciones; el orden y las
+eliminaciones se conservan al guardar.
 
 El panel de diagramas permite cambiar colores de línea, relleno y texto; usar línea
 continua, segmentos, puntos o guion-punto; ajustar grosor, esquinas y opacidad; y elegir
@@ -139,8 +147,15 @@ El motor es idéntico en todos los documentos. Lo que cambia entre uno y otro so
 y el JSON. Por eso un asistente puede rellenarlo sin entender nada del resto, y por eso
 actualizar el motor de un documento existente es sustituir todo salvo esas dos zonas.
 
-El contrato completo —clases del cuerpo, esquema del JSON, tipos de caja y de flecha— está
-en [AGENTS.md](AGENTS.md).
+El motor viaja recortado: sin comentarios ni sangrado, porque nadie lo lee ahí —se lee en
+`src/`, que es donde se edita—. Las dos zonas tuyas no se tocan: el cuerpo es HTML normal y
+los diagramas son JSON con una caja por línea, igual de legibles que si los hubieras escrito
+tú. De los 160 KB de un documento vacío, unos 150 son motor y catálogos: se pagan una vez y
+no crecen con lo que escribas.
+
+El contrato —clases del cuerpo, esquema del JSON, tipos de caja y de flecha— no está en un
+documento aparte: la referencia es el ejemplo que funciona en [`index.html`](index.html) y las
+cinco plantillas de [`templates/`](templates/), y `src/` es el código que hay detrás.
 
 ## Lo que no hace
 
@@ -162,15 +177,32 @@ múltiple es Cmd, porque Ctrl+clic es el clic derecho; el documento lo detecta s
 
 ## Idioma del interfaz
 
-El andamiaje del documento —barra de herramientas, diálogos, ayuda— está en castellano.
-El motor no tiene todavía cadenas en inglés; traducirlo es tocar los literales de
-`src/motor.html` y `src/studio.js`. Ver [TODO.md](TODO.md).
+El andamiaje del documento —barra de herramientas, diálogos, ayuda— está en castellano y en
+inglés. Hay un solo juego de controles: las cadenas viven en `src/i18n.json`, que viaja dentro
+de cada documento, y el motor las cambia al vuelo.
+
+Un documento abre con la interfaz en el idioma que declara en `<html lang>`, así que
+`index.html` y `templates/en/` abren en inglés, mientras que `template.html` y `templates/`
+abren en castellano. El selector **Idioma** lo cambia en cualquier sentido, y tu elección se
+recuerda en el navegador sin tocar el fichero.
 
 ## Desarrollo
 
-`index.html`, `template.html` y `templates/*.html` son generados: recompílalos con
-`python src/build.py` después de tocar cualquier cosa de `src/`. Consulta
-[las fuentes y las pruebas](docs/development.md).
+`index.html`, `template.html` y las plantillas de `templates/` y `templates/en/` son
+generados: recompílalos con `python src/build.py` después de tocar cualquier cosa de `src/`.
+No los edites a mano, porque la siguiente compilación se los lleva por delante.
+
+Hacen falta Python 3, Node 22 o posterior y Chrome o Chromium. Los documentos que salen no
+necesitan nada de eso.
+
+```powershell
+python src/build.py
+python tests/validate.py   # estructura, referencias de figuras y decisiones, catálogos
+python tests/minify.py     # recortar el motor no cambia el programa
+python tests/peso.py       # cada documento cabe en su techo, y por qué
+python tests/drift.py      # las salidas coinciden byte a byte con src/
+node tests/browser.cjs     # carga, edición, guardado, reapertura, PDF y móvil
+```
 
 ## Licencia
 

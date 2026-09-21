@@ -2,70 +2,70 @@
   "version": 1,
   "meta": { "rev": 1, "savedAt": "2026-09-21", "savedBy": "", "history": [] },
   "answers": {
-    "1": "Sí. La cola se queda: sin ella el pico de fin de mes tumba las lecturas."
+    "1": "Yes. The queue stays: without it the month-end peak takes reads down."
   },
   "figures": {
     "f1": {
       "w": 780,
       "h": 300,
       "nodes": [
-        {"id":"cli","x":30,"y":110,"w":140,"h":52,"kind":"box","title":"clientes"},
-        {"id":"mono","x":220,"y":50,"w":320,"h":160,"kind":"box","title":"monolito","top":true},
-        {"id":"c1","x":236,"y":96,"w":140,"h":44,"kind":"chip","title":"API pública","parent":"mono"},
-        {"id":"c2","x":384,"y":96,"w":140,"h":44,"kind":"chip","title":"informes","parent":"mono"},
-        {"id":"c3","x":236,"y":150,"w":288,"h":44,"kind":"chip","title":"tareas programadas","parent":"mono"},
-        {"id":"bd","x":600,"y":110,"w":150,"h":52,"kind":"box","title":"base de datos"}
+        {"id":"cli","x":30,"y":110,"w":140,"h":52,"kind":"box","title":"clients"},
+        {"id":"mono","x":220,"y":50,"w":320,"h":160,"kind":"box","title":"monolith","top":true},
+        {"id":"c1","x":236,"y":96,"w":140,"h":44,"kind":"chip","title":"public API","parent":"mono"},
+        {"id":"c2","x":384,"y":96,"w":140,"h":44,"kind":"chip","title":"reports","parent":"mono"},
+        {"id":"c3","x":236,"y":150,"w":288,"h":44,"kind":"chip","title":"scheduled jobs","parent":"mono"},
+        {"id":"bd","x":600,"y":110,"w":150,"h":52,"kind":"box","title":"database"}
       ],
       "edges": [
         {"id":"e1","from":"cli","to":"mono","label":""},
-        {"id":"e2","from":"mono","to":"bd","label":"lee y escribe"}
+        {"id":"e2","from":"mono","to":"bd","label":"reads and writes"}
       ]
     },
     "f2": {
       "w": 1080,
       "h": 560,
       "nodes": [
-        {"id":"zext","x":900,"y":18,"w":160,"h":20,"kind":"label","title":"externo","align":"end"},
-        {"id":"cli","x":60,"y":40,"w":220,"h":56,"kind":"box","title":"clientes","sub":"aplicaciones y socios"},
-        {"id":"div","x":30,"y":120,"w":1020,"h":0,"kind":"divider","title":"pasarela","sub":"interno","align":"end"},
-        {"id":"api","x":60,"y":170,"w":240,"h":150,"kind":"new","title":"servicio de entrada","sub":"pieza nueva","top":true},
-        {"id":"a1","x":74,"y":222,"w":212,"h":42,"kind":"chip","title":"escrituras","sub":"van a la cola","parent":"api"},
-        {"id":"a2","x":74,"y":270,"w":212,"h":42,"kind":"chip","title":"lecturas","sub":"pasan de largo","parent":"api"},
-        {"id":"cola","x":60,"y":370,"w":240,"h":68,"kind":"box","title":"cola","sub":"reintentos y orden"},
-        {"id":"svc","x":420,"y":170,"w":240,"h":250,"kind":"box","title":"servicio de datos","top":true},
-        {"id":"s1","x":434,"y":214,"w":212,"h":44,"kind":"chip","title":"consumidor","sub":"aplica las escrituras","parent":"svc"},
-        {"id":"s2","x":434,"y":268,"w":212,"h":44,"kind":"chip","title":"API de lectura","sub":"síncrona","parent":"svc"},
-        {"id":"s3","x":434,"y":322,"w":212,"h":44,"kind":"chipdead","title":"caché propia","sub":"se retira","parent":"svc"},
-        {"id":"bd","x":780,"y":240,"w":160,"h":68,"kind":"box","title":"base de datos","sub":"única fuente de verdad"},
-        {"id":"plan","x":420,"y":470,"w":240,"h":60,"kind":"box","title":"planificador","sub":"tareas nocturnas"}
+        {"id":"zext","x":900,"y":18,"w":160,"h":20,"kind":"label","title":"external","align":"end"},
+        {"id":"cli","x":60,"y":40,"w":220,"h":56,"kind":"box","title":"clients","sub":"applications and partners"},
+        {"id":"div","x":30,"y":120,"w":1020,"h":0,"kind":"divider","title":"gateway","sub":"internal","align":"end"},
+        {"id":"api","x":60,"y":170,"w":240,"h":150,"kind":"new","title":"entry service","sub":"new piece","top":true},
+        {"id":"a1","x":74,"y":222,"w":212,"h":42,"kind":"chip","title":"writes","sub":"go to the queue","parent":"api"},
+        {"id":"a2","x":74,"y":270,"w":212,"h":42,"kind":"chip","title":"reads","sub":"pass through","parent":"api"},
+        {"id":"cola","x":60,"y":370,"w":240,"h":68,"kind":"box","title":"queue","sub":"retries and ordering"},
+        {"id":"svc","x":420,"y":170,"w":240,"h":250,"kind":"box","title":"data service","top":true},
+        {"id":"s1","x":434,"y":214,"w":212,"h":44,"kind":"chip","title":"consumer","sub":"applies writes","parent":"svc"},
+        {"id":"s2","x":434,"y":268,"w":212,"h":44,"kind":"chip","title":"read API","sub":"synchronous","parent":"svc"},
+        {"id":"s3","x":434,"y":322,"w":212,"h":44,"kind":"chipdead","title":"own cache","sub":"removed","parent":"svc"},
+        {"id":"bd","x":780,"y":240,"w":160,"h":68,"kind":"box","title":"database","sub":"single source of truth"},
+        {"id":"plan","x":420,"y":470,"w":240,"h":60,"kind":"box","title":"scheduler","sub":"nightly jobs"}
       ],
       "edges": [
-        {"id":"e1","from":"cli","to":"api","label":"peticiones"},
-        {"id":"e2","from":"a1","to":"cola","label":"encola","kind":"new"},
-        {"id":"e3","from":"cola","to":"svc","label":"consume"},
-        {"id":"e4","from":"a2","to":"svc","label":"reenvía","kind":"new"},
-        {"id":"e5","from":"svc","to":"bd","label":"lee y escribe"},
-        {"id":"e6","from":"plan","to":"svc","label":"red interna"}
+        {"id":"e1","from":"cli","to":"api","label":"requests"},
+        {"id":"e2","from":"a1","to":"cola","label":"enqueues","kind":"new","fromAnchor":"w","toAnchor":"w","wps":[{"x":40,"y":243},{"x":40,"y":404}],"lo":{"dx":0,"dy":26}},
+        {"id":"e3","from":"cola","to":"svc","label":"consumes"},
+        {"id":"e4","from":"a2","to":"svc","label":"forwards","kind":"new"},
+        {"id":"e5","from":"svc","to":"bd","label":"reads and writes"},
+        {"id":"e6","from":"plan","to":"svc","label":"internal network"}
       ]
     },
     "f3": {
       "w": 940,
       "h": 280,
       "nodes": [
-        {"id":"cli","x":30,"y":120,"w":120,"h":48,"kind":"box","title":"clientes","small":true},
-        {"id":"mono","x":330,"y":120,"w":140,"h":48,"kind":"dead","title":"monolito","small":true},
-        {"id":"cron","x":330,"y":30,"w":140,"h":48,"kind":"dead","title":"cron interno","small":true},
-        {"id":"inf","x":510,"y":120,"w":140,"h":48,"kind":"dead","title":"informes","small":true},
-        {"id":"bd","x":790,"y":90,"w":120,"h":180,"kind":"box","title":"base de datos"},
-        {"id":"paso","x":400,"y":198,"w":0,"h":48,"kind":"divider","title":"pasarela"},
-        {"id":"api","x":540,"y":198,"w":160,"h":48,"kind":"new","title":"servicio nuevo","small":true}
+        {"id":"cli","x":30,"y":120,"w":120,"h":48,"kind":"box","title":"clients","small":true},
+        {"id":"mono","x":330,"y":120,"w":140,"h":48,"kind":"dead","title":"monolith","small":true},
+        {"id":"cron","x":330,"y":30,"w":140,"h":48,"kind":"dead","title":"internal cron","small":true},
+        {"id":"inf","x":510,"y":120,"w":140,"h":48,"kind":"dead","title":"reports","small":true},
+        {"id":"bd","x":790,"y":90,"w":120,"h":180,"kind":"box","title":"database"},
+        {"id":"paso","x":400,"y":198,"w":0,"h":48,"kind":"divider","title":"gateway"},
+        {"id":"api","x":540,"y":198,"w":160,"h":48,"kind":"new","title":"new service","small":true}
       ],
       "edges": [
         {"id":"e1","from":"cli","to":"mono","label":"","kind":"dead"},
         {"id":"e2","from":"mono","to":"inf","label":"","kind":"dead"},
         {"id":"e3","from":"inf","to":"bd","label":"","kind":"dead"},
         {"id":"e4","from":"cron","to":"mono","label":"","kind":"dead"},
-        {"id":"e5","from":"cli","to":"api","label":"","kind":"new","wp":{"x":220,"y":222}},
+        {"id":"e5","from":"cli","to":"api","label":"","kind":"new","wps":[{"x":220,"y":222}]},
         {"id":"e6","from":"api","to":"bd","label":"","kind":"new"}
       ]
     }

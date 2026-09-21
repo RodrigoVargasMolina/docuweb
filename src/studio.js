@@ -43,7 +43,7 @@
     }
     applyAppearance();
     var title = contentRoot.querySelector("h1");
-    if (title) document.title = title.textContent.trim() || "Documento";
+    if (title) document.title = title.textContent.trim() || t("doc.untitled");
   }
   function setTextEditing(on) {
     textSession = null;
@@ -51,7 +51,7 @@
     renderSectionControls(on);
     document.body.classList.toggle("editing-content", on);
     var btn = document.getElementById("btn-content");
-    btn.textContent = on ? "Terminar texto" : "Editar texto";
+    btn.textContent = on ? t("appbar.finishText") : t("appbar.editText");
     btn.setAttribute("aria-pressed", String(on));
     contentRoot.querySelectorAll(EDITABLE).forEach(function (e) {
       if (e.closest(".figtools,.deccount,.answer") || e.querySelector("textarea,input,button")) return;
@@ -72,35 +72,51 @@
     selection.removeAllRanges(); selection.addRange(range);
     syncContent(); markDirty();
   }
+  /* Los bloques de primer nivel que se pueden mover o quitar: cabecera, secciones
+     y pie. La cabecera y el pie se eliminan igual que una seccion. */
+  var BLOCK_TAGS = { HEADER: "header", SECTION: "section", FOOTER: "footer" };
+  function editableBlocks(root) {
+    return Array.from(root.children).filter(function (e) { return !!BLOCK_TAGS[e.tagName]; });
+  }
+  function blockName(block, blocks) {
+    var heading = block.querySelector("h1,h2");
+    if (heading && heading.textContent.trim()) return heading.textContent.trim();
+    if (block.tagName !== "SECTION") return t("block." + BLOCK_TAGS[block.tagName]);
+    var same = blocks.filter(function (e) { return e.tagName === "SECTION"; });
+    return t("block.section") + " " + (same.indexOf(block) + 1);
+  }
   function changeSection(index, action) {
     var root = cleanContent(contentRoot.cloneNode(true));
-    var sections = Array.from(root.children).filter(function (e) { return e.tagName === "SECTION"; });
-    var section = sections[index];
-    if (!section || (action === "up" && index === 0) || (action === "down" && index === sections.length - 1)) return;
+    var blocks = editableBlocks(root);
+    var block = blocks[index];
+    if (!block || (action === "up" && index === 0) || (action === "down" && index === blocks.length - 1)) return;
     snapshot();
     if (action === "remove") {
-      section.querySelectorAll('[data-fig]').forEach(function (e) { delete model.figures[e.getAttribute('data-fig')]; });
-      section.querySelectorAll('[data-answer]').forEach(function (e) { delete model.answers[e.getAttribute('data-answer')]; });
-      section.remove();
+      block.querySelectorAll('[data-fig]').forEach(function (e) { delete model.figures[e.getAttribute('data-fig')]; });
+      block.querySelectorAll('[data-answer]').forEach(function (e) { delete model.answers[e.getAttribute('data-answer')]; });
+      block.remove();
       selClear();
-    } else if (action === "up") root.insertBefore(section, sections[index - 1]);
-    else root.insertBefore(sections[index + 1], section);
+    } else if (action === "up") root.insertBefore(block, blocks[index - 1]);
+    else root.insertBefore(blocks[index + 1], block);
     model.document.html = root.innerHTML;
     afterChange();
   }
   function renderSectionControls(on) {
     contentRoot.querySelectorAll('[data-block-tools]').forEach(function (e) { e.remove(); });
     if (!on) return;
-    var sections = Array.from(contentRoot.children).filter(function (e) { return e.tagName === "SECTION"; });
-    sections.forEach(function (section, index) {
+    var blocks = editableBlocks(contentRoot);
+    blocks.forEach(function (block, index) {
       var bar = document.createElement('div'); bar.className = 'section-controls'; bar.setAttribute('data-block-tools', '');
-      [['up', 'Subir'], ['down', 'Bajar'], ['remove', 'Eliminar sección']].forEach(function (pair) {
+      var what = blockName(block, blocks);
+      // El boton de quitar nombra el bloque: "Eliminar sección", "Eliminar cabecera", "Eliminar pie".
+      var actions = [['up', t("block.up")], ['down', t("block.down")], ['remove', t("block.delete" + block.tagName.charAt(0) + block.tagName.slice(1).toLowerCase())]];
+      actions.forEach(function (pair) {
         var button = toolButton(pair[1], function () { changeSection(index, pair[0]); }, 'btn--ghost');
-        button.disabled = pair[0] === 'up' && index === 0 || pair[0] === 'down' && index === sections.length - 1;
-        button.setAttribute('aria-label', pair[1] + ': ' + (section.querySelector('h2') ? section.querySelector('h2').textContent : 'sección ' + (index + 1)));
+        button.disabled = pair[0] === 'up' && index === 0 || pair[0] === 'down' && index === blocks.length - 1;
+        button.setAttribute('aria-label', pair[1] + ': ' + what);
         bar.appendChild(button);
       });
-      section.insertBefore(bar, section.firstChild);
+      block.insertBefore(bar, block.firstChild);
     });
   }
   function beginTextChange(target) {
@@ -110,22 +126,29 @@
     }
   }
   function newDecision(id) {
-    return '<section><h2>Decisión pendiente</h2><ol class="decisions"><li data-decision="' + id + '">'
-      + '<span class="num">' + String(id).padStart(2, "0") + '</span><div><p class="decision-q">¿Qué hay que decidir?</p>'
-      + '<p class="decision-w">Explica las consecuencias y quién debe responder.</p></div>'
-      + '<div class="answer"><span class="lbl">Respuesta:</span><textarea data-answer="' + id + '" rows="1" placeholder="sin responder"></textarea></div></li></ol></section>';
+    return '<section><h2>' + t("new.decision.title") + '</h2><ol class="decisions"><li data-decision="' + id + '">'
+      + '<span class="num">' + String(id).padStart(2, "0") + '</span><div><p class="decision-q">' + t("new.decision.q") + '</p>'
+      + '<p class="decision-w">' + t("new.decision.w") + '</p></div>'
+      + '<div class="answer"><span class="lbl">' + t("answers.label") + '</span><textarea data-answer="' + id + '" rows="1" placeholder="' + t("answers.placeholder") + '"></textarea></div></li></ol></section>';
+  }
+  /* <h1> nuevo para el documento. La cabecera se puede borrar como cualquier bloque,
+     asi que tiene que haber una forma de volver a crearla. */
+  function newHeader() {
+    return '<header><p class="kicker">' + t("new.header.kicker") + '</p><h1>' + t("new.header.title") + '</h1>'
+      + '<p class="lede">' + t("new.header.lede") + '</p>'
+      + '<div class="meta"><span class="pill is-draft">' + t("new.header.pill1") + '</span><span class="pill">' + t("new.header.pill2") + '</span></div></header>';
   }
   function figureHTML(id) {
-    return '<section><h2>Diagrama</h2><figure data-fig="' + id + '"><div class="figtools" data-tools="' + id + '"></div>'
-      + '<div class="canvas canvas--mid"><svg data-svg="' + id + '" role="img" aria-label="Diagrama del documento"></svg></div>'
-      + '<figcaption>Describe lo que muestra el diagrama.</figcaption></figure></section>';
+    return '<section><h2>' + t("new.diagram.title") + '</h2><figure data-fig="' + id + '"><div class="figtools" data-tools="' + id + '"></div>'
+      + '<div class="canvas canvas--mid"><svg data-svg="' + id + '" role="img" aria-label="' + t("new.diagram.aria") + '"></svg></div>'
+      + '<figcaption>' + t("new.diagram.caption") + '</figcaption></figure></section>';
   }
   function addBlock(kind) {
     snapshot();
     var root = cleanContent(contentRoot.cloneNode(true));
-    var section = '<section><h2>Nueva sección</h2><p>Escribe aquí el contenido.</p></section>';
-    if (kind === "callout") section = '<section><div class="callout"><h3>Idea destacada</h3><p>Explica el hallazgo o la recomendación.</p></div></section>';
-    if (kind === "table") section = '<section><h2>Comparación</h2><div class="tablewrap"><table><thead><tr><th>Criterio</th><th>Alternativa A</th><th>Alternativa B</th></tr></thead><tbody><tr><td>Beneficio</td><td>Por completar</td><td>Por completar</td></tr><tr><td>Limitación</td><td>Por completar</td><td>Por completar</td></tr></tbody></table></div></section>';
+    var section = '<section><h2>' + t("new.section.title") + '</h2><p>' + t("new.section.body") + '</p></section>';
+    if (kind === "callout") section = '<section><div class="callout"><h3>' + t("new.callout.title") + '</h3><p>' + t("new.callout.body") + '</p></div></section>';
+    if (kind === "table") section = '<section><h2>' + t("new.table.title") + '</h2><div class="tablewrap"><table><thead><tr><th>' + t("new.table.h1") + '</th><th>' + t("new.table.h2") + '</th><th>' + t("new.table.h3") + '</th></tr></thead><tbody><tr><td>' + t("new.table.r1") + '</td><td>' + t("new.table.todo") + '</td><td>' + t("new.table.todo") + '</td></tr><tr><td>' + t("new.table.r2") + '</td><td>' + t("new.table.todo") + '</td><td>' + t("new.table.todo") + '</td></tr></tbody></table></div></section>';
     if (kind === "decision") {
       var ids = Array.from(root.querySelectorAll("[data-decision]")).map(function (e) { return Number(e.getAttribute("data-decision")) || 0; });
       section = newDecision(Math.max.apply(Math, [0].concat(ids)) + 1);
@@ -135,22 +158,53 @@
       model.figures[id] = diagramPreset("flow");
       section = figureHTML(id);
     }
-    var footer = root.querySelector("footer");
-    if (footer) footer.insertAdjacentHTML("beforebegin", section);
-    else root.insertAdjacentHTML("beforeend", section);
+    if (kind === "header") section = newHeader();
+    // Se inserta como elemento para poder volver a localizarlo tras re-renderizar.
+    var holder = document.createElement("div");
+    holder.innerHTML = section;
+    var block = holder.firstElementChild;
+    if (kind === "header") root.insertBefore(block, root.firstChild);
+    else {
+      var footer = root.querySelector("footer");
+      if (footer) root.insertBefore(block, footer);
+      else root.appendChild(block);
+    }
+    var index = editableBlocks(root).indexOf(block);
     model.document.html = root.innerHTML;
     afterChange();
-    var added = contentRoot.querySelector("section:last-of-type");
-    if (added) { added.scrollIntoView({ behavior: "smooth", block: "center" }); var heading = added.querySelector("[contenteditable]"); if (heading) heading.focus(); }
+    var added = editableBlocks(contentRoot)[index];
+    if (added) {
+      added.scrollIntoView({ behavior: "smooth", block: "center" });
+      var heading = added.querySelector("h1,h2") || added.querySelector("[contenteditable]");
+      if (heading) heading.focus();
+    }
   }
   function diagramPreset(kind) {
-    var labels = kind === "layers" ? ["Presentación", "Aplicación", "Datos"] : kind === "sequence" ? ["Preparar", "Ejecutar", "Validar"] : ["Entrada", "Proceso", "Resultado"];
+    if (kind === "cards") {
+      var cards = [
+        {id:"panel",x:24,y:24,w:712,h:328,kind:"box",appearance:clone(CARD_STYLES.panel)},
+        {id:"heading",parent:"panel",x:48,y:48,w:288,h:48,kind:"box",title:t("preset.cards"),appearance:clone(CARD_STYLES.heading)}
+      ];
+      ["input","process","output"].forEach(function (name,i) {
+        cards.push({id:"card"+i,parent:"panel",x:48+i*236,y:i===1?232:136,w:192,h:88,kind:"box",title:t("preset.labels."+name),appearance:clone(i===0?CARD_STYLES.placeholder:CARD_STYLES.card)});
+      });
+      return {w:760,h:376,nodes:cards,edges:[0,1].map(function (i) { return {id:"e"+i,from:"card"+i,to:"card"+(i+1),fromAnchor:"e",toAnchor:"w",label:t("preset.edge.sends"),appearance:{route:"curve",stroke:"#a594ce",strokeWidth:0.75,endHead:"open"}}; })};
+    }
+    var labels = kind === "layers"
+      ? [t("preset.labels.presentation"), t("preset.labels.application"), t("preset.labels.data")]
+      : kind === "sequence"
+        ? [t("preset.labels.prepare"), t("preset.labels.run"), t("preset.labels.validate")]
+        : [t("preset.labels.input"), t("preset.labels.process"), t("preset.labels.output")];
     var vertical = kind === "layers";
-    var nodes = labels.map(function (t, i) { return { id: "n" + i, x: vertical ? 180 : 32 + i * 224, y: vertical ? 32 + i * 112 : 64, w: 176, h: 64, kind: i === 1 ? "new" : "box", title: t }; });
-    var edges = [0, 1].map(function (i) { return { id: "e" + i, from: "n" + i, to: "n" + (i + 1), label: kind === "sequence" ? "continúa" : "envía" }; });
+    var nodes = labels.map(function (label, i) { return { id: "n" + i, x: vertical ? 180 : 32 + i * 224, y: vertical ? 32 + i * 112 : 64, w: 176, h: 64, kind: i === 1 ? "new" : "box", title: label }; });
+    var edgeLabel = kind === "sequence" ? t("preset.edge.continues") : t("preset.edge.sends");
+    var edges = [0, 1].map(function (i) { return { id: "e" + i, from: "n" + i, to: "n" + (i + 1), label: edgeLabel }; });
     if (kind === "beforeafter") {
-      nodes = [{id:"n0",x:32,y:64,w:220,h:72,kind:"dead",title:"Situación actual",sub:"limitación por resolver"}, {id:"n1",x:352,y:64,w:220,h:72,kind:"new",title:"Situación propuesta",sub:"mejora esperada"}];
-      edges = [{id:"e0",from:"n0",to:"n1",label:"transformación",kind:"new"}];
+      nodes = [
+        {id:"n0",x:32,y:64,w:220,h:72,kind:"dead",title:t("preset.before.title"),sub:t("preset.before.sub")},
+        {id:"n1",x:352,y:64,w:220,h:72,kind:"new",title:t("preset.after.title"),sub:t("preset.after.sub")}
+      ];
+      edges = [{id:"e0",from:"n0",to:"n1",label:t("preset.before.edge"),kind:"new"}];
     }
     return { w: vertical ? 540 : 704, h: vertical ? 384 : 224, nodes: nodes, edges: edges };
   }
@@ -159,17 +213,18 @@
     var preset = diagramPreset(kind), d = fig(f), mapping = {};
     var offset = d.nodes.length ? Math.max.apply(Math, d.nodes.map(function (n) { return n.y + n.h; })) + 48 : 0;
     preset.nodes.forEach(function (n) { var old = n.id; n.id = uid("n", d.nodes); mapping[old] = n.id; n.y += offset; d.nodes.push(n); });
+    preset.nodes.forEach(function (n) { if (n.parent) n.parent = mapping[n.parent]; });
     preset.edges.forEach(function (e) { e.id = uid("e", d.edges); e.from = mapping[e.from]; e.to = mapping[e.to]; d.edges.push(e); });
     d.w = Math.max(d.w, preset.w); d.h = Math.max(d.h, offset + preset.h);
     state.sel = { fig: f, items: preset.nodes.map(function (n) { return { type: "node", id: n.id }; }) };
     closeModal(); afterChange();
   }
   function openDiagramPresets(f) {
-    openModal("Añadir diagrama", function (body) {
-      [["flow","Flujo"],["layers","Arquitectura por capas"],["beforeafter","Antes y después"],["sequence","Secuencia de etapas"]].forEach(function (pair) {
+    openModal(t("preset.title"), function (body) {
+      [["cards",t("preset.cards")],["flow",t("preset.flow")],["layers",t("preset.layers")],["beforeafter",t("preset.beforeafter")],["sequence",t("preset.sequence")]].forEach(function (pair) {
         body.appendChild(toolButton(pair[1], function () { insertDiagramPreset(f, pair[0]); }));
       });
-    }, [{label:"Cerrar",onClick:closeModal}]);
+    }, [{label:t("modal.close"),onClick:closeModal}]);
   }
   function descendants(f, roots) {
     var found = {}, out = [];
@@ -195,7 +250,8 @@
     d.edges.slice().forEach(function (e) {
       if (!mapping[e.from] || !mapping[e.to]) return;
       var c = clone(e); c.id = uid("e",d.edges); c.from = mapping[e.from]; c.to = mapping[e.to];
-      if (c.wp) { c.wp.x += 24; c.wp.y += 24; } d.edges.push(c);
+      setWaypoints(c, waypoints(c).map(function (w) { return { x: w.x + 24, y: w.y + 24 }; }));
+      d.edges.push(c);
     });
     state.sel = {fig:f,items:roots.map(function (n) {return {type:"node",id:mapping[n.id]};})};
     afterChange();
@@ -227,31 +283,40 @@
         descendants(f,[n]).forEach(function(k){k[axis]+=delta; deltas[k.id]={axis:axis,value:delta};});
         cursor += n[dim]+gap;
       });
-      fig(f).edges.forEach(function(e){var a=deltas[e.from],b=deltas[e.to]; if(e.wp&&a&&b&&a.axis===b.axis&&a.value===b.value)e.wp[a.axis]+=a.value;});
+      fig(f).edges.forEach(function(e){var a=deltas[e.from],b=deltas[e.to]; if(a&&b&&a.axis===b.axis&&a.value===b.value)waypoints(e).forEach(function(w){w[a.axis]+=a.value;});});
     }
     afterChange();
   }
   function studioFigureTools(f, bar) {
-    bar.appendChild(toolButton("Diagramas…",function(){openDiagramPresets(f);},"btn--ghost"));
+    bar.appendChild(toolButton(t("tools.diagrams"),function(){openDiagramPresets(f);},"btn--ghost"));
     var active = state.sel.fig === f && selIds("node").length > 0;
-    var duplicate = toolButton("Duplicar",function(){duplicateSelection(f);},"btn--ghost"); duplicate.disabled=!active; bar.appendChild(duplicate);
-    var select = document.createElement("select"); select.className="btn btn--sm"; select.setAttribute("aria-label","Organizar cajas");
-    [["","Organizar…"],["left","Alinear izquierda"],["top","Alinear arriba"],["distribute-x","Distribuir horizontal"],["distribute-y","Distribuir vertical"],["fit","Ajustar al texto"]].forEach(function(pair){var option=document.createElement("option");option.value=pair[0];option.textContent=pair[1];select.appendChild(option);});
+    var duplicate = toolButton(t("tools.duplicate"),function(){duplicateSelection(f);},"btn--ghost"); duplicate.disabled=!active; bar.appendChild(duplicate);
+    var select = document.createElement("select"); select.className="btn btn--sm"; select.setAttribute("aria-label",t("tools.arrange.aria"));
+    [["",t("tools.arrange")],["left",t("tools.arrange.left")],["top",t("tools.arrange.top")],["distribute-x",t("tools.arrange.distributeX")],["distribute-y",t("tools.arrange.distributeY")],["fit",t("tools.arrange.fit")]].forEach(function(pair){var option=document.createElement("option");option.value=pair[0];option.textContent=pair[1];select.appendChild(option);});
     select.disabled=!active;
     select.addEventListener("change",function(){if(select.value)arrangeSelection(f,select.value);});bar.appendChild(select);
   }
   function preparePrint() {
     contentRoot.querySelectorAll(".answer-print").forEach(function(e){e.remove();});
     contentRoot.querySelectorAll("[data-answer]").forEach(function(ta){
-      var p=document.createElement("div");p.className="answer-print";p.textContent=ta.value||"Sin responder";ta.parentNode.appendChild(p);
+      var p=document.createElement("div");p.className="answer-print";p.textContent=ta.value||t("answers.printEmpty");ta.parentNode.appendChild(p);
     });
   }
+  // Un documento descargado desde Plantillas sale en el idioma de la interfaz.
+  function templateVar(template) {
+    if (!template.i18n) return template;
+    return template.i18n[lang] || template.i18n.es || template;
+  }
   function newTemplate(template) {
+    var v = templateVar(template);
     var root = document.documentElement.cloneNode(true);
-    var fresh = {version:1,meta:{rev:1,savedAt:"",savedBy:"",history:[]},answers:{},figures:clone(template.figures),document:{html:template.html,design:template.design,theme:"auto"}};
-    root.querySelector("#document-content").innerHTML=template.html;
-    root.querySelector("#diagram-data").textContent="\n"+JSON.stringify(fresh,null,2).replace(/</g,"\\u003c")+"\n";
-    root.querySelector("title").textContent=template.title;
+    // el cuerpo va en #document-content, no repetido dentro del JSON: al abrir el
+    // fichero descargado el motor lo vuelve a leer de ahi
+    var fresh = {version:1,meta:{rev:1,savedAt:"",savedBy:"",history:[]},answers:{},figures:clone(v.figures||{}),document:{design:template.design,theme:"auto"}};
+    root.setAttribute("lang",lang);
+    root.querySelector("#document-content").innerHTML=v.html;
+    root.querySelector("#diagram-data").textContent="\n"+fileJSON(fresh)+"\n";
+    root.querySelector("title").textContent=v.title;
     root.setAttribute("data-design",template.design);root.removeAttribute("data-theme");
     root.querySelector("body").classList.remove("editing","editing-content");
     root.querySelector("#overlay").hidden=true;
@@ -259,27 +324,46 @@
     root.querySelector("#props").classList.remove("open");root.querySelector("#props-body").innerHTML="";
     root.querySelector("#notice").classList.remove("open");
     root.querySelector("#btn-history").textContent="v1";
-    root.querySelector("#status").className="saved";root.querySelector("#status").textContent="sin cambios";
-    root.querySelector(".brandmark").textContent="docuweb · "+template.title;
-    root.querySelector("#btn-edit").textContent="Editar diagramas";root.querySelector("#btn-edit").setAttribute("aria-pressed","false");
-    root.querySelector("#btn-content").textContent="Editar texto";root.querySelector("#btn-content").setAttribute("aria-pressed","false");
+    root.querySelector("#status").className="saved";root.querySelector("#status").textContent=t("status.clean");
+    root.querySelector(".brandmark").textContent=t("template.brand")+" · "+v.title;
+    root.querySelector("#btn-edit").textContent=t("appbar.editDiagrams");root.querySelector("#btn-edit").setAttribute("aria-pressed","false");
+    root.querySelector("#btn-content").textContent=t("appbar.editText");root.querySelector("#btn-content").setAttribute("aria-pressed","false");
     downloadBlob(template.id+".html","<!doctype html>\n"+root.outerHTML);
-    closeModal();notice("Plantilla descargada. Abre "+template.id+".html para empezar un documento nuevo.");
+    closeModal();notice(t("templates.done",{file:template.id+".html"}));
   }
   function openTemplates() {
-    openModal("Un documento para cada propósito",function(body){
-      var p=document.createElement("p");p.textContent="Elige una estructura. Se descargará un documento nuevo, listo para editar y compartir.";body.appendChild(p);
+    openModal(t("templates.title"),function(body){
+      var p=document.createElement("p");p.textContent=t("templates.intro");body.appendChild(p);
       var grid=document.createElement("div");grid.className="template-grid";
-      templateCatalog.forEach(function(t){
-        var card=toolButton("",function(){newTemplate(t);},"template-card");
+      templateCatalog.forEach(function(template){
+        var v=templateVar(template);
+        var card=toolButton("",function(){newTemplate(template);},"template-card");
         var preview=document.createElement("span");preview.className="template-preview";preview.setAttribute("aria-hidden","true");preview.innerHTML="<i></i><i></i><i></i>";
-        var title=document.createElement("strong");title.textContent=t.title;
-        var detail=document.createElement("small");detail.textContent=t.description;
+        var title=document.createElement("strong");title.textContent=v.title;
+        var detail=document.createElement("small");detail.textContent=v.description;
         card.appendChild(preview);card.appendChild(title);card.appendChild(detail);grid.appendChild(card);
       });body.appendChild(grid);
-    },[{label:"Cerrar",onClick:closeModal}]);
+    },[{label:t("modal.close"),onClick:closeModal}]);
   }
   function initStudio(restored) {
+    closeToolbarPanels();
+    document.querySelectorAll('[data-panel]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        var open = button.getAttribute('aria-expanded') !== 'true';
+        closeToolbarPanels();
+        document.getElementById(button.dataset.panel).classList.toggle('is-open', open);
+        button.setAttribute('aria-expanded', String(open));
+      });
+    });
+    document.addEventListener('click', function (event) {
+      if (!event.target.closest('.appbar') || event.target.closest('.menu-content button,.more-content button')) closeToolbarPanels();
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape') return;
+      var button = document.querySelector('[data-panel][aria-expanded="true"]');
+      closeToolbarPanels();
+      if (button) button.focus();
+    });
     if (!baseline.document) baseline.document={html:captureContent(),design:"technical",theme:"auto"};
     // The visible HTML remains authoritative for documents filled in by hand.
     baseline.document.html=captureContent();
@@ -294,6 +378,7 @@
     document.getElementById("btn-content-undo").addEventListener("click",undo);
     document.getElementById("btn-content-redo").addEventListener("click",redo);
     [["design-select","design"],["theme-select","theme"]].forEach(function(pair){document.getElementById(pair[0]).addEventListener("change",function(e){snapshot();model.document[pair[1]]=e.target.value;applyAppearance();markDirty();});});
+    document.getElementById("lang-select").addEventListener("change",function(e){setLang(e.target.value);});
     contentRoot.addEventListener("focusout",function(){textSession=null;});
     contentRoot.addEventListener("beforeinput",function(e){beginTextChange(e.target);});
     contentRoot.addEventListener("input",function(e){if(e.target.isContentEditable){beginTextChange(e.target);syncContent();var h=contentRoot.querySelector("h1");if(h)document.title=h.textContent;markDirty();}});
@@ -304,4 +389,9 @@
       if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();insertPlainText("\n");}
       if((e.ctrlKey||e.metaKey)&&(e.key.toLowerCase()==="z"||e.key.toLowerCase()==="y")){e.preventDefault();if(e.shiftKey||e.key.toLowerCase()==="y")redo();else undo();}
     });
+  }
+  function closeToolbarPanels() {
+    document.querySelectorAll('.appbar .is-open').forEach(function (panel) { panel.classList.remove('is-open'); });
+    document.querySelectorAll('.appbar [data-panel]').forEach(function (button) { button.setAttribute('aria-expanded','false'); });
+    document.querySelectorAll('.appbar details[open]').forEach(function (menu) { menu.open = false; });
   }

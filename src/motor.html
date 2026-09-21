@@ -184,6 +184,10 @@
   .marquee{fill:var(--info);fill-opacity:.08;stroke:var(--info);stroke-width:1;stroke-dasharray:4 3;pointer-events:none}
   .handle{fill:var(--surface);stroke:var(--info);stroke-width:1.75;cursor:nwse-resize}
   .wp{fill:var(--surface);stroke:var(--info);stroke-width:1.75;cursor:move}
+  .anch{fill:var(--surface);stroke:var(--info);stroke-width:1.25;opacity:.55;cursor:pointer}
+  .anch:hover{opacity:1;stroke-width:2}
+  .anch.is-on{fill:var(--info);opacity:1}
+  .endp{fill:var(--info);stroke:var(--surface);stroke-width:1.5;cursor:move}
   .connect-src{stroke:var(--info)!important;stroke-width:2.5!important}
 
   /* ---------- panel ---------- */
@@ -308,18 +312,37 @@
 
 <div class="appbar">
   <div class="appbar-inner">
-    <span class="brandmark">docuweb</span>
-    <button type="button" class="revbadge" id="btn-history" title="Ver el historial de versiones de este fichero">v1</button>
-    <span id="status" class="saved">sin cambios</span>
-    <button type="button" class="btn btn--sm" id="btn-notes" aria-pressed="true" title="Muestra u oculta las notas de revisión">Notas</button>
-    <button type="button" class="btn btn--sm btn--ghost" id="btn-help" title="Cómo se edita este documento">Ayuda</button>
-    <button type="button" class="btn btn--sm" id="btn-templates">Plantillas</button>
-    <button type="button" class="btn" id="btn-content" aria-pressed="false">Editar texto</button>
-    <button type="button" class="btn" id="btn-edit" aria-pressed="false">Editar diagramas</button>
-    <button type="button" class="btn btn--primary" id="btn-save">Grabar versión</button>
-    <button type="button" class="btn btn--sm" id="btn-print">Imprimir / PDF</button>
-    <div class="document-controls"><label>Estilo <select id="design-select"><option value="technical">Técnico</option><option value="editorial">Editorial</option><option value="executive">Ejecutivo</option></select></label><label>Tema <select id="theme-select"><option value="auto">Sistema</option><option value="light">Claro</option><option value="dark">Oscuro</option></select></label></div>
-    <button type="button" class="btn btn--ghost btn--sm" id="btn-reset" title="Vuelve a los diagramas originales de este fichero">Restablecer</button>
+    <div class="appbar-heading">
+    <button type="button" class="btn mobile-control" id="btn-menu" data-panel="preferences" aria-controls="preferences" aria-expanded="false" data-i18n-aria-label="appbar.preferences" aria-label="Preferencias">☰</button>
+    <div class="document-identity"><span class="product-name">docuweb · </span><span class="brandmark">docuweb</span></div>
+    <div class="document-state" aria-live="polite">
+    <button type="button" class="revbadge" id="btn-history" data-i18n-title="appbar.history.title" title="Ver el historial de versiones de este fichero">v1</button>
+    <span aria-hidden="true">·</span><span id="status" class="saved" data-i18n="status.clean">Sin cambios</span>
+    </div>
+    <button type="button" class="btn btn--primary" id="btn-save"><span class="desktop-label" data-i18n="appbar.save">Guardar versión</span><span class="mobile-label" data-i18n="appbar.saveShort">Guardar</span></button>
+    </div>
+    <div class="appbar-actions">
+    <div class="toolbar-menu" id="editing-menu">
+    <button type="button" class="btn mobile-control" data-panel="editing-menu" aria-controls="editing-actions" aria-expanded="false" data-i18n="appbar.editMenu">Editar ▾</button>
+    <div class="menu-content" id="editing-actions">
+    <button type="button" class="btn" id="btn-content" aria-pressed="false" data-i18n="appbar.editText">Editar texto</button>
+    <button type="button" class="btn" id="btn-edit" aria-pressed="false" data-i18n="appbar.editDiagrams">Editar diagramas</button>
+    </div></div>
+    <div class="toolbar-menu secondary-menu" id="secondary-menu">
+    <button type="button" class="btn mobile-control" data-panel="secondary-menu" aria-controls="secondary-actions" aria-expanded="false" data-i18n-aria-label="appbar.more" aria-label="Más">•••</button>
+    <div class="menu-content" id="secondary-actions">
+    <button type="button" class="btn btn--sm" id="btn-notes" aria-pressed="true" data-i18n-title="appbar.notes.title" title="Muestra u oculta las notas de revisión" data-i18n="appbar.notes">Notas</button>
+    <button type="button" class="btn btn--sm btn--ghost" id="btn-help" data-i18n-title="appbar.help.title" data-i18n-aria-label="appbar.help" aria-label="Ayuda" title="Cómo se edita este documento">?</button>
+    <button type="button" class="btn btn--sm" id="btn-templates" data-i18n="appbar.templates">Plantillas</button>
+    </div></div>
+    <button type="button" class="btn btn--sm" id="btn-print" data-i18n="appbar.print">Imprimir / PDF</button>
+    </div>
+    <div class="appbar-preferences" id="preferences">
+    <div class="document-controls"><label><span data-i18n="appbar.style">Estilo</span> <select id="design-select"><option value="technical" data-i18n="style.technical">Técnico</option><option value="editorial" data-i18n="style.editorial">Editorial</option><option value="executive" data-i18n="style.executive">Ejecutivo</option></select></label><label><span data-i18n="appbar.theme">Tema</span> <select id="theme-select"><option value="auto" data-i18n="theme.auto">Sistema</option><option value="light" data-i18n="theme.light">Claro</option><option value="dark" data-i18n="theme.dark">Oscuro</option></select></label><label><span data-i18n="appbar.lang">Idioma</span> <select id="lang-select"><option value="es">Español</option><option value="en">English</option></select></label></div>
+    <details class="more-menu"><summary class="btn" data-i18n="appbar.more">Más</summary><div class="more-content">
+    <button type="button" class="btn btn--ghost btn--sm" id="btn-reset" data-i18n-title="appbar.reset.title" title="Vuelve a los diagramas originales de este fichero" data-i18n="appbar.reset">Restablecer documento</button>
+    </div></details>
+    </div>
   </div>
 </div>
 
@@ -327,7 +350,7 @@
 
   <div class="notice" id="notice">
     <p id="notice-text"></p>
-    <button type="button" class="btn btn--sm" id="notice-dismiss">Entendido</button>
+    <button type="button" class="btn btn--sm" id="notice-dismiss" data-i18n="notice.dismiss">Entendido</button>
   </div>
 
   <div id="document-content">
@@ -354,14 +377,15 @@
     <p>Marcador del motor. No es un documento.</p>
   </footer>
   </div>
-  <div class="content-tools" aria-label="Añadir contenido">
-    <button class="btn btn--sm" type="button" data-add-block="section">+ Sección</button>
-    <button class="btn btn--sm" type="button" data-add-block="callout">+ Aviso</button>
-    <button class="btn btn--sm" type="button" data-add-block="table">+ Tabla</button>
-    <button class="btn btn--sm" type="button" data-add-block="figure">+ Diagrama</button>
-    <button class="btn btn--sm" type="button" data-add-block="decision">+ Decisión</button>
-    <button class="btn btn--sm" type="button" id="btn-content-undo">Deshacer</button>
-    <button class="btn btn--sm" type="button" id="btn-content-redo">Rehacer</button>
+  <div class="content-tools" data-i18n-aria-label="appbar.addContent" aria-label="Añadir contenido">
+    <button class="btn btn--sm" type="button" data-add-block="header" data-i18n="add.header">+ Título</button>
+    <button class="btn btn--sm" type="button" data-add-block="section" data-i18n="add.section">+ Sección</button>
+    <button class="btn btn--sm" type="button" data-add-block="callout" data-i18n="add.callout">+ Aviso</button>
+    <button class="btn btn--sm" type="button" data-add-block="table" data-i18n="add.table">+ Tabla</button>
+    <button class="btn btn--sm" type="button" data-add-block="figure" data-i18n="add.diagram">+ Diagrama</button>
+    <button class="btn btn--sm" type="button" data-add-block="decision" data-i18n="add.decision">+ Decisión</button>
+    <button class="btn btn--sm" type="button" id="btn-content-undo" data-i18n="add.undo">Deshacer</button>
+    <button class="btn btn--sm" type="button" id="btn-content-redo" data-i18n="add.redo">Rehacer</button>
   </div>
 </div>
 
@@ -373,10 +397,10 @@
   </div>
 </div>
 
-<div class="props" id="props" role="dialog" aria-label="Propiedades del elemento seleccionado">
+<div class="props" id="props" role="dialog" data-i18n-aria-label="props.aria" aria-label="Propiedades del elemento seleccionado">
   <header>
-    <h3 id="props-title">Propiedades</h3>
-    <button type="button" class="btn btn--sm btn--ghost" id="props-close" aria-label="Cerrar">Cerrar</button>
+    <h3 id="props-title" data-i18n="props.title">Propiedades</h3>
+    <button type="button" class="btn btn--sm btn--ghost" id="props-close" data-i18n-aria-label="modal.close" aria-label="Cerrar" data-i18n="modal.close">Cerrar</button>
   </header>
   <div id="props-body"></div>
 </div>
@@ -429,6 +453,7 @@
 </script>
 
 <script id="template-data" type="application/json">[]</script>
+<script id="i18n-data" type="application/json">{}</script>
 <script>
 (function () {
   "use strict";
@@ -438,8 +463,88 @@
   var FIGS = [];
   var SNAP = 4;
 
+  /* ---------------- idioma de la interfaz ----------------
+     Un unico juego de controles: las cadenas viven en el catalogo `i18n-data` y se
+     cambian en caliente, sin duplicar botones por idioma. El idioma del documento
+     (<html lang>) es el valor por defecto; la eleccion de quien edita se guarda en
+     el navegador, nunca dentro del fichero. */
+  var I18N = (function () {
+    try {
+      // El catalogo viaja traspuesto: una lista de claves y, por idioma, la lista de
+      // textos en el mismo orden. Escribir cada clave una vez y no una por idioma
+      // ahorra varios kilobytes en un fichero que se descarga entero; montarlo de
+      // vuelta son estas cuatro lineas y ocurre una sola vez al abrir.
+      var raw = JSON.parse(document.getElementById("i18n-data").textContent) || {};
+      var out = {};
+      Object.keys(raw).forEach(function (code) {
+        if (code === "keys") return;
+        var table = out[code] = {};
+        raw.keys.forEach(function (key, i) { table[key] = raw[code][i]; });
+      });
+      return out;
+    } catch (err) { return {}; }
+  })();
+  var LANG_KEY = "docuweb:idioma";
+  // los contenedores de la interfaz no comparten idioma con el contenido del documento
+  var CHROME = [".appbar", ".content-tools", "#props", "#overlay", "#notice", "#status"];
+
+  function docLang() {
+    var raw = (document.documentElement.getAttribute("lang") || "es").toLowerCase();
+    var two = raw.slice(0, 2);
+    if (I18N[two]) return two;
+    if (I18N[raw]) return raw;
+    return "es";
+  }
+  var lang = docLang();
+  function t(key, vars) {
+    var table = I18N[lang] || {};
+    var text = table[key];
+    if (text == null) text = (I18N.es || {})[key];
+    if (text == null) return key;
+    return String(text).replace(/\{(\w+)\}/g, function (m, k) {
+      return vars && vars[k] != null ? String(vars[k]) : m;
+    });
+  }
+  function tList(key) {
+    var table = I18N[lang] || {}, list = table[key];
+    if (!list) list = (I18N.es || {})[key];
+    return Array.isArray(list) ? list : [];
+  }
+  // Lo que ya esta escrito en el HTML lleva data-i18n; los atributos, data-i18n-<attr>.
+  function applyStatic() {
+    CHROME.forEach(function (sel) {
+      var box = document.querySelector(sel);
+      if (box) box.setAttribute("lang", lang);
+    });
+    document.querySelectorAll("[data-i18n]").forEach(function (el2) {
+      el2.textContent = t(el2.getAttribute("data-i18n"));
+    });
+    ["title", "aria-label", "placeholder"].forEach(function (attr) {
+      document.querySelectorAll("[data-i18n-" + attr + "]").forEach(function (el2) {
+        el2.setAttribute(attr, t(el2.getAttribute("data-i18n-" + attr)));
+      });
+    });
+    var picker = document.getElementById("lang-select");
+    if (picker) picker.value = lang;
+  }
+  function setLang(next) {
+    if (!I18N[next] || next === lang) return;
+    lang = next;
+    try { localStorage.setItem(LANG_KEY, lang); } catch (err) { /* modo privado */ }
+    applyStatic();
+    // vuelve a pintar barras, paneles y avisos, que se construyen con t()
+    afterChange();
+  }
+  function initLang() {
+    try {
+      var saved = localStorage.getItem(LANG_KEY);
+      if (saved && I18N[saved]) lang = saved;
+    } catch (err) { /* nada */ }
+    applyStatic();
+  }
+
   var dataEl = document.getElementById("diagram-data");
-  var baseline = JSON.parse(dataEl.textContent);
+  var baseline = normalizeEdges(JSON.parse(dataEl.textContent));
   var model = clone(baseline);
   FIGS = Object.keys(model.figures);
 
@@ -458,6 +563,22 @@
   /* ---------------- utilidades ---------------- */
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  /* El modelo tal y como se graba dentro del fichero.
+
+     Dos cosas que no hacen falta en disco. El cuerpo del documento ya viaja en el
+     HTML visible, y al abrir se vuelve a leer de ahi (`baseline.document.html`), asi
+     que repetirlo aqui duplica el documento entero dentro de si mismo. Y del `<`
+     solo hay que esconder del analizador de HTML el que abre `</` o `<!--`: escapar
+     todos costaba seis bytes cada uno, y en un documento largo eso son miles. */
+  function fileJSON(m) {
+    var texto = JSON.stringify(m, function (key, value) {
+      return (key === "html" && this === m.document) ? undefined : value;
+    }, 2);
+    return texto.replace(/<!--/g, "\\u003c!--").replace(/<\//g, "<\\/");
+  }
+  function writeModel(m) { dataEl.textContent = "\n" + fileJSON(m) + "\n"; }
+
   function fig(id) { return model.figures[id]; }
   function node(f, id) { return fig(f).nodes.filter(function (n) { return n.id === id; })[0]; }
   function edge(f, id) { return fig(f).edges.filter(function (e) { return e.id === id; })[0]; }
@@ -521,13 +642,18 @@
     return out;
   }
   // codos que acompanan: de aristas elegidas, o cuyos dos extremos se mueven
+  // los codos que acompanan al grupo: los de las flechas elegidas y los de las
+  // flechas cuyas dos cajas se mueven
   function movingWps(f, nodeSet) {
     var eids = selIds("edge");
-    return fig(f).edges.filter(function (e) {
-      if (!e.wp) return false;
-      if (eids.indexOf(e.id) >= 0) return true;
-      return !!(nodeSet[e.from] && nodeSet[e.to]);
+    var out = [];
+    fig(f).edges.forEach(function (e) {
+      var ws = waypoints(e);
+      if (!ws.length) return;
+      if (eids.indexOf(e.id) < 0 && !(nodeSet[e.from] && nodeSet[e.to])) return;
+      ws.forEach(function (w) { out.push(w); });
     });
+    return out;
   }
 
   function el(name, attrs, cls) {
@@ -593,24 +719,89 @@
     return { x: c.x + dx * s, y: c.y + dy * s };
   }
 
+  // amarres fijos: las cuatro esquinas y las cuatro mitades de cada lado
+  var ANCHOR_POINTS = {
+    nw: [0, 0], n: [0.5, 0], ne: [1, 0],
+    w: [0, 0.5], e: [1, 0.5],
+    sw: [0, 1], s: [0.5, 1], se: [1, 1]
+  };
+  var ANCHOR_KEYS = ["nw", "n", "ne", "e", "se", "s", "sw", "w"];
+  // Se resuelven al pintar, no al cargar: asi siguen al idioma elegido.
+  function anchorOpts() {
+    return [
+      ["auto", t("anchor.auto")],
+      ["n", t("anchor.n")], ["ne", t("anchor.ne")], ["e", t("anchor.e")], ["se", t("anchor.se")],
+      ["s", t("anchor.s")], ["sw", t("anchor.sw")], ["w", t("anchor.w")], ["nw", t("anchor.nw")]
+    ];
+  }
+
+  function anchorPoint(n, key) {
+    var a = n && ANCHOR_POINTS[key];
+    if (!a) return null;                       // sin amarre: lo decide borderPoint
+    return { x: n.x + n.w * a[0], y: n.y + n.h * a[1] };
+  }
+
+  // al soltar la punta gana el amarre mas cercano; el centro devuelve el automatico
+  function nearestAnchor(n, p) {
+    if (!n) return null;
+    var best = null, bestD = Infinity;
+    ANCHOR_KEYS.forEach(function (k) {
+      var q = anchorPoint(n, k);
+      var dist = Math.hypot(p.x - q.x, p.y - q.y);
+      if (dist < bestD) { bestD = dist; best = k; }
+    });
+    var c = center(n);
+    return Math.hypot(p.x - c.x, p.y - c.y) < bestD ? null : best;
+  }
+
+  function anchorOf(e, which) { return which === "from" ? e.fromAnchor : e.toAnchor; }
+
+  // codos: una lista por flecha. `wp` era un codo unico y se sigue leyendo igual
+  function waypoints(e) {
+    if (e.wps && e.wps.length) return e.wps;
+    return e.wp ? [e.wp] : [];
+  }
+
+  function setWaypoints(e, list) {
+    delete e.wp;
+    if (list && list.length) e.wps = list;
+    else delete e.wps;
+  }
+
+  function normalizeEdges(m) {
+    if (!m || !m.figures) return m;
+    Object.keys(m.figures).forEach(function (k) {
+      (m.figures[k].edges || []).forEach(function (e) {
+        if (e.wp) setWaypoints(e, waypoints(e).slice());
+      });
+    });
+    return m;
+  }
+
+  function setAnchor(e, which, key) {
+    var prop = which === "from" ? "fromAnchor" : "toAnchor";
+    if (!key || key === "auto") delete e[prop];
+    else e[prop] = key;
+  }
+
   function edgePath(f, e) {
     var a = node(f, e.from), b = node(f, e.to);
     if (!a || !b) return null;
-    var wp = e.wp || null;
-    var p1 = borderPoint(a, wp || center(b));
-    var p2 = borderPoint(b, wp || center(a));
-    var pts = wp ? [p1, wp, p2] : [p1, p2];
+    var ws = waypoints(e);
+    var first = ws[0] || null, last = ws[ws.length - 1] || null;
+    // con un extremo amarrado, el otro apunta a ese punto y no al centro de la caja
+    var pa = anchorPoint(a, e.fromAnchor), pb = anchorPoint(b, e.toAnchor);
+    var p1 = pa || borderPoint(a, first || pb || center(b));
+    var p2 = pb || borderPoint(b, last || pa || center(a));
+    var pts = [p1].concat(ws).concat([p2]);
     // punto y angulo para la etiqueta: en el tramo mas largo
-    var mid, seg;
-    if (wp) {
-      var d1 = Math.hypot(wp.x - p1.x, wp.y - p1.y);
-      var d2 = Math.hypot(p2.x - wp.x, p2.y - wp.y);
-      seg = d1 >= d2 ? [p1, wp] : [wp, p2];
-    } else {
-      seg = [p1, p2];
+    var seg = [p1, p2], segIndex = 0, best = -1;
+    for (var i = 0; i < pts.length - 1; i++) {
+      var d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
+      if (d > best) { best = d; seg = [pts[i], pts[i + 1]]; segIndex = i; }
     }
-    mid = { x: (seg[0].x + seg[1].x) / 2, y: (seg[0].y + seg[1].y) / 2 };
-    return { pts: pts, mid: mid, seg: seg };
+    var mid = { x: (seg[0].x + seg[1].x) / 2, y: (seg[0].y + seg[1].y) / 2 };
+    return { pts: pts, mid: mid, seg: seg, segIndex: segIndex };
   }
 
   /* ---------------- render ---------------- */
@@ -623,10 +814,10 @@
       maxX = Math.max(maxX, n.x + n.w + 12); maxY = Math.max(maxY, n.y + n.h + 24);
     });
     d.edges.forEach(function (e) {
-      if (e.wp) {
-        minX = Math.min(minX, e.wp.x - 12); minY = Math.min(minY, e.wp.y - 12);
-        maxX = Math.max(maxX, e.wp.x + 12); maxY = Math.max(maxY, e.wp.y + 12);
-      }
+      waypoints(e).forEach(function (w) {
+        minX = Math.min(minX, w.x - 12); minY = Math.min(minY, w.y - 12);
+        maxX = Math.max(maxX, w.x + 12); maxY = Math.max(maxY, w.y + 12);
+      });
     });
     return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
   }
@@ -760,10 +951,16 @@
       if (!p) return;
       var kind = e.kind || "line";
       var g = el("g", { "data-edge": e.id }, "edge");
-      var pts = p.pts.map(function (q) { return q.x + "," + q.y; }).join(" ");
-      var line = el("polyline", { points: pts, "marker-end": "url(#" + f + "-mk-" + kind + ")" }, "e-" + kind);
-      g.appendChild(el("polyline", { points: pts }, "hit"));
+      var geometry = connectorShape(p, e);
+      var line = el(geometry.tag, geometry.attrs, "e-" + kind);
+      g.appendChild(el(geometry.tag, geometry.attrs, "hit"));
       g.appendChild(line);
+      // Place labels on the actual curve, including after nodes or elbows move.
+      if (geometry.tag === "path") {
+        var length = line.getTotalLength();
+        p.mid = line.getPointAtLength(length / 2);
+        p.seg = [line.getPointAtLength(Math.max(0, length / 2 - 1)), line.getPointAtLength(Math.min(length, length / 2 + 1))];
+      }
       if (e.label) {
         var dx = p.seg[1].x - p.seg[0].x, dy = p.seg[1].y - p.seg[0].y;
         var horizontalish = Math.abs(dx) >= Math.abs(dy);
@@ -808,9 +1005,11 @@
     // superposiciones de edicion
     if (state.editing) {
       d.edges.forEach(function (e) {
-        if (!e.wp) return;
-        var c = el("circle", { cx: e.wp.x, cy: e.wp.y, r: 5, "data-wp": e.id }, "wp");
-        gOver.appendChild(c);
+        waypoints(e).forEach(function (w, i) {
+          gOver.appendChild(el("circle", {
+            cx: w.x, cy: w.y, r: 5, "data-wp": e.id + "|" + i
+          }, "wp"));
+        });
       });
       if (state.sel.fig === f) {
         state.sel.items.forEach(function (it) {
@@ -831,6 +1030,31 @@
             }, "sel-ring"));
           }
         });
+        // amarres: con una sola flecha elegida se ven los destinos de sus dos puntas
+        var onlyE = selOnly();
+        if (onlyE && onlyE.type === "edge") {
+          var oe = edge(f, onlyE.id);
+          var op = oe && edgePath(f, oe);
+          if (op) {
+            [["from", node(f, oe.from), op.pts[0]],
+             ["to", node(f, oe.to), op.pts[op.pts.length - 1]]].forEach(function (side) {
+              var which = side[0], box = side[1], tip = side[2];
+              if (!box) return;
+              var cur = anchorOf(oe, which);
+              ANCHOR_KEYS.concat(["auto"]).forEach(function (k) {
+                var q = k === "auto" ? center(box) : anchorPoint(box, k);
+                var on = k === "auto" ? !cur : cur === k;
+                gOver.appendChild(el("circle", {
+                  cx: q.x, cy: q.y, r: on ? 4.5 : 3.5,
+                  "data-anch": oe.id + "|" + which + "|" + k
+                }, "anch" + (on ? " is-on" : "")));
+              });
+              gOver.appendChild(el("circle", {
+                cx: tip.x, cy: tip.y, r: 6, "data-endp": oe.id + "|" + which
+              }, "endp"));
+            });
+          }
+        }
         // redimensionar solo tiene sentido con un unico elemento elegido
         var only = selOnly();
         if (only && only.type === "node") {
@@ -905,14 +1129,14 @@
     state.dirty = true;
     var s = document.getElementById("status");
     s.className = "dirty";
-    s.textContent = "cambios sin grabar";
+    s.textContent = t("status.dirty");
     try { localStorage.setItem(STORE_KEY, JSON.stringify(model)); } catch (err) { /* modo privado */ }
   }
   function markClean(msg) {
     state.dirty = false;
     var s = document.getElementById("status");
     s.className = "saved";
-    s.textContent = msg || "sin cambios";
+    s.textContent = msg || t("status.clean");
     try { localStorage.removeItem(STORE_KEY); } catch (err) { /* nada */ }
   }
 
@@ -948,14 +1172,14 @@
     return out;
   })();
 
-  var MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  var WHO_KEY = "docuweb:autor";
+
   // hereda el nombre del fichero que esta abierto, sin su sufijo de version:
   // asi, si alguien lo renombra, las versiones siguientes siguen ese nombre
   var BASENAME = (function () {
     var f = (SELF.file || "").replace(/\.html?$/i, "").replace(/-v\d+$/i, "");
     return f || "documento";
   })();
-  var WHO_KEY = "docuweb:autor";
 
   function meta() {
     if (!model.meta) model.meta = { rev: 1, savedAt: todayISO(), savedBy: "", history: [] };
@@ -970,7 +1194,8 @@
   function fmtDate(iso) {
     var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
     if (!m) return iso || "";
-    return Number(m[3]) + " " + MESES[Number(m[2]) - 1] + " " + m[1];
+    var months = tList("date.months");
+    return Number(m[3]) + " " + (months[Number(m[2]) - 1] || m[2]) + " " + m[1];
   }
 
   // La version vive en la barra de herramientas, no en el documento.
@@ -1049,8 +1274,7 @@
       fsDir = d;
       fsFile = null;
       closeModal();
-      notice("Carpeta fijada: " + d.name + ". Las próximas versiones se graban ahí "
-        + "directamente, sin diálogo y sin pasar por Descargas.");
+      notice(t("save.folder.pinned", { folder: d.name }));
     }).catch(function () { /* cancelado por el usuario */ });
   }
 
@@ -1067,7 +1291,7 @@
     }
     var opts = {
       suggestedName: filename,
-      types: [{ description: "Página HTML", accept: { "text/html": [".html"] } }]
+      types: [{ description: t("save.fileType"), accept: { "text/html": [".html"] } }]
     };
     if (fsFile) opts.startIn = fsFile;
     return window.showSaveFilePicker(opts).then(function (h) {
@@ -1091,17 +1315,9 @@
 
   function destinoTexto(next) {
     var nombre = BASENAME + "-v" + next + ".html";
-    if (fsDir) {
-      return "Se grabará " + nombre + " en la carpeta " + fsDir.name
-        + ", sin diálogo y sin pasar por Descargas.";
-    }
-    if (HAS_SAVE) {
-      return "Se abrirá el diálogo del sistema para grabar " + nombre
-        + ". Llévalo a la carpeta de este documento y las siguientes versiones se "
-        + "ofrecerán ya ahí; o fíjala de una vez con el botón de abajo.";
-    }
-    return "Este navegador no puede escribir en disco desde una página local: "
-      + nombre + " irá a Descargas y tendrás que moverlo. Chrome y Edge sí lo permiten.";
+    if (fsDir) return t("save.dest.folder", { file: nombre, folder: fsDir.name });
+    if (HAS_SAVE) return t("save.dest.dialog", { file: nombre });
+    return t("save.dest.download", { file: nombre });
   }
 
   // la ruta propia, para que no haya que adivinar adonde llevar el fichero
@@ -1110,7 +1326,7 @@
     var d = document.createElement("div");
     d.className = "field";
     var l = document.createElement("label");
-    l.textContent = "Este documento está en";
+    l.textContent = t("save.where");
     var v = document.createElement("div");
     v.style.fontSize = "12px";
     v.style.lineHeight = "1.45";
@@ -1133,20 +1349,20 @@
     var noteVal = "";
 
     var buttons = [
-      { label: "Grabar", cls: "btn--primary", onClick: function () { closeModal(); doSave(who, noteVal); } }
+      { label: t("modal.save"), cls: "btn--primary", onClick: function () { closeModal(); doSave(who, noteVal); } }
     ];
     if (HAS_DIR && !fsDir) {
-      buttons.push({ label: "Fijar carpeta…", cls: "", onClick: pickFolder });
+      buttons.push({ label: t("modal.pickFolder"), cls: "", onClick: pickFolder });
     }
-    buttons.push({ label: "Cancelar", cls: "btn--ghost", onClick: closeModal });
+    buttons.push({ label: t("modal.cancel"), cls: "btn--ghost", onClick: closeModal });
 
-    openModal("Grabar versión v" + next, function (body) {
+    openModal(t("modal.saveTitle") + " v" + next, function (body) {
       var p = document.createElement("p");
       p.textContent = destinoTexto(next);
       body.appendChild(p);
       if (!fsDir) rutaPropia(body);
-      body.appendChild(field("Quién graba", who, function (v) { who = v; }));
-      body.appendChild(field("Qué cambia en esta versión", "", function (v) { noteVal = v; }));
+      body.appendChild(field(t("save.field.who"), who, function (v) { who = v; }));
+      body.appendChild(field(t("save.field.note"), "", function (v) { noteVal = v; }));
     }, buttons);
   }
 
@@ -1173,8 +1389,7 @@
     renderAll();
 
     // vuelca el modelo actual dentro del propio documento
-    var json = JSON.stringify(model, null, 2).replace(/</g, "\\u003c");
-    dataEl.textContent = "\n" + json + "\n";
+    writeModel(model);
 
     // .value no se serializa: se escribe tambien en el HTML para que el
     // fichero grabado muestre las respuestas aunque no se ejecute el guion
@@ -1188,7 +1403,7 @@
     document.getElementById("props-body").innerHTML = "";
     var status = document.getElementById("status");
     status.className = "saved";
-    status.textContent = "sin cambios";
+    status.textContent = t("status.clean");
 
     var filename = BASENAME + "-v" + m.rev + ".html";
     var html = "<!doctype html>\n" + document.documentElement.outerHTML;
@@ -1209,25 +1424,28 @@
       if (res === "cancel") {
         // no se grabo nada: la version no debe avanzar
         model.meta = metaBefore;
-        dataEl.textContent = "\n" + JSON.stringify(model, null, 2).replace(/</g, "\\u003c") + "\n";
+        writeModel(model);
         renderMeta();
         markDirty();
         restaurar();
         return;
       }
       baseline = clone(model);
-      markClean("versión grabada");
+      markClean(t("status.saved"));
       restaurar();
       if (res === true) {
-        notice("Grabado " + filename + (fsDir ? " en " + fsDir.name : "")
-          + ". Queda junto al original, con la v" + m.rev + " escrita dentro: aunque alguien "
-          + "lo renombre, el documento sigue diciendo qué versión es y quién la grabó.");
+        notice(t("save.done.disk", {
+          file: filename,
+          folder: fsDir ? " " + t("save.inFolder", { folder: fsDir.name }) : "",
+          rev: m.rev
+        }));
       } else {
         downloadBlob(filename, html);
-        notice("Descargado " + filename + " a la carpeta de descargas: este navegador no "
-          + "permite escribir en disco desde una página local. Muévelo a "
-          + (SELF.dir || "la carpeta del original")
-          + ". Lleva la v" + m.rev + " escrita dentro.");
+        notice(t("save.done.download", {
+          file: filename,
+          dir: SELF.dir || t("save.originalFolder"),
+          rev: m.rev
+        }));
       }
     });
   }
@@ -1235,28 +1453,20 @@
   /* ---------------- historial ---------------- */
 
   function openHelp() {
-    openModal("Cómo se edita", function (body) {
+    openModal(t("help.title"), function (body) {
       var bloques = [
-        ["Texto y bloques", "Editar texto permite escribir en títulos, párrafos, tablas y pies de figura. Al final del documento puedes añadir secciones, tablas, avisos, diagramas y decisiones. Deshacer y Rehacer también recuperan el contenido."],
-        ["Plantillas y estilo", "Plantillas descarga un documento nuevo. Estilo cambia la apariencia del documento actual; Tema permite elegir claro, oscuro o seguir el sistema. Todo se conserva al grabar una versión."],
-        ["Apariencia", "Selecciona una caja o línea para cambiar colores, relleno, patrón, grosor, esquinas y texto. Las flechas admiten puntas en ambos extremos. Puedes aplicar cambios a una selección múltiple, copiar y pegar apariencia o volver a los valores del tipo."],
-        ["Diagramas", "Selecciona cajas para duplicarlas, alinearlas, distribuirlas o ajustarlas al texto. Diagramas añade un flujo, capas, un antes y después o una secuencia."],
-        ["Imprimir / PDF", "Abre la impresión del navegador y elige Guardar como PDF. Se ocultan los controles y se incluyen las respuestas completas."],
-        ["Editar", "El botón Editar diagramas abre las barras de herramientas de las figuras. "
-          + "Fuera de ese modo el documento solo se lee."],
-        ["Mover y cambiar", "Arrastra cajas, codos de flecha y etiquetas. Tira de la esquina para "
-          + "redimensionar. Doble clic sobre una caja abre su panel. Supr borra lo elegido."],
-        ["Varios a la vez", "Abre un marco arrastrando sobre el fondo, o suma y resta con "
-          + ADD_KEY + "+clic. Seleccionar todo coge la figura entera. Arrastrando cualquiera de "
-          + "los elegidos se mueve el grupo."],
-        ["Flechas", "Con la flecha seleccionada, Añadir codo crea un punto para rodear una caja. "
-          + "Las etiquetas se arrastran solas y Recentrar etiqueta las devuelve a su sitio."],
-        ["Notas", "+ Nota deja un comentario azul sobre el dibujo, que puede apuntar a una caja. "
-          + "El botón Notas las oculta todas, y entonces tampoco salen en el SVG exportado."],
-        ["Respuestas", "Cada decisión abierta tiene su línea de respuesta: se escribe sin entrar "
-          + "en modo edición, basta pulsar sobre ella."],
-        ["Grabar", "Grabar versión crea el fichero siguiente con el número subido. En Chrome y "
-          + "Edge puedes fijar la carpeta una vez y a partir de ahí graba ahí mismo, sin diálogo."]
+        [t("help.b1.h"), t("help.b1.p")],
+        [t("help.b2.h"), t("help.b2.p")],
+        [t("help.b3.h"), t("help.b3.p")],
+        [t("help.b4.h"), t("help.b4.p")],
+        [t("help.b5.h"), t("help.b5.p")],
+        [t("help.b6.h"), t("help.b6.p")],
+        [t("help.b7.h"), t("help.b7.p")],
+        [t("help.b8.h"), t("help.b8.p", { add: ADD_KEY })],
+        [t("help.b9.h"), t("help.b9.p")],
+        [t("help.b10.h"), t("help.b10.p")],
+        [t("help.b11.h"), t("help.b11.p")],
+        [t("help.b12.h"), t("help.b12.p")]
       ];
       bloques.forEach(function (b) {
         var h = document.createElement("div");
@@ -1272,15 +1482,14 @@
         h.appendChild(l); h.appendChild(t);
         body.appendChild(h);
       });
-    }, [{ label: "Cerrar", cls: "btn--ghost", onClick: closeModal }]);
+    }, [{ label: t("modal.close"), cls: "btn--ghost", onClick: closeModal }]);
   }
 
   function openHistory() {
     var m = meta();
-    openModal("Historial de versiones", function (body) {
+    openModal(t("history.title"), function (body) {
       var p = document.createElement("p");
-      p.textContent = "Cada línea es una versión grabada de este fichero. El historial viaja dentro del documento, "
-        + "así que cualquiera que lo reciba ve por dónde ha pasado.";
+      p.textContent = t("history.intro");
       body.appendChild(p);
       var list = document.createElement("div");
       list.className = "histlist";
@@ -1288,7 +1497,7 @@
       if (!rows.length) {
         var empty = document.createElement("div");
         empty.className = "histrow";
-        empty.textContent = "Todavía no se ha grabado ninguna versión.";
+        empty.textContent = t("history.empty");
         list.appendChild(empty);
       }
       rows.forEach(function (h) {
@@ -1298,7 +1507,7 @@
         r.className = "r"; r.textContent = "v" + h.rev;
         var d = document.createElement("div");
         var n = document.createElement("div");
-        n.textContent = h.note || "sin nota";
+        n.textContent = h.note || t("history.nonote");
         var w = document.createElement("div");
         w.className = "who";
         w.textContent = fmtDate(h.at) + (h.by ? " · " + h.by : "");
@@ -1308,7 +1517,7 @@
       });
       body.appendChild(list);
     }, [
-      { label: "Cerrar", cls: "btn--ghost", onClick: closeModal }
+      { label: t("modal.close"), cls: "btn--ghost", onClick: closeModal }
     ]);
   }
 
@@ -1320,17 +1529,21 @@
     renderProps();
   }
 
-  var KINDS_NODE = [
-    ["box", "caja normal"],
-    ["new", "pieza nueva (verde)"],
-    ["out", "fuera del ámbito (discontinua)"],
-    ["dead", "se elimina (roja)"],
-    ["chip", "bloque interior"],
-    ["chipdead", "bloque interior · se elimina"],
-    ["divider", "línea de frontera"],
-    ["label", "solo texto"]
-  ];
-  var KINDS_EDGE = [["line", "normal"], ["new", "camino nuevo (verde)"], ["dead", "se elimina (roja)"]];
+  function kindsNode() {
+    return [
+      ["box", t("kind.box")],
+      ["new", t("kind.new")],
+      ["out", t("kind.out")],
+      ["dead", t("kind.dead")],
+      ["chip", t("kind.chip")],
+      ["chipdead", t("kind.chipdead")],
+      ["divider", t("kind.divider")],
+      ["label", t("kind.label")]
+    ];
+  }
+  function kindsEdge() {
+    return [["line", t("kind.edge.line")], ["new", t("kind.edge.new")], ["dead", t("kind.edge.dead")]];
+  }
 
   function field(label, value, onInput, type) {
     var wrap = document.createElement("div");
@@ -1394,21 +1607,21 @@
 
     if (only.type === "node" && node(f, only.id) && node(f, only.id).kind === "note") {
       var nt = node(f, only.id);
-      title.textContent = "Nota";
-      body.appendChild(areaField("Texto de la nota", nt.text, function (v) {
+      title.textContent = t("props.note");
+      body.appendChild(areaField(t("props.note.text"), nt.text, function (v) {
         if (!live) { snapshot(); live = true; }
         nt.text = v; fitNoteHeight(nt); markDirty(); render(f);
       }));
-      body.appendChild(field("Firma", nt.by, function (v) {
+      body.appendChild(field(t("props.note.by"), nt.by, function (v) {
         if (!live) { snapshot(); live = true; }
         nt.by = v; fitNoteHeight(nt); markDirty(); render(f);
       }));
-      var anchorOpts = [["", "no apunta a nada"]].concat(
+      var targetOpts = [["", t("props.note.none")]].concat(
         fig(f).nodes
           .filter(function (n2) { return n2.kind !== "note" && n2.kind !== "label"; })
           .map(function (n2) { return [n2.id, n2.title || n2.id]; })
       );
-      body.appendChild(selectField("Apunta a", nt.anchor || "", anchorOpts, function (v) {
+      body.appendChild(selectField(t("props.note.target"), nt.anchor || "", targetOpts, function (v) {
         snapshot();
         if (v) nt.anchor = v; else delete nt.anchor;
         afterChange();
@@ -1418,7 +1631,7 @@
       na.className = "props-actions";
       var nDel = document.createElement("button");
       nDel.type = "button"; nDel.className = "btn btn--sm btn--danger";
-      nDel.textContent = "Eliminar nota";
+      nDel.textContent = t("props.note.delete");
       nDel.addEventListener("click", function () { deleteNode(f, nt.id); });
       na.appendChild(nDel);
       body.appendChild(na);
@@ -1428,20 +1641,20 @@
     if (only.type === "node") {
       var n = node(f, only.id);
       if (!n) { panel.classList.remove("open"); return; }
-      title.textContent = "Caja";
-      body.appendChild(field("Título", n.title, function (v) {
+      title.textContent = t("props.box");
+      body.appendChild(field(t("props.box.title"), n.title, function (v) {
         if (!live) { snapshot(); live = true; }
         n.title = v; markDirty(); render(f);
       }));
-      body.appendChild(field("Subtítulo", n.sub, function (v) {
+      body.appendChild(field(t("props.box.sub"), n.sub, function (v) {
         if (!live) { snapshot(); live = true; }
         n.sub = v; markDirty(); render(f);
       }));
-      body.appendChild(field("Tercera línea", n.sub2, function (v) {
+      body.appendChild(field(t("props.box.sub2"), n.sub2, function (v) {
         if (!live) { snapshot(); live = true; }
         n.sub2 = v; markDirty(); render(f);
       }));
-      body.appendChild(selectField("Estilo", n.kind, KINDS_NODE, function (v) {
+      body.appendChild(selectField(t("props.box.style"), n.kind, kindsNode(), function (v) {
         snapshot(); n.kind = v; afterChange();
       }));
       renderAppearancePanel(f, body);
@@ -1449,49 +1662,78 @@
       acts.className = "props-actions";
       var bTop = document.createElement("button");
       bTop.type = "button"; bTop.className = "btn btn--sm";
-      bTop.textContent = n.top ? "Centrar texto" : "Texto arriba";
+      bTop.textContent = n.top ? t("props.box.center") : t("props.box.top");
       bTop.addEventListener("click", function () { snapshot(); n.top = !n.top; afterChange(); });
       acts.appendChild(bTop);
       var bDel = document.createElement("button");
       bDel.type = "button"; bDel.className = "btn btn--sm btn--danger";
-      bDel.textContent = "Eliminar caja";
+      bDel.textContent = t("props.box.delete");
       bDel.addEventListener("click", function () { deleteNode(f, n.id); });
       acts.appendChild(bDel);
       body.appendChild(acts);
     } else {
       var e = edge(f, only.id);
       if (!e) { panel.classList.remove("open"); return; }
-      title.textContent = "Flecha";
-      body.appendChild(field("Etiqueta", e.label, function (v) {
+      title.textContent = t("props.edge");
+      body.appendChild(field(t("props.edge.label"), e.label, function (v) {
         if (!live) { snapshot(); live = true; }
         e.label = v; markDirty(); render(f);
       }));
       var opts = fig(f).nodes
         .filter(function (n2) { return n2.kind !== "label" && n2.kind !== "divider" && n2.kind !== "note"; })
         .map(function (n2) { return [n2.id, n2.title || n2.id]; });
-      body.appendChild(selectField("Origen", e.from, opts, function (v) { snapshot(); e.from = v; afterChange(); }));
-      body.appendChild(selectField("Destino", e.to, opts, function (v) { snapshot(); e.to = v; afterChange(); }));
-      body.appendChild(selectField("Estilo", e.kind || "line", KINDS_EDGE, function (v) { snapshot(); e.kind = v; afterChange(); }));
+      body.appendChild(selectField(t("props.edge.from"), e.from, opts, function (v) { snapshot(); e.from = v; afterChange(); }));
+      body.appendChild(selectField(t("props.edge.to"), e.to, opts, function (v) { snapshot(); e.to = v; afterChange(); }));
+      body.appendChild(selectField(t("props.edge.style"), e.kind || "line", kindsEdge(), function (v) { snapshot(); e.kind = v; afterChange(); }));
+      body.appendChild(selectField(t("props.edge.fromAnchor"), e.fromAnchor || "auto", anchorOpts(), function (v) {
+        snapshot(); setAnchor(e, "from", v); afterChange();
+      }));
+      body.appendChild(selectField(t("props.edge.toAnchor"), e.toAnchor || "auto", anchorOpts(), function (v) {
+        snapshot(); setAnchor(e, "to", v); afterChange();
+      }));
       renderAppearancePanel(f, body);
       var acts2 = document.createElement("div");
       acts2.className = "props-actions";
       var bWp = document.createElement("button");
       bWp.type = "button"; bWp.className = "btn btn--sm";
-      bWp.textContent = e.wp ? "Quitar codo" : "Añadir codo";
+      bWp.textContent = t("props.edge.addElbow");
       bWp.addEventListener("click", function () {
         snapshot();
-        if (e.wp) { delete e.wp; }
-        else {
-          var p = edgePath(f, e);
-          e.wp = { x: Math.round(p.mid.x), y: Math.round(p.mid.y) - 30 };
-        }
+        var p = edgePath(f, e);
+        // el codo nace separado de la linea, perpendicular al tramo, para poder cogerlo
+        var vx = p.seg[1].x - p.seg[0].x, vy = p.seg[1].y - p.seg[0].y;
+        var len = Math.hypot(vx, vy) || 1;
+        var list = waypoints(e).slice();
+        list.splice(p.segIndex, 0, {
+          x: Math.round(p.mid.x - vy / len * 30),
+          y: Math.round(p.mid.y + vx / len * 30)
+        });
+        setWaypoints(e, list);
         afterChange();
       });
       acts2.appendChild(bWp);
+      if (waypoints(e).length) {
+        var bWpNo = document.createElement("button");
+        bWpNo.type = "button"; bWpNo.className = "btn btn--sm";
+        bWpNo.textContent = waypoints(e).length === 1 ? t("props.edge.delElbow") : t("props.edge.delElbows");
+        bWpNo.addEventListener("click", function () {
+          snapshot(); setWaypoints(e, []); afterChange();
+        });
+        acts2.appendChild(bWpNo);
+      }
+      if (e.fromAnchor || e.toAnchor) {
+        var bAn = document.createElement("button");
+        bAn.type = "button"; bAn.className = "btn btn--sm";
+        bAn.textContent = t("props.edge.release");
+        bAn.addEventListener("click", function () {
+          snapshot(); setAnchor(e, "from", null); setAnchor(e, "to", null); afterChange();
+        });
+        acts2.appendChild(bAn);
+      }
       if (e.lo && (e.lo.dx || e.lo.dy)) {
         var bLo = document.createElement("button");
         bLo.type = "button"; bLo.className = "btn btn--sm";
-        bLo.textContent = "Recentrar etiqueta";
+        bLo.textContent = t("props.edge.recenter");
         bLo.addEventListener("click", function () {
           snapshot(); delete e.lo; afterChange();
         });
@@ -1499,7 +1741,7 @@
       }
       var bDel2 = document.createElement("button");
       bDel2.type = "button"; bDel2.className = "btn btn--sm btn--danger";
-      bDel2.textContent = "Eliminar flecha";
+      bDel2.textContent = t("props.edge.delete");
       bDel2.addEventListener("click", function () { deleteEdge(f, e.id); });
       acts2.appendChild(bDel2);
       body.appendChild(acts2);
@@ -1508,21 +1750,21 @@
 
   function renderPropsMulti(f, body, title) {
     var nodeIds = selIds("node"), edgeIds = selIds("edge");
-    title.textContent = selCount() + " elementos";
+    title.textContent = t("props.multi.title", { n: selCount() });
 
     var p = document.createElement("p");
     p.style.fontSize = "13px";
     p.style.color = "var(--ink-muted)";
     p.style.margin = "0";
     p.style.lineHeight = "1.5";
-    p.textContent = nodeIds.length + (nodeIds.length === 1 ? " caja" : " cajas") + " y "
-      + edgeIds.length + (edgeIds.length === 1 ? " flecha" : " flechas")
-      + ". Arrastra cualquiera de ellas y se mueve el grupo entero.";
+    var boxes = t(nodeIds.length === 1 ? "props.multi.boxes.one" : "props.multi.boxes.many", { n: nodeIds.length });
+    var arrows = t(edgeIds.length === 1 ? "props.multi.edges.one" : "props.multi.edges.many", { n: edgeIds.length });
+    p.textContent = t("props.multi.summary", { nodes: boxes, edges: arrows });
     body.appendChild(p);
 
     if (nodeIds.length) {
-      body.appendChild(selectField("Estilo de las cajas", "",
-        [["", "sin cambiar"]].concat(KINDS_NODE), function (v) {
+      body.appendChild(selectField(t("props.multi.boxStyle"), "",
+        [["", t("props.multi.unchanged")]].concat(kindsNode()), function (v) {
           if (!v) return;
           snapshot();
           nodeIds.forEach(function (id) { var nn = node(f, id); if (nn) nn.kind = v; });
@@ -1530,8 +1772,8 @@
         }));
     }
     if (edgeIds.length) {
-      body.appendChild(selectField("Estilo de las flechas", "",
-        [["", "sin cambiar"]].concat(KINDS_EDGE), function (v) {
+      body.appendChild(selectField(t("props.multi.edgeStyle"), "",
+        [["", t("props.multi.unchanged")]].concat(kindsEdge()), function (v) {
           if (!v) return;
           snapshot();
           edgeIds.forEach(function (id) { var ee = edge(f, id); if (ee) ee.kind = v; });
@@ -1544,12 +1786,12 @@
     renderAppearancePanel(f, body);
     var bNone = document.createElement("button");
     bNone.type = "button"; bNone.className = "btn btn--sm btn--ghost";
-    bNone.textContent = "Quitar selección";
+    bNone.textContent = t("props.multi.clear");
     bNone.addEventListener("click", function () { selClear(); renderAll(); renderProps(); });
     acts.appendChild(bNone);
     var bDel = document.createElement("button");
     bDel.type = "button"; bDel.className = "btn btn--sm btn--danger";
-    bDel.textContent = "Eliminar los " + selCount();
+    bDel.textContent = t("props.multi.delete", { n: selCount() });
     bDel.addEventListener("click", deleteSelection);
     acts.appendChild(bDel);
     body.appendChild(acts);
@@ -1592,19 +1834,19 @@
       var bar = document.querySelector('[data-tools="' + f + '"]');
       if (!bar) return;
       bar.innerHTML = "";
-      bar.appendChild(toolButton("+ Caja", function () {
+      bar.appendChild(toolButton(t("tools.box"), function () {
         snapshot();
         var d = fig(f);
         var id = uid("n", d.nodes);
         var vb = viewBoxOf(f);
         d.nodes.push({
           id: id, x: Math.round(vb.x + vb.w / 2 - 70), y: Math.round(vb.y + vb.h - 90),
-          w: 140, h: 52, kind: "box", title: "nueva caja"
+          w: 140, h: 52, kind: "box", title: t("tools.newBox")
         });
         selSet(f, "node", id);
         afterChange();
       }));
-      bar.appendChild(toolButton("+ Nota", function () {
+      bar.appendChild(toolButton(t("tools.note"), function () {
         snapshot();
         var d = fig(f);
         var id = uid("nota", d.nodes);
@@ -1614,7 +1856,7 @@
         var nt = {
           id: id, x: Math.round(vb.x + 24), y: Math.round(vb.y + 24),
           w: 220, h: 60, kind: "note",
-          text: "Escribe aquí la duda o el comentario.",
+          text: t("tools.newNote"),
           by: who
         };
         fitNoteHeight(nt);
@@ -1624,25 +1866,25 @@
         afterChange();
         var ta = document.querySelector("#props-body textarea");
         if (ta) { ta.focus(); ta.select(); }
-      }, "", "Una nota de revisión: puede quedarse suelta o apuntar a una caja"));
+      }, "", t("tools.note.title")));
       var connecting = state.connect && state.connect.fig === f;
       bar.appendChild(toolButton(
-        connecting ? "Elige destino…" : "+ Flecha",
+        connecting ? t("tools.arrowTarget") : t("tools.arrow"),
         function () {
           if (connecting) { state.connect = null; }
           else { state.connect = { fig: f, from: null }; }
           renderAll(); renderTools();
         },
         connecting ? "btn--primary" : "",
-        "Pulsa el botón y después la caja de origen y la de destino"
+        t("tools.arrow.title")
       ));
       studioFigureTools(f, bar);
-      bar.appendChild(toolButton("Seleccionar todo", function () { selectAll(f); }, "btn--ghost",
-        "Elige todas las cajas, notas y flechas de esta figura para moverlas juntas"));
-      bar.appendChild(toolButton("Deshacer", undo, "btn--ghost"));
-      bar.appendChild(toolButton("Rehacer", redo, "btn--ghost"));
-      bar.appendChild(toolButton("Exportar SVG", function () { exportSvg(f); }, "btn--ghost"));
-      bar.appendChild(toolButton("Restablecer figura", function () {
+      bar.appendChild(toolButton(t("tools.selectAll"), function () { selectAll(f); }, "btn--ghost",
+        t("tools.selectAll.title")));
+      bar.appendChild(toolButton(t("tools.undo"), undo, "btn--ghost"));
+      bar.appendChild(toolButton(t("tools.redo"), redo, "btn--ghost"));
+      bar.appendChild(toolButton(t("tools.exportSvg"), function () { exportSvg(f); }, "btn--ghost"));
+      bar.appendChild(toolButton(t("tools.resetFigure"), function () {
         snapshot();
         model.figures[f] = baseline.figures[f] ? clone(baseline.figures[f]) : { w: 640, h: 220, nodes: [], edges: [] };
         selClear();
@@ -1655,10 +1897,10 @@
       hint.className = "hint";
       var picked = state.sel.fig === f ? selCount() : 0;
       hint.textContent = connecting
-        ? (state.connect.from ? "ahora la caja de destino" : "pulsa la caja de origen")
+        ? (state.connect.from ? t("tools.hint.connectTo") : t("tools.hint.connect"))
         : picked > 1
-          ? picked + " elegidos · arrastra cualquiera y se mueven juntos"
-          : "arrastra cajas, codos y etiquetas · marco en el vacío o " + ADD_KEY + "+clic para varios · Supr borra";
+          ? t("tools.hint.picked", { n: picked })
+          : t("tools.hint.idle", { add: ADD_KEY });
       bar.appendChild(hint);
     });
   }
@@ -1740,7 +1982,7 @@
     return {
       mode: "move", start: start,
       nodes: nodes.map(function (nn) { return { n: nn, x0: nn.x, y0: nn.y }; }),
-      wps: movingWps(f, set).map(function (e) { return { e: e, x0: e.wp.x, y0: e.wp.y }; })
+      wps: movingWps(f, set).map(function (w) { return { w: w, x0: w.x, y0: w.y }; })
     };
   }
 
@@ -1788,6 +2030,8 @@
       if (evt.button === 2) return;              // clic derecho: no toca nada
       var add = isAdditive(evt);
       var wpEl = evt.target.closest("[data-wp]");
+      var anchEl = evt.target.closest("[data-anch]");
+      var endpEl = evt.target.closest("[data-endp]");
       var lblEl = evt.target.closest("[data-elabel]");
       var resizeEl = evt.target.closest("[data-resize]");
       var nodeEl = evt.target.closest("[data-node]");
@@ -1816,15 +2060,42 @@
         return;
       }
 
+      if (anchEl) {
+        var ap = anchEl.getAttribute("data-anch").split("|");
+        var ae = edge(f, ap[0]);
+        if (ae) { snapshot(); setAnchor(ae, ap[1], ap[2]); afterChange(); }
+        evt.preventDefault();
+        return;
+      }
+
+      if (endpEl) {
+        var ep = endpEl.getAttribute("data-endp").split("|");
+        var pe = edge(f, ep[0]);
+        if (pe) {
+          snapshot();
+          if (!selHas(f, "edge", pe.id)) selSet(f, "edge", pe.id);
+          drag = { mode: "end", e: pe, which: ep[1], start: svgPoint(svg, evt) };
+          svg.setPointerCapture(evt.pointerId);
+          state.dragging = true;
+          renderAll(); renderProps();
+        }
+        evt.preventDefault();
+        return;
+      }
+
       if (resizeEl) {
         var rn = node(f, resizeEl.getAttribute("data-resize"));
         snapshot();
         drag = { mode: "resize", n: rn, start: svgPoint(svg, evt), w0: rn.w, h0: rn.h };
       } else if (wpEl) {
-        var we = edge(f, wpEl.getAttribute("data-wp"));
+        var wparts = wpEl.getAttribute("data-wp").split("|");
+        var we = edge(f, wparts[0]);
+        var wi = Number(wparts[1]) || 0;
+        var wpt = waypoints(we)[wi];
+        if (!wpt) return;
         snapshot();
         if (!selHas(f, "edge", we.id)) selSet(f, "edge", we.id);
-        drag = { mode: "wp", e: we, start: svgPoint(svg, evt), x0: we.wp.x, y0: we.wp.y };
+        drag = { mode: "wp", e: we, i: wi, start: svgPoint(svg, evt), x0: wpt.x, y0: wpt.y };
         renderProps();
       } else if (lblEl) {
         var le = edge(f, lblEl.getAttribute("data-elabel"));
@@ -1894,8 +2165,8 @@
           it.n.y = snap(it.y0 + dy, free);
         });
         drag.wps.forEach(function (it) {
-          it.e.wp.x = snap(it.x0 + dx, free);
-          it.e.wp.y = snap(it.y0 + dy, free);
+          it.w.x = snap(it.x0 + dx, free);
+          it.w.y = snap(it.y0 + dy, free);
         });
       } else if (drag.mode === "resize") {
         drag.n.w = Math.max(40, snap(drag.w0 + dx, free));
@@ -1905,9 +2176,12 @@
         } else {
           drag.n.h = Math.max(drag.n.kind === "divider" ? 0 : 28, snap(drag.h0 + dy, free));
         }
+      } else if (drag.mode === "end") {
+        var eb = node(f, drag.which === "from" ? drag.e.from : drag.e.to);
+        setAnchor(drag.e, drag.which, nearestAnchor(eb, p));
       } else if (drag.mode === "wp") {
-        drag.e.wp.x = snap(drag.x0 + dx, free);
-        drag.e.wp.y = snap(drag.y0 + dy, free);
+        var dw = waypoints(drag.e)[drag.i];
+        if (dw) { dw.x = snap(drag.x0 + dx, free); dw.y = snap(drag.y0 + dy, free); }
       } else if (drag.mode === "label") {
         drag.e.lo.dx = snap(drag.x0 + dx, free);
         drag.e.lo.dy = snap(drag.y0 + dy, free);
@@ -1930,6 +2204,22 @@
         svg.releasePointerCapture(evt.pointerId);
       }
     }
+    // doble clic en un codo: se quita solo ese
+    svg.addEventListener("dblclick", function (evt) {
+      if (!state.editing) return;
+      var el2 = evt.target.closest("[data-wp]");
+      if (!el2) return;
+      var parts = el2.getAttribute("data-wp").split("|");
+      var de = edge(f, parts[0]);
+      if (!de) return;
+      var list = waypoints(de).slice();
+      list.splice(Number(parts[1]) || 0, 1);
+      snapshot();
+      setWaypoints(de, list);
+      afterChange();
+      evt.preventDefault();
+    });
+
     svg.addEventListener("pointerup", endDrag);
     svg.addEventListener("pointercancel", endDrag);
 
@@ -1960,6 +2250,12 @@
     if (li) li.classList.toggle("is-answered", filled);
     autoGrow(ta);
   }
+  // El recuento de respuestas se usa en dos sitios y concuerda en numero.
+  function countText(done, total) {
+    if (done === 0) return t(total === 1 ? "answers.count.none.one" : "answers.count.none.many", { n: total });
+    if (done === total) return t(total === 1 ? "answers.count.all.one" : "answers.count.all.many", { n: total });
+    return t("answers.count.some", { done: done, total: total });
+  }
   function renderAnswers() {
     var a = answers(), total = 0, done = 0;
     document.querySelectorAll("[data-answer]").forEach(function (ta) {
@@ -1971,11 +2267,7 @@
     });
     var c = document.getElementById("dec-count");
     if (c) {
-      c.textContent = done === 0
-        ? "Ninguna respondida todavía · " + total + " abiertas"
-        : done === total
-          ? "Las " + total + " respondidas"
-          : done + " de " + total + " respondidas";
+      c.textContent = countText(done, total);
     }
   }
   function attachAnswers() {
@@ -1983,7 +2275,7 @@
       if (ta._docuwebAttached) return;
       ta._docuwebAttached = true;
       var question = ta.closest("[data-decision]").querySelector(".decision-q");
-      ta.setAttribute("aria-label", question ? question.textContent : "Respuesta a la decisión");
+      ta.setAttribute("aria-label", question ? question.textContent : t("answers.aria"));
       ta.addEventListener("input", function () {
         var k = ta.getAttribute("data-answer");
         var a = answers();
@@ -1994,10 +2286,7 @@
           var all = document.querySelectorAll("[data-answer]");
           var d = 0;
           all.forEach(function (t) { if (t.value.trim()) d++; });
-          c.textContent = d === 0
-            ? "Ninguna respondida todavía · " + all.length + " abiertas"
-            : d === all.length ? "Las " + all.length + " respondidas"
-              : d + " de " + all.length + " respondidas";
+          c.textContent = countText(d, all.length);
         }
         markDirty();
       });
@@ -2021,7 +2310,7 @@
     var b = document.getElementById("btn-notes");
     b.setAttribute("aria-pressed", String(on));
     var n = countNotes();
-    b.textContent = on ? (n ? "Notas · " + n : "Notas") : "Notas ocultas";
+    b.textContent = on ? (n ? t("appbar.notes.count", { n: n }) : t("appbar.notes")) : t("appbar.notes.hidden");
     try { localStorage.setItem(NOTES_KEY, on ? "1" : "0"); } catch (err) { /* nada */ }
     if (!on && state.sel.fig) {
       var sf = state.sel.fig;
@@ -2041,7 +2330,7 @@
     state.editing = on;
     document.body.classList.toggle("editing", on);
     document.getElementById("btn-edit").setAttribute("aria-pressed", String(on));
-    document.getElementById("btn-edit").textContent = on ? "Salir de edición" : "Editar diagramas";
+    document.getElementById("btn-edit").textContent = on ? t("appbar.finishDiagrams") : t("appbar.editDiagrams");
     if (!on) { selClear(); state.connect = null; }
     renderAll();
     renderProps();
@@ -2058,10 +2347,12 @@
       var raw = localStorage.getItem(STORE_KEY);
       if (raw) {
         var parsed = JSON.parse(raw);
-        if (parsed && parsed.figures) { model = parsed; restored = true; }
+        if (parsed && parsed.figures) { model = normalizeEdges(parsed); restored = true; }
       }
     } catch (err) { /* almacenamiento no disponible */ }
 
+    // el idioma tiene que estar resuelto antes de pintar nada con t()
+    initLang();
     initStudio(restored);
 
     var notesOn = true;
@@ -2081,12 +2372,12 @@
     if (!state.dirty) {
       var st = document.getElementById("status");
       st.className = "saved";
-      st.textContent = "sin cambios";
+      st.textContent = t("status.clean");
     }
 
     if (restored) {
       markDirty();
-      notice("Se han recuperado cambios que no llegaste a grabar en el fichero. Pulsa Grabar fichero para fijarlos, o Restablecer para volver a los diagramas originales.");
+      notice(t("restored.notice"));
     }
 
     document.getElementById("btn-edit").addEventListener("click", function () { setEditing(!state.editing); });
@@ -2095,14 +2386,14 @@
     document.getElementById("btn-history").addEventListener("click", openHistory);
     document.getElementById("btn-help").addEventListener("click", openHelp);
     document.getElementById("btn-reset").addEventListener("click", function () {
-      if (!window.confirm("Se descartan los cambios sin grabar y vuelven los diagramas de la última versión grabada. ¿Continuar?")) return;
+      if (!window.confirm(t("confirm.reset"))) return;
       snapshot();
       model = clone(baseline);
       restoreContent();
       selClear();
       renderMeta();
       renderAll(); renderProps(); renderTools(); renderAnswers();
-      markClean("sin cambios");
+      markClean(t("status.clean"));
     });
     document.getElementById("props-close").addEventListener("click", function () { select(null, null, null); });
     document.getElementById("notice-dismiss").addEventListener("click", function () {
@@ -2148,8 +2439,8 @@
         var nodes = movingNodes(f), set = {};
         nodes.forEach(function (nn) { set[nn.id] = 1; });
         nodes.forEach(function (nn) { nn.x += map[evt.key][0]; nn.y += map[evt.key][1]; });
-        movingWps(f, set).forEach(function (e) {
-          e.wp.x += map[evt.key][0]; e.wp.y += map[evt.key][1];
+        movingWps(f, set).forEach(function (w) {
+          w.x += map[evt.key][0]; w.y += map[evt.key][1];
         });
         afterChange();
       }

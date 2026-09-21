@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="es">
+<html lang="en" data-design="executive">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>Título del documento</title>
-<meta name="description" content="Documento creado con docuweb.">
+<title>Executive report</title>
+<meta name="description" content="Findings, indicators and next steps to decide on.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600&display=swap">
@@ -17,7 +17,7 @@
   <div class="appbar-inner">
     <div class="appbar-heading">
     <button type="button" class="btn mobile-control" id="btn-menu" data-panel="preferences" aria-controls="preferences" aria-expanded="false" data-i18n-aria-label="appbar.preferences" aria-label="Preferencias">☰</button>
-    <div class="document-identity"><span class="product-name">docuweb · </span><span class="brandmark">Ámbito o proyecto</span></div>
+    <div class="document-identity"><span class="product-name">docuweb · </span><span class="brandmark">docuweb · Executive report</span></div>
     <div class="document-state" aria-live="polite">
     <button type="button" class="revbadge" id="btn-history" data-i18n-title="appbar.history.title" title="Ver el historial de versiones de este fichero">v1</button>
     <span aria-hidden="true">·</span><span id="status" class="saved" data-i18n="status.clean">Sin cambios</span>
@@ -61,52 +61,7 @@
        Todo lo que hay entre esta marca y la de cierre es tuyo.
        El resto del fichero es el motor: no hace falta tocarlo.
   ════════════════════════════════════════════════════════ -->
-  <header>
-    <p class="kicker">Ámbito o proyecto</p>
-    <h1>Título del documento</h1>
-    <p class="lede">
-      Una o dos frases que digan qué defiende este documento. Lo que el lector debe
-      llevarse aunque no siga leyendo.
-    </p>
-    <div class="meta">
-      <span class="pill is-draft">Borrador</span>
-      <span class="pill">Fecha</span>
-    </div>
-  </header>
-
-  <section>
-    <h2>Primera sección</h2>
-    <p>
-      El texto que prepara la figura: qué hay que mirar y por qué importa.
-    </p>
-    <figure data-fig="f1">
-      <div class="figtools" data-tools="f1"></div>
-      <div class="canvas canvas--mid"><svg data-svg="f1" role="img" aria-label="Describe aquí el diagrama para quien no puede verlo."></svg></div>
-      <figcaption>
-        <b>La afirmación que sostiene la figura.</b> Una figura, una idea: si hacen falta
-        dos frases sin relación, probablemente hagan falta dos figuras.
-      </figcaption>
-    </figure>
-  </section>
-
-  <section>
-    <h2>Decisiones abiertas</h2>
-    <p class="deccount" id="dec-count"></p>
-    <ol class="decisions">
-      <li data-decision="1"><span class="num">01</span><div>
-        <p class="decision-q">¿La pregunta que hay que resolver?</p>
-        <p class="decision-w">Por qué importa y qué cambia según la respuesta.</p>
-      </div>
-        <div class="answer"><span class="lbl">↳ Respuesta:</span><textarea data-answer="1" rows="1" placeholder="sin responder"></textarea></div>
-      </li>
-    </ol>
-  </section>
-
-  <footer>
-    <p>
-      De dónde sale lo que dice este documento y a qué fecha.
-    </p>
-  </footer>
+<header><p class="kicker">Working document</p><h1>Report title</h1><p class="lede">Write the main conclusion and the decision the reader needs.</p><div class="meta"><span class="pill is-draft">Draft</span><span class="pill">Date to be filled in</span></div></header><section><h2>Indicators</h2><div class="metric-grid"><div class="metric"><h3>Result</h3><p>To be measured</p></div><div class="metric"><h3>Deadline</h3><p>To be measured</p></div><div class="metric"><h3>Resources</h3><p>To be measured</p></div></div></section><section><h2>Findings</h2><p>Summarise the findings and explain the evidence behind them.</p></section><section><div class="callout"><h3>Recommendation</h3><p>Describe the recommended action and its expected effect.</p></div></section><section><h2>Next steps</h2><div class="tablewrap"><table><thead><tr><th>Action</th><th>Owner</th><th>Date</th></tr></thead><tbody><tr><td>To be defined</td><td>To be assigned</td><td>To be agreed</td></tr><tr><td>To be defined</td><td>To be assigned</td><td>To be agreed</td></tr></tbody></table></div></section><section><h2>Pending decision</h2><p class="deccount" id="dec-count"></p><ol class="decisions"><li data-decision="1"><span class="num">01</span><div><p class="decision-q">Which action is authorised?</p><p class="decision-w">State the scope, the owner and the resources agreed.</p></div><div class="answer"><span class="lbl">Answer:</span><textarea data-answer="1" rows="1" placeholder="unanswered"></textarea></div></li></ol></section><footer><p>Sources, owner and date of last update: to be completed.</p></footer>
   <!-- ═══════════════ FIN DEL CONTENIDO ═══════════════ -->
   </div>
   <div class="content-tools" data-i18n-aria-label="appbar.addContent" aria-label="Añadir contenido">
@@ -142,18 +97,8 @@
   "version": 1,
   "meta": {"rev":1,"savedAt":"","savedBy":"","history":[]},
   "answers": {},
-  "figures": {
-    "f1": {
-      "w": 640,
-      "h": 220,
-      "nodes": [
-        {"id":"a","x":40,"y":80,"w":160,"h":56,"kind":"box","title":"origen","sub":"de dónde sale"},
-        {"id":"b","x":260,"y":80,"w":160,"h":56,"kind":"new","title":"pieza nueva"},
-        {"id":"c","x":480,"y":80,"w":120,"h":56,"kind":"box","title":"destino"}
-      ],
-      "edges": [{"id":"e1","from":"a","to":"b","label":"qué viaja"},{"id":"e2","from":"b","to":"c","label":"qué escribe"}]
-    }
-  }
+  "figures": {},
+  "document": {"design":"executive","theme":"auto"}
 }
 </script>
 
