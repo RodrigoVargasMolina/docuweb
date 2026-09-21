@@ -2512,6 +2512,11 @@
     b.setAttribute("aria-pressed", String(on));
     var n = countNotes();
     b.textContent = on ? (n ? t("appbar.notes.count", { n: n }) : t("appbar.notes")) : t("appbar.notes.hidden");
+    /* Sin notas no hay nada que mostrar ni que ocultar, y un botón que al pulsarlo no
+       cambia nada parece roto. Apagado, y su título dice dónde se hacen: es el sitio
+       donde se va a buscar la función, aunque no sea donde vive. */
+    b.disabled = n === 0;
+    b.setAttribute("title", n ? t("appbar.notes.title") : t("appbar.notes.none"));
     try { localStorage.setItem(NOTES_KEY, on ? "1" : "0"); } catch (err) { /* nada */ }
     if (!on && state.sel.fig) {
       var sf = state.sel.fig;

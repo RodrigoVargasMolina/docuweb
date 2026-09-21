@@ -12,6 +12,10 @@ module.exports = async function({run,open,click,change,screenshot,cdp}) {
   const pastilla=await run(`{const s=getComputedStyle(document.getElementById('btn-history'));({borde:s.borderTopWidth,fondo:s.backgroundColor})}`);
   assert.equal(pastilla.borde,'1px');
   assert.notEqual(pastilla.fondo,'rgba(0, 0, 0, 0)');
+  // sin notas, el boton de Notas no puede hacer nada: apagado y diciendo donde se hacen
+  assert.equal(await run(`document.getElementById('btn-notes').disabled`),true,'nothing to show or hide');
+  assert.ok(/\+ Nota/.test(await run(`document.getElementById('btn-notes').title`)),'and it says where they come from');
+
   // la ayuda es larga: tiene que abrirse por el titulo, no por el final
   await click('btn-help');
   assert.equal(await run(`document.querySelector('.modal').scrollTop`),0,'help opens at its title');
